@@ -4,7 +4,7 @@
             <img class="h-10 w-auto" src="{{ asset('nav-banner.png') }}" alt="BPHL 4 Jambi">
         </a>
     </div>
-    <div class="flex flex-row space-x-6 items-center">
+    <div class="flex-row space-x-6">
         <a href="{{ url('/') }}" class="text-black hover:text-blue-500 transition">Beranda</a>
         <a href="{{ url('/tentang') }}" class="text-black hover:text-blue-500 transition">Tentang</a>
         <a href="{{ url('/kontak') }}" class="text-black hover:text-blue-500 transition">Kontak</a>
