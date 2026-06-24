@@ -1,12 +1,17 @@
 <nav class="bg-white border-b border-gray-200 py-4 px-6 md:px-12 flex justify-between items-center">
-<div class="flex items-center">
-                <a href="{{ url('/') }}">
-                    <img class="h-10 w-auto" src="{{ asset('nav-banner.png') }}" alt="BPHL 4 Jambi">
-                </a>
-            </div>
-    <div>
-        <a href="/login" class="bg-black hover:bg-gray-800 text-white font-medium py-2 px-5 rounded-md transition duration-150 ease-in-out">
-            Masuk
+    <div class="flex items-center">
+        <a href="{{ url('/') }}">
+            <img class="h-10 w-auto" src="{{ asset('nav-banner.png') }}" alt="BPHL 4 Jambi">
         </a>
     </div>
+    <div class="flex flex-row space-x-6 items-center">
+        <a href="{{ url('/') }}" class="text-black hover:text-blue-500 transition">Beranda</a>
+        <a href="{{ url('/tentang') }}" class="text-black hover:text-blue-500 transition">Tentang</a>
+        <a href="{{ url('/kontak') }}" class="text-black hover:text-blue-500 transition">Kontak</a>
+    </div>
+    <x-button.primary>
+        <a href="/login">
+            Masuk
+        </a>
+    </x-button.primary>
 </nav>
