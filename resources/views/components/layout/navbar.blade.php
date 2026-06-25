@@ -4,14 +4,12 @@
             <img class="h-10 w-auto" src="{{ asset('nav-banner.png') }}" alt="BPHL 4 Jambi">
         </a>
     </div>
-    <div class="flex-row space-x-6">
+    <div class="flex items-center space-x-6">
         <a href="{{ url('/') }}" class="text-black hover:text-blue-500 transition">Beranda</a>
         <a href="{{ url('/tentang') }}" class="text-black hover:text-blue-500 transition">Tentang</a>
         <a href="{{ url('/kontak') }}" class="text-black hover:text-blue-500 transition">Kontak</a>
     </div>
-    <x-button.primary>
-        <a href="/login">
-            Masuk
-        </a>
-    </x-button.primary>
+    <x-action.button-primary>
+        <a href="/login">Masuk</a>
+    </x-action.button-primary>
 </nav>

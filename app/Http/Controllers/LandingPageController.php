@@ -9,7 +9,9 @@ class LandingPageController extends Controller
     public function index(): View
     {
         $totalPegawai = 120;
+        $totalSPT = 120;
+        $totalSPD = 120;
 
-        return view('welcome', compact('totalPegawai'));
+        return view('pages.home', compact('totalPegawai', 'totalSPT', 'totalSPD'));
     }
 }
