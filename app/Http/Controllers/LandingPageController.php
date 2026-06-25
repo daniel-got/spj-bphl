@@ -8,6 +8,7 @@ class LandingPageController extends Controller
 {
     public function index(): View
     {
+
         $totalPegawai = 55;
         $totalPegawaiIV = 10;
         $totalPegawaiIII = 32;
