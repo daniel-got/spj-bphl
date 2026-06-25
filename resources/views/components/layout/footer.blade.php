@@ -40,7 +40,7 @@
         <div
             class="mt-10 pt-6 border-t border-border-custom flex flex-col sm:flex-row justify-between items-center gap-2 text-sm text-muted">
             <p>&copy; {{ date('Y') }} BPHL Wilayah IV Jambi. Hak cipta dilindungi.</p>
-            <p>Sistem Informasi Perjalanan Dinas</p>
+            <p>SPJ Perjalanan Dinas</p>
         </div>
 
     </div>
