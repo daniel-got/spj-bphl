@@ -1,26 +1,40 @@
 @props([
-    'items' => [],     // [['label' => 'Menu', 'url' => '#', 'icon' => 'home', 'active' => false]]
+    'items'     => [],     // Opsional. Jika kosong, otomatis pakai config('navigation.sidebar')
     'collapsed' => false,
 ])
 
-<aside {{ $attributes->merge(['class' => 'bg-white border-r border-gray-200 flex flex-col min-h-screen transition-all duration-300 ' . ($collapsed ? 'w-16' : 'w-64')]) }}>
+@php
+// Gunakan items dari props jika dikirim, fallback ke config jika tidak ada
+$menuItems = !empty($items) ? $items : config('navigation.sidebar', []);
+
+// Tandai item aktif berdasarkan URL saat ini
+$menuItems = array_map(function ($item) {
+    $item['active'] = request()->is(ltrim($item['url'], '/') ?: '/');
+    return $item;
+}, $menuItems);
+@endphp
+
+<aside {{ $attributes->merge(['class' => 'bg-surface border-r border-border-custom flex flex-col min-h-screen transition-all duration-300 ' . ($collapsed ? 'w-16' : 'w-64')]) }}>
 
     {{-- Logo / Brand --}}
-    <div class="h-16 flex items-center px-4 border-b border-gray-200">
+    <div class="h-16 flex items-center px-4 border-b border-border-custom">
         @if(!$collapsed)
-            <span class="text-sm font-bold text-gray-800 truncate">SPJ BPHL 4 Jambi</span>
+            <span class="text-sm font-bold text-primary truncate">SPJ BPHL 4 Jambi</span>
+        @else
+            <span class="text-primary font-bold text-lg">S</span>
         @endif
     </div>
 
     {{-- Navigation Items --}}
-    <nav class="flex-1 py-4 space-y-1 px-2">
-        @foreach($items as $item)
+    <nav class="flex-1 py-4 space-y-1 px-2" aria-label="Sidebar Navigation">
+        @foreach($menuItems as $item)
             <a
                 href="{{ $item['url'] ?? '#' }}"
+                title="{{ $collapsed ? $item['label'] : '' }}"
                 class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
                     {{ ($item['active'] ?? false)
-                        ? 'bg-gray-900 text-white'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}"
+                        ? 'bg-primary text-white'
+                        : 'text-muted hover:bg-primary-light hover:text-primary' }}"
             >
                 @if(isset($item['icon']))
                     <x-utility.icon :name="$item['icon']" class="w-5 h-5 flex-shrink-0" />
@@ -32,10 +46,11 @@
         @endforeach
     </nav>
 
-    {{-- Footer slot --}}
+    {{-- Footer Slot (opsional, misal info user) --}}
     @isset($footer)
-        <div class="p-4 border-t border-gray-200">
+        <div class="p-4 border-t border-border-custom">
             {{ $footer }}
         </div>
     @endisset
+
 </aside>
