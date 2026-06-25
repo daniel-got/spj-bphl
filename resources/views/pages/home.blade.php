@@ -14,15 +14,18 @@
             </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <x-dashboard.stat-card title="Total Pegawai" :value="$totalPegawai" description="Personil BPHL IV" icon="users"
                 color="blue" />
 
-            <x-dashboard.stat-card title="SPT" :value="$totalSPT" description="Total Surat Perintah Tugas"
-                icon="document-text" color="green" />
+            <x-dashboard.stat-card title="Golongan IV" :value="$totalPegawaiIV" description="Total Pegawai Golongan IV"
+                icon="users" color="green" />
 
-            <x-dashboard.stat-card title="SPD" :value="$totalSPD" description="Total Surat Perjalanan Dinas"
-                icon="clipboard" color="yellow" />
+            <x-dashboard.stat-card title="Golongan III" :value="$totalPegawaiIII" description="Total Pegawai Golongan III"
+                icon="users" color="yellow" />
+            <x-dashboard.stat-card title="Golongan II" :value="$totalPegawaiII" description="Total Pegawai Golongan II"
+                icon="users" color="red" />
+
         </div>
 
     </main>
