@@ -10,13 +10,13 @@
 ])
 
 <x-feedback.modal :id="$id" :title="$title" size="sm">
-    <p class="text-sm text-gray-600">{{ $message }}</p>
+    <p class="text-sm text-muted">{{ $message }}</p>
 
     <x-slot:footer>
         <button
             type="button"
             onclick="closeModal('{{ $id }}')"
-            class="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            class="px-4 py-2 text-sm font-medium text-text-main border border-border-custom rounded-md hover:bg-background transition-colors"
         >
             {{ $cancelText }}
         </button>
@@ -29,7 +29,7 @@
             <button
                 type="submit"
                 class="px-4 py-2 text-sm font-medium rounded-md transition-colors
-                    {{ $danger ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-gray-900 hover:bg-gray-800 text-white' }}"
+                    {{ $danger ? 'bg-danger hover:opacity-90 text-white' : 'bg-primary hover:bg-primary-hover text-white' }}"
             >
                 {{ $confirmText }}
             </button>

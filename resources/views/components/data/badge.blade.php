@@ -1,17 +1,17 @@
 @props([
     'label',
-    'color' => 'gray', // gray | blue | green | red | yellow | purple | orange
+    'color' => 'primary', // primary | secondary | success | warning | danger | info | gray
 ])
 
 @php
 $colorMap = [
-    'gray'   => 'bg-gray-100 text-gray-700',
-    'blue'   => 'bg-blue-100 text-blue-700',
-    'green'  => 'bg-green-100 text-green-700',
-    'red'    => 'bg-red-100 text-red-700',
-    'yellow' => 'bg-yellow-100 text-yellow-700',
-    'purple' => 'bg-purple-100 text-purple-700',
-    'orange' => 'bg-orange-100 text-orange-700',
+    'primary'   => 'bg-primary-light text-primary',
+    'secondary' => 'bg-secondary-light text-secondary',
+    'success'   => 'bg-green-100 text-success',
+    'warning'   => 'bg-yellow-100 text-warning',
+    'danger'    => 'bg-red-100 text-danger',
+    'info'      => 'bg-blue-100 text-info',
+    'gray'      => 'bg-background text-muted',
 ];
 $classes = $colorMap[$color] ?? $colorMap['gray'];
 @endphp

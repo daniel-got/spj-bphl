@@ -3,15 +3,15 @@
 @php
 $map = [
     // SPT/SPD statuses
-    'draft'     => ['label' => 'Draft',     'color' => 'gray'],
-    'pending'   => ['label' => 'Menunggu',  'color' => 'yellow'],
-    'approved'  => ['label' => 'Disetujui', 'color' => 'green'],
-    'rejected'  => ['label' => 'Ditolak',   'color' => 'red'],
-    'active'    => ['label' => 'Aktif',     'color' => 'blue'],
-    'inactive'  => ['label' => 'Nonaktif',  'color' => 'gray'],
-    'completed' => ['label' => 'Selesai',   'color' => 'green'],
-    'cancelled' => ['label' => 'Dibatalkan','color' => 'red'],
-    'ongoing'   => ['label' => 'Berlangsung','color' => 'blue'],
+    'draft'     => ['label' => 'Draft',       'color' => 'gray'],
+    'pending'   => ['label' => 'Menunggu',    'color' => 'warning'],
+    'approved'  => ['label' => 'Disetujui',   'color' => 'success'],
+    'rejected'  => ['label' => 'Ditolak',     'color' => 'danger'],
+    'active'    => ['label' => 'Aktif',       'color' => 'primary'],
+    'inactive'  => ['label' => 'Nonaktif',    'color' => 'gray'],
+    'completed' => ['label' => 'Selesai',     'color' => 'success'],
+    'cancelled' => ['label' => 'Dibatalkan',  'color' => 'danger'],
+    'ongoing'   => ['label' => 'Berlangsung', 'color' => 'info'],
 ];
 
 $config = $map[$status] ?? ['label' => ucfirst($status), 'color' => 'gray'];
