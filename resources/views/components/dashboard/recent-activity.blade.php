@@ -1,30 +1,30 @@
 @props([
     'title'      => 'Aktivitas Terkini',
     'activities' => [],
-    // activity: ['label', 'description' => null, 'time', 'icon' => null, 'color' => 'gray']
+    // activity: ['label', 'description' => null, 'time', 'icon' => null]
 ])
 
-<div {{ $attributes->merge(['class' => 'bg-white border border-gray-200 rounded-xl p-6 shadow-sm']) }}>
-    <h3 class="text-sm font-semibold text-gray-900 mb-4">{{ $title }}</h3>
+<div {{ $attributes->merge(['class' => 'bg-surface border border-border-custom rounded-xl p-6 shadow-sm']) }}>
+    <h3 class="text-sm font-semibold text-text-main mb-4">{{ $title }}</h3>
 
     @if(count($activities))
         <ul class="space-y-4">
             @foreach($activities as $activity)
                 <li class="flex items-start gap-3">
-                    <div class="flex-shrink-0 mt-0.5 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                    <div class="flex-shrink-0 mt-0.5 w-8 h-8 rounded-full bg-primary-light flex items-center justify-center">
                         @if(isset($activity['icon']))
-                            <x-utility.icon :name="$activity['icon']" class="w-4 h-4 text-gray-500" />
+                            <x-utility.icon :name="$activity['icon']" class="w-4 h-4 text-primary" />
                         @else
-                            <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+                            <span class="w-2 h-2 rounded-full bg-primary"></span>
                         @endif
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-900 truncate">{{ $activity['label'] }}</p>
+                        <p class="text-sm font-medium text-text-main truncate">{{ $activity['label'] }}</p>
                         @if(isset($activity['description']))
-                            <p class="text-xs text-gray-500 mt-0.5">{{ $activity['description'] }}</p>
+                            <p class="text-xs text-muted mt-0.5">{{ $activity['description'] }}</p>
                         @endif
                     </div>
-                    <span class="flex-shrink-0 text-xs text-gray-400 whitespace-nowrap">{{ $activity['time'] }}</span>
+                    <span class="flex-shrink-0 text-xs text-muted whitespace-nowrap">{{ $activity['time'] }}</span>
                 </li>
             @endforeach
         </ul>

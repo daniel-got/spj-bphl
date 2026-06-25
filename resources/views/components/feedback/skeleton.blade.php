@@ -6,13 +6,13 @@
 
 @php
 function skeletonBase(): string {
-    return 'bg-gray-200 rounded animate-pulse';
+    return 'bg-border-custom rounded animate-pulse'; // Menggunakan border-custom sebagai warna skeleton base
 }
 @endphp
 
 @for($i = 0; $i < $count; $i++)
     @if($type === 'card')
-        <div class="bg-white border border-gray-200 rounded-xl p-6 space-y-3" {{ $attributes }}>
+        <div class="bg-surface border border-border-custom rounded-xl p-6 space-y-3" {{ $attributes }}>
             <div class="h-4 {{ skeletonBase() }} w-1/3"></div>
             <div class="h-8 {{ skeletonBase() }} w-1/2"></div>
             <div class="h-3 {{ skeletonBase() }} w-2/3"></div>

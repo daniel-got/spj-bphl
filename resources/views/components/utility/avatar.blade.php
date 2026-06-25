@@ -20,8 +20,8 @@ $radius = $shape === 'square' ? 'rounded-lg' : 'rounded-full';
 $parts    = explode(' ', trim($name));
 $initials = strtoupper(substr($parts[0], 0, 1) . (count($parts) > 1 ? substr(end($parts), 0, 1) : ''));
 
-// Warna konsisten berdasarkan nama
-$colors = ['bg-blue-500','bg-green-500','bg-purple-500','bg-yellow-500','bg-red-500','bg-indigo-500','bg-pink-500','bg-teal-500'];
+// Warna konsisten berdasarkan nama (menggunakan warna palette kita)
+$colors = ['bg-primary', 'bg-secondary', 'bg-success', 'bg-warning', 'bg-danger', 'bg-info'];
 $color  = $colors[crc32($name) % count($colors)];
 @endphp
 

@@ -6,10 +6,10 @@
 
 @php
 $typeMap = [
-    'info'    => ['bg' => 'bg-gray-900', 'icon' => 'information-circle', 'iconColor' => 'text-blue-400'],
-    'success' => ['bg' => 'bg-gray-900', 'icon' => 'check-circle',        'iconColor' => 'text-green-400'],
-    'warning' => ['bg' => 'bg-gray-900', 'icon' => 'exclamation',         'iconColor' => 'text-yellow-400'],
-    'error'   => ['bg' => 'bg-gray-900', 'icon' => 'x-circle',            'iconColor' => 'text-red-400'],
+    'info'    => ['bg' => 'bg-info',    'icon' => 'information-circle', 'iconColor' => 'text-white'],
+    'success' => ['bg' => 'bg-success', 'icon' => 'check-circle',        'iconColor' => 'text-white'],
+    'warning' => ['bg' => 'bg-warning', 'icon' => 'exclamation',         'iconColor' => 'text-white'],
+    'error'   => ['bg' => 'bg-danger',  'icon' => 'x-circle',            'iconColor' => 'text-white'],
 ];
 $style = $typeMap[$type] ?? $typeMap['info'];
 @endphp
@@ -28,7 +28,7 @@ $style = $typeMap[$type] ?? $typeMap['info'];
 >
     <x-utility.icon :name="$style['icon']" class="w-5 h-5 flex-shrink-0 {{ $style['iconColor'] }}" />
     <p class="text-sm font-medium flex-1">{{ $message }}</p>
-    <button @click="show = false" type="button" class="text-gray-400 hover:text-white transition-colors">
+    <button @click="show = false" type="button" class="text-white opacity-80 hover:opacity-100 transition-opacity">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>

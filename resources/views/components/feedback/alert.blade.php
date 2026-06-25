@@ -5,11 +5,12 @@
 ])
 
 @php
+// Semantic alert styles mapping
 $typeMap = [
-    'info'    => ['bg' => 'bg-blue-50',   'border' => 'border-blue-200',  'text' => 'text-blue-800',  'icon' => 'information-circle'],
-    'success' => ['bg' => 'bg-green-50',  'border' => 'border-green-200', 'text' => 'text-green-800', 'icon' => 'check-circle'],
-    'warning' => ['bg' => 'bg-yellow-50', 'border' => 'border-yellow-200','text' => 'text-yellow-800','icon' => 'exclamation'],
-    'error'   => ['bg' => 'bg-red-50',    'border' => 'border-red-200',   'text' => 'text-red-800',   'icon' => 'x-circle'],
+    'info'    => ['bg' => 'bg-blue-50',   'border' => 'border-blue-200',  'text' => 'text-info',     'icon' => 'information-circle'],
+    'success' => ['bg' => 'bg-green-50',  'border' => 'border-green-200', 'text' => 'text-success',  'icon' => 'check-circle'],
+    'warning' => ['bg' => 'bg-yellow-50', 'border' => 'border-yellow-200','text' => 'text-warning',  'icon' => 'exclamation'],
+    'error'   => ['bg' => 'bg-red-50',    'border' => 'border-red-200',   'text' => 'text-danger',   'icon' => 'x-circle'],
 ];
 $style = $typeMap[$type] ?? $typeMap['info'];
 @endphp

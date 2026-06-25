@@ -24,7 +24,7 @@ $pos = $positionMap[$position] ?? $positionMap['top'];
             opacity-0 group-hover:opacity-100
             transition-opacity duration-150 ease-in-out
             whitespace-nowrap px-2.5 py-1.5 text-xs font-medium
-            bg-gray-900 text-white rounded-md shadow-md"
+            bg-text-main text-surface rounded-md shadow-md"
     >
         {{ $text }}
     </div>

@@ -6,7 +6,7 @@
 
         <div class="max-w-3xl mb-16">
             <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 text-black">
-                Sistem Informasi Perjalanan Dinas
+                SPJ Perjalanan Dinas
             </h1>
             <p class="text-lg text-gray-600 leading-relaxed mb-8">
                 Portal resmi Balai Pengelolaan Hutan Lestari (BPHL) Wilayah IV Jambi untuk pengelolaan administrasi

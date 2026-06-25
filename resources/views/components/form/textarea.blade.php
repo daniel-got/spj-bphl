@@ -2,7 +2,8 @@
     'name',
     'label'       => null,
     'placeholder' => null,
-    'rows'        => 4,
+    'value'       => null,
+    'rows'        => 3,
     'required'    => false,
     'disabled'    => false,
     'error'       => null,
@@ -11,9 +12,9 @@
 
 <div {{ $attributes->only('class')->merge(['class' => 'flex flex-col gap-1']) }}>
     @if($label)
-        <label for="{{ $name }}" class="text-sm font-medium text-gray-700">
+        <label for="{{ $name }}" class="text-sm font-medium text-text-main">
             {{ $label }}
-            @if($required) <span class="text-red-500">*</span> @endif
+            @if($required) <span class="text-danger">*</span> @endif
         </label>
     @endif
 
@@ -22,17 +23,18 @@
         name="{{ $name }}"
         rows="{{ $rows }}"
         placeholder="{{ $placeholder }}"
-        {{ $required ? 'required' : '' }}
-        {{ $disabled ? 'disabled' : '' }}
-        class="w-full px-3 py-2 text-sm border rounded-md shadow-sm placeholder-gray-400 resize-y
-            focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900
-            disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
-            {{ $error ? 'border-red-400 focus:ring-red-400' : 'border-gray-300' }}"
-    >{{ old($name) }}</textarea>
+        {{ $required  ? 'required'  : '' }}
+        {{ $disabled  ? 'disabled'  : '' }}
+        {{ $attributes->except(['class', 'name', 'rows', 'value', 'placeholder', 'required', 'disabled']) }}
+        class="w-full px-3 py-2 text-sm border rounded-md shadow-sm placeholder-muted bg-surface text-text-main
+            focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+            disabled:bg-background disabled:text-muted disabled:cursor-not-allowed
+            {{ $error ? 'border-danger focus:ring-danger' : 'border-border-custom' }}"
+    >{{ old($name, $value) }}</textarea>
 
     @if($error)
-        <p class="text-xs text-red-500">{{ $error }}</p>
+        <p class="text-xs text-danger">{{ $error }}</p>
     @elseif($hint)
-        <p class="text-xs text-gray-400">{{ $hint }}</p>
+        <p class="text-xs text-muted">{{ $hint }}</p>
     @endif
 </div>
