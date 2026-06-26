@@ -29,6 +29,13 @@ return new class extends Migration
             $table->string('nama_ppk')->nullable();
             $table->string('nip_ppk')->nullable();
             $table->json('pejabat_ditugaskan')->nullable();
+            
+            // Workflow & Tracking Columns
+            $table->enum('status', ['draft', 'diajukan', 'direvisi', 'disetujui', 'ditolak'])->default('draft');
+            $table->foreignId('pembuat_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('verifikator_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->text('catatan_verifikator')->nullable();
+            
             $table->timestamps();
         });
     }
