@@ -14,11 +14,21 @@ class LoginController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
+        $remember = $request->boolean('remember');
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            return redirect()->intended('dashboard');
+            // Role-Based Redirect — sesuai pola developing_clean.md
+            // Masing-masing role diarahkan ke dashboard yang berbeda
+            $user = Auth::user();
+
+            if ($user->isAdmin()) {
+                return redirect()->intended(route('admin.dashboard'));
+            }
+
+            // Default: arahkan ke dashboard umum (akan dibuat nanti per role)
+            return redirect()->intended('/dashboard');
         }
 
         return back()->withErrors([

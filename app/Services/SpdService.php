@@ -8,31 +8,44 @@ use Illuminate\Support\Facades\DB;
 class SpdService
 {
     /**
+     * Get statistics count for SPDs (preventing N+1 memory loading).
+     */
+    public function getCounts(): array
+    {
+        return [
+            'all' => Spd::count(),
+            'disetujui' => Spd::where('status', 'disetujui')->count(),
+            'direvisi' => Spd::where('status', 'direvisi')->count(),
+            'ditolak' => Spd::where('status', 'ditolak')->count(),
+        ];
+    }
+
+    /**
      * Get all SPD records with optional search and filter.
      */
-    public function getAllLatest(array $filters = [])
+    public function getAllLatest(array $filters = [], int $perPage = 10)
     {
         $query = Spd::query();
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
-            $query->where(function($q) use ($search) {
-                $q->where('nomor_spd', 'like', '%' . $search . '%')
-                  ->orWhere('pegawai_ditugaskan', 'like', '%' . $search . '%')
-                  ->orWhere('tujuan_kegiatan', 'like', '%' . $search . '%')
-                  ->orWhere('tempat_tujuan', 'like', '%' . $search . '%');
+            $query->where(function ($q) use ($search) {
+                $q->where('nomor_spd', 'like', '%'.$search.'%')
+                    ->orWhere('pegawai_ditugaskan', 'like', '%'.$search.'%')
+                    ->orWhere('tujuan_kegiatan', 'like', '%'.$search.'%')
+                    ->orWhere('tempat_tujuan', 'like', '%'.$search.'%');
             });
         }
 
-        if (!empty($filters['jenis_perjalanan'])) {
+        if (! empty($filters['jenis_perjalanan'])) {
             $query->where('jenis_perjalanan', $filters['jenis_perjalanan']);
         }
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        return $query->latest()->get();
+        return $query->latest()->paginate($perPage);
     }
 
     /**
@@ -60,6 +73,7 @@ class SpdService
     {
         return DB::transaction(function () use ($spd, $data) {
             $spd->update($data);
+
             return $spd;
         });
     }
@@ -71,6 +85,7 @@ class SpdService
     {
         return DB::transaction(function () use ($spd) {
             $spd->delete();
+
             return true;
         });
     }

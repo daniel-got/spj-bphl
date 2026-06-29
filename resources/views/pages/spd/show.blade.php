@@ -9,7 +9,7 @@
             {{-- Header --}}
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('spd.index') }}"
+                    <a href="{{ route('user.spd.index') }}"
                         class="inline-flex items-center justify-center w-10 h-10 rounded-full border border-border-custom bg-surface text-text-main hover:bg-background transition duration-150 shadow-xs"
                         title="Kembali">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>

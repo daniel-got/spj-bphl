@@ -14,21 +14,29 @@
                     <img class="h-30 w-auto" src="{{ asset('favicon.png') }}" alt="Logo">
                 </div>
 
-                <form method="POST" action="{{ route('login') }}" class="w-full max-w-md mx-auto px-6 py-8 space-y-6 text-left">
+                <form method="POST" action="{{ route('login') }}"
+                    class="w-full max-w-md mx-auto px-6 py-8 space-y-6 text-left">
                     @csrf
-                    
+
                     <x-form.input name="email" label="Email" type="email" placeholder="contoh@email.com"
                         :value="old('email')" :required="true" :error="$errors->first('email')" hint="Gunakan email kantor" />
-                        
+
                     <x-form.input name="password" label="Password" type="password" placeholder="********"
                         :required="true" :error="$errors->first('password')" />
-                        
+                    <label class="flex items-center gap-2"> <input type="checkbox" name="remember"
+                            class="rounded border-border-custom text-primary focus:ring-primary" <span
+                            class="text-sm text-text-main">
+                        Ingat Saya </span>
+                    </label>
+
+
                     <x-action.button-primary type="submit" class="w-full">
                         Masuk
                     </x-action.button-primary>
-                    
+
+
                     <a href="/"
-                        class="block w-full text-center text-xs font-semibold tracking-wider text-text-main hover:text-primary transition-colors">
+                        class="block w-full text-center text-sm font-semibold tracking-wider text-text-main hover:text-primary transition-colors">
                         Kembali ke Beranda
                     </a>
                 </form>

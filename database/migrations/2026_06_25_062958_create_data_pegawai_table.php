@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('data_pegawai', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('nama_pegawai');
             $table->string('nip')->unique();
-            $table->string('pangkat_golongan')->nullable();
+            $table->string('pangkat')->nullable();
+            $table->string('golongan')->nullable();
             $table->string('jabatan')->nullable();
             $table->string('sub_seksi')->nullable();
             $table->timestamps();

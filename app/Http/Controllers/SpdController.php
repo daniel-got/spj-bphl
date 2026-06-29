@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Spd;
 use App\Http\Requests\StoreSpdRequest;
 use App\Http\Requests\UpdateSpdRequest;
+use App\Models\Spd;
 use App\Services\SpdService;
 
 class SpdController extends Controller
@@ -21,11 +21,12 @@ class SpdController extends Controller
      */
     public function index()
     {
-        $allSpds = $this->spdService->getAllLatest();
+        $counts = $this->spdService->getCounts();
         $filters = request()->only(['search', 'jenis_perjalanan', 'status']);
-        $spds = $this->spdService->getAllLatest($filters);
-        
-        return view('pages.spd.index', compact('spds', 'allSpds'));
+        $perPage = (int) request('per_page', 10);
+        $spds = $this->spdService->getAllLatest($filters, $perPage);
+
+        return view('pages.spd.index', compact('spds', 'counts'));
     }
 
     /**
@@ -43,7 +44,7 @@ class SpdController extends Controller
     {
         $this->spdService->createSpd($request->validated());
 
-        return redirect()->route('spd.index')->with('success', 'Data SPD berhasil ditambahkan');
+        return redirect()->route('user.spd.index')->with('success', 'Data SPD berhasil ditambahkan');
     }
 
     /**
@@ -52,6 +53,7 @@ class SpdController extends Controller
     public function show(string $id)
     {
         $spd = $this->spdService->getSpdById($id);
+
         return view('pages.spd.show', compact('spd'));
     }
 
@@ -70,7 +72,7 @@ class SpdController extends Controller
     {
         $this->spdService->updateSpd($spd, $request->validated());
 
-        return redirect()->route('spd.index')->with('success', 'Data SPD berhasil diperbarui');
+        return redirect()->route('user.spd.index')->with('success', 'Data SPD berhasil diperbarui');
     }
 
     /**
@@ -80,6 +82,6 @@ class SpdController extends Controller
     {
         $this->spdService->deleteSpd($spd);
 
-        return redirect()->route('spd.index')->with('success', 'Data SPD berhasil dihapus');
+        return redirect()->route('user.spd.index')->with('success', 'Data SPD berhasil dihapus');
     }
 }

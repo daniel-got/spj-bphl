@@ -19,11 +19,13 @@
 
     {{-- Logo / Brand --}}
     <div class="h-16 flex items-center px-4 border-b border-border-custom">
-        @if (!$collapsed)
-            <span class="text-sm font-bold text-primary truncate">SPJ BPHL 4 Jambi</span>
-        @else
-            <span class="text-primary font-bold text-lg">S</span>
-        @endif
+        {{-- @if (!$collapsed) --}}
+        {{--    <span class="text-sm font-bold text-primary truncate">SPJ BPHL 4 Jambi</span> --}}
+        {{-- @else --}}
+        {{--    <span class="text-primary font-bold text-lg">S</span> --}}
+        {{-- @endif --}}
+        <img class="h-8 w-auto" src="{{ asset('nav-banner.png') }}" alt="BPHL 4 Jambi">
+
     </div>
 
     {{-- Navigation Items --}}
