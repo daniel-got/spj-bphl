@@ -25,7 +25,8 @@ class UpdatePegawaiRequest extends FormRequest
             'email'            => ['required', 'string', 'email', 'max:255'],
             'password'         => ['nullable', 'string', 'min:8'], // Opsional saat update
             'role'             => ['required', 'string', Rule::in(\App\Enums\UserRole::values())],
-            'pangkat_golongan' => ['nullable', 'string', 'max:100'],
+            'pangkat'          => ['nullable', 'string', Rule::in(\App\Enums\Pangkat::values())],
+            'golongan'         => ['nullable', 'string', Rule::in(\App\Enums\Golongan::values())],
             'jabatan'          => ['nullable', 'string', 'max:100'],
             'sub_seksi'        => ['nullable', 'string', 'max:100'],
         ];

@@ -102,7 +102,8 @@
                                                     'nip' => $pegawai->nip,
                                                     'nama_pegawai' => $pegawai->nama_pegawai,
                                                     'email' => $pegawai->user?->email,
-                                                    'pangkat_golongan' => $pegawai->pangkat_golongan,
+                                                    'pangkat' => $pegawai->pangkat,
+                                                    'golongan' => $pegawai->golongan,
                                                     'jabatan' => $pegawai->jabatan,
                                                     'sub_seksi' => $pegawai->sub_seksi,
                                                     'role' => $pegawai->user?->role,
@@ -176,9 +177,19 @@
 
                 <hr class="border-border-custom my-4">
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <x-form.input name="pangkat_golongan" label="Pangkat/Golongan (Opsional)"
-                        placeholder="Contoh: Penata Tk.I (III/d)" :value="old('pangkat_golongan')" />
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-form.select name="pangkat" label="Pangkat (Opsional)" :options="array_combine(
+                        \App\Enums\Pangkat::values(),
+                        array_map(fn($p) => \App\Enums\Pangkat::from($p)->label(), \App\Enums\Pangkat::values()),
+                    )" :selected="old('pangkat')" />
+                    
+                    <x-form.select name="golongan" label="Golongan (Opsional)" :options="array_combine(
+                        \App\Enums\Golongan::values(),
+                        array_map(fn($g) => \App\Enums\Golongan::from($g)->label(), \App\Enums\Golongan::values()),
+                    )" :selected="old('golongan')" />
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <x-form.input name="jabatan" label="Jabatan (Opsional)" placeholder="Contoh: Staf Pelaksana"
                         :value="old('jabatan')" />
                     <x-form.input name="sub_seksi" label="Sub Seksi (Opsional)" placeholder="Contoh: TU"
@@ -248,12 +259,30 @@
 
                 <hr class="border-border-custom my-4">
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="flex flex-col gap-1">
-                        <label class="text-sm font-medium text-text-main">Pangkat/Golongan</label>
-                        <input id="edit-pangkat" type="text" name="pangkat_golongan"
+                        <label class="text-sm font-medium text-text-main">Pangkat</label>
+                        <select id="edit-pangkat" name="pangkat"
                             class="w-full px-3 py-2 text-sm border border-border-custom rounded-md shadow-sm bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                            <option value="">Pilih Pangkat</option>
+                            @foreach (\App\Enums\Pangkat::cases() as $pangkat)
+                                <option value="{{ $pangkat->value }}">{{ $pangkat->label() }}</option>
+                            @endforeach
+                        </select>
                     </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-sm font-medium text-text-main">Golongan</label>
+                        <select id="edit-golongan" name="golongan"
+                            class="w-full px-3 py-2 text-sm border border-border-custom rounded-md shadow-sm bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                            <option value="">Pilih Golongan</option>
+                            @foreach (\App\Enums\Golongan::cases() as $golongan)
+                                <option value="{{ $golongan->value }}">{{ $golongan->label() }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="flex flex-col gap-1">
                         <label class="text-sm font-medium text-text-main">Jabatan</label>
                         <input id="edit-jabatan" type="text" name="jabatan"
@@ -347,7 +376,7 @@
                                 <p class="font-medium mb-1">Panduan Import Data</p>
                                 <ul class="list-disc pl-4 space-y-1 text-blue-600">
                                     <li>Format kolom: <code class="text-xs bg-blue-100 px-1 rounded">nama_pegawai, nip,
-                                            pangkat_golongan, jabatan, sub_seksi, email, password, role</code></li>
+                                            pangkat, golongan, jabatan, sub_seksi, email, password, role</code></li>
                                     <li>Klik <strong>Cek Data CSV</strong> untuk memvalidasi sebelum import ke database.
                                     </li>
                                 </ul>
@@ -492,7 +521,8 @@
             document.getElementById('edit-nama').value = pegawai.nama_pegawai || '';
             document.getElementById('edit-nip').value = pegawai.nip || '';
             document.getElementById('edit-email').value = pegawai.email || '';
-            document.getElementById('edit-pangkat').value = pegawai.pangkat_golongan || '';
+            document.getElementById('edit-pangkat').value = pegawai.pangkat || '';
+            document.getElementById('edit-golongan').value = pegawai.golongan || '';
             document.getElementById('edit-jabatan').value = pegawai.jabatan || '';
             document.getElementById('edit-sub-seksi').value = pegawai.sub_seksi || '';
 

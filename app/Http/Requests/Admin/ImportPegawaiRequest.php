@@ -14,7 +14,8 @@ class ImportPegawaiRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => ['required', 'file', 'mimes:csv,txt', 'max:5120'], // Max 5MB
+            'file' => ['required_without:import_token', 'file', 'mimes:csv,txt', 'max:5120'], // Max 5MB
+            'import_token' => ['nullable', 'string'],
         ];
     }
     

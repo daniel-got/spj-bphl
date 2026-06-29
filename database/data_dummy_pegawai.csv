@@ -1,11 +1,11 @@
-nama_pegawai,nip,pangkat_golongan,jabatan,sub_seksi,email,password,role
-Budi Admin,198001012005011001,Penata Tk.I (III/d),Admin Sistem,TU,admin@bphl.go.id,password123,admin
-Ir. Santoso Kepala,197005051998031002,Pembina Utama (IV/e),Kepala Balai,Balai,kepala@bphl.go.id,password123,kepala_balai
-Siti Aminah TU,197508082000122003,Pembina (IV/a),Kepala Sub Bagian TU,TU,tu@bphl.go.id,password123,kepala_tu
-Dr. Hendra Seksi 1,198203032008011004,Pembina (IV/a),Kepala Seksi PEPHPHL,PEPHPHL,pephphl@bphl.go.id,password123,kepala_seksi_pephphl
-Ir. Rini Seksi 2,198304042009022005,Pembina (IV/a),Kepala Seksi PPPHPHL,PPPHPHL,ppphphl@bphl.go.id,password123,kepala_seksi_ppphphl
-Ahmad Verifikator,199001012015031006,Penata (III/c),Verifikator Dokumen,TU,verifikator1@bphl.go.id,password123,verifikator
-Dewi Verifikator,199202022018042007,Penata Muda (III/a),Verifikator Keuangan,TU,verifikator2@bphl.go.id,password123,verifikator
-Joko Pegawai,199505052020121008,Pengatur (II/c),Staf Pelaksana,PEPHPHL,pegawai1@bphl.go.id,password123,user
-Lina Pegawai,199606062021112009,Pengatur (II/c),Staf Pelaksana,PPPHPHL,pegawai2@bphl.go.id,password123,user
-Rudi Pegawai,199808082023101010,Pengatur Muda (II/a),Staf Administrasi,TU,pegawai3@bphl.go.id,password123,user
+nama_pegawai,nip,pangkat,golongan,jabatan,sub_seksi,email,password,role
+Budi Admin,198001012005011001,III/d,III,Admin Sistem,TU,admin@bphl.go.id,password123,admin
+Ir. Santoso Kepala,197005051998031002,IV/e,IV,Kepala Balai,Balai,kepala@bphl.go.id,password123,kepala_balai
+Siti Aminah TU,197508082000122003,IV/a,IV,Kepala Sub Bagian TU,TU,tu@bphl.go.id,password123,kepala_tu
+Dr. Hendra Seksi 1,198203032008011004,IV/a,IV,Kepala Seksi PEPHPHL,PEPHPHL,pephphl@bphl.go.id,password123,kepala_seksi_pephphl
+Ir. Rini Seksi 2,198304042009022005,IV/a,IV,Kepala Seksi PPPHPHL,PPPHPHL,ppphphl@bphl.go.id,password123,kepala_seksi_ppphphl
+Ahmad Verifikator,199001012015031006,III/c,III,Verifikator Dokumen,TU,verifikator1@bphl.go.id,password123,verifikator
+Dewi Verifikator,199202022018042007,III/a,III,Verifikator Keuangan,TU,verifikator2@bphl.go.id,password123,verifikator
+Joko Pegawai,199505052020121008,II/c,II,Staf Pelaksana,PEPHPHL,pegawai1@bphl.go.id,password123,user
+Lina Pegawai,199606062021112009,II/c,II,Staf Pelaksana,PPPHPHL,pegawai2@bphl.go.id,password123,user
+Rudi Pegawai,199808082023101010,II/a,II,Staf Administrasi,TU,pegawai3@bphl.go.id,password123,user

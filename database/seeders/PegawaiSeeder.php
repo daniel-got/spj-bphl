@@ -24,9 +24,9 @@ class PegawaiSeeder extends Seeder
                 // 1. Buat User
                 $user = User::create([
                     'name'     => $data[0],
-                    'email'    => $data[5],
-                    'password' => Hash::make($data[6]), // password123
-                    'role'     => $data[7],
+                    'email'    => $data[6],
+                    'password' => Hash::make($data[7]), // password123
+                    'role'     => $data[8],
                 ]);
 
                 // 2. Buat Pegawai terhubung ke User
@@ -34,9 +34,10 @@ class PegawaiSeeder extends Seeder
                     'user_id'          => $user->id,
                     'nama_pegawai'     => $data[0],
                     'nip'              => $data[1],
-                    'pangkat_golongan' => $data[2],
-                    'jabatan'          => $data[3],
-                    'sub_seksi'        => $data[4],
+                    'pangkat'          => $data[2],
+                    'golongan'         => $data[3],
+                    'jabatan'          => $data[4],
+                    'sub_seksi'        => $data[5],
                     'created_at'       => now(),
                     'updated_at'       => now(),
                 ]);

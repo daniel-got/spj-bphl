@@ -5,6 +5,8 @@ namespace App\Http\Requests\Admin;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+use Illuminate\Validation\Rule;
+
 class StorePegawaiRequest extends FormRequest
 {
     /**
@@ -27,8 +29,9 @@ class StorePegawaiRequest extends FormRequest
             'nip'              => ['required', 'string', 'max:50', Rule::unique('data_pegawai', 'nip')],
             'email'            => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password'         => ['required', 'string', 'min:8'],
-            'role'             => ['required', 'string', \Illuminate\Validation\Rule::in(\App\Enums\UserRole::values())],
-            'pangkat_golongan' => ['nullable', 'string', 'max:100'],
+            'role'             => ['required', 'string', Rule::in(\App\Enums\UserRole::values())],
+            'pangkat'          => ['nullable', 'string', Rule::in(\App\Enums\Pangkat::values())],
+            'golongan'         => ['nullable', 'string', Rule::in(\App\Enums\Golongan::values())],
             'jabatan'          => ['nullable', 'string', 'max:100'],
             'sub_seksi'        => ['nullable', 'string', 'max:100'],
         ];

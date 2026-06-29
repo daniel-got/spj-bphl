@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('nama_pegawai');
             $table->string('nip')->unique();
-            $table->string('pangkat_golongan')->nullable();
+            $table->string('pangkat')->nullable();
+            $table->string('golongan')->nullable();
             $table->string('jabatan')->nullable();
             $table->string('sub_seksi')->nullable();
             $table->timestamps();

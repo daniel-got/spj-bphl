@@ -44,7 +44,8 @@ class KelolaPegawaiService
                 'user_id' => $user->id,
                 'nama_pegawai' => $data['nama_pegawai'],
                 'nip' => $data['nip'],
-                'pangkat_golongan' => $data['pangkat_golongan'] ?? null,
+                'pangkat' => $data['pangkat'] ?? null,
+                'golongan' => $data['golongan'] ?? null,
                 'jabatan' => $data['jabatan'] ?? null,
                 'sub_seksi' => $data['sub_seksi'] ?? null,
             ]);
@@ -61,7 +62,8 @@ class KelolaPegawaiService
             $pegawai->update([
                 'nama_pegawai' => $data['nama_pegawai'],
                 'nip' => $data['nip'],
-                'pangkat_golongan' => $data['pangkat_golongan'] ?? null,
+                'pangkat' => $data['pangkat'] ?? null,
+                'golongan' => $data['golongan'] ?? null,
                 'jabatan' => $data['jabatan'] ?? null,
                 'sub_seksi' => $data['sub_seksi'] ?? null,
             ]);
@@ -105,7 +107,7 @@ class KelolaPegawaiService
         $header = fgetcsv($handle, 1000, ',');
 
         // Pastikan format kolom sesuai dengan template
-        $expectedHeader = ['nama_pegawai', 'nip', 'pangkat_golongan', 'jabatan', 'sub_seksi', 'email', 'password', 'role'];
+        $expectedHeader = ['nama_pegawai', 'nip', 'pangkat', 'golongan', 'jabatan', 'sub_seksi', 'email', 'password', 'role'];
 
         // Membersihkan BOM jika ada pada karakter pertama (biasa terjadi pada file CSV dari Excel)
         $header[0] = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $header[0]);
@@ -159,6 +161,23 @@ class KelolaPegawaiService
                     continue;
                 }
 
+                // Cek pangkat dan golongan valid
+                $validPangkat = \App\Enums\Pangkat::values();
+                if (!empty($data['pangkat']) && !in_array($data['pangkat'], $validPangkat)) {
+                    $errors[] = "Baris $rowNum: Pangkat '{$data['pangkat']}' tidak valid.";
+                    $gagal++;
+                    $rowNum++;
+                    continue;
+                }
+
+                $validGolongan = \App\Enums\Golongan::values();
+                if (!empty($data['golongan']) && !in_array($data['golongan'], $validGolongan)) {
+                    $errors[] = "Baris $rowNum: Golongan '{$data['golongan']}' tidak valid.";
+                    $gagal++;
+                    $rowNum++;
+                    continue;
+                }
+
                 // Insert User
                 $user = User::create([
                     'name' => $data['nama_pegawai'],
@@ -172,7 +191,8 @@ class KelolaPegawaiService
                     'user_id' => $user->id,
                     'nama_pegawai' => $data['nama_pegawai'],
                     'nip' => $data['nip'],
-                    'pangkat_golongan' => $data['pangkat_golongan'] ?: null,
+                    'pangkat' => $data['pangkat'] ?: null,
+                    'golongan' => $data['golongan'] ?: null,
                     'jabatan' => $data['jabatan'] ?: null,
                     'sub_seksi' => $data['sub_seksi'] ?: null,
                 ]);
@@ -206,7 +226,7 @@ class KelolaPegawaiService
         $handle = fopen($file->getRealPath(), 'r');
         $header = fgetcsv($handle, 1000, ',');
 
-        $expectedHeader = ['nama_pegawai', 'nip', 'pangkat_golongan', 'jabatan', 'sub_seksi', 'email', 'password', 'role'];
+        $expectedHeader = ['nama_pegawai', 'nip', 'pangkat', 'golongan', 'jabatan', 'sub_seksi', 'email', 'password', 'role'];
         $header[0] = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $header[0]);
 
         if ($header !== $expectedHeader) {
@@ -227,6 +247,9 @@ class KelolaPegawaiService
         $preview = [];
         $rowNum = 2;
         $validRoles = \App\Enums\UserRole::values();
+        
+        $seenNips = [];
+        $seenEmails = [];
 
         while (($row = fgetcsv($handle, 1000, ',')) !== false) {
             if (empty(array_filter($row))) {
@@ -234,7 +257,7 @@ class KelolaPegawaiService
             }
 
             if (count($row) !== count($header)) {
-                $errors[] = "Baris $rowNum: Jumlah kolom tidak sesuai (seharusnya " . count($header) . " kolom).";
+                $errors[] = "Baris $rowNum: Jumlah kolom tidak sesuai.";
                 $gagal++;
                 $rowNum++;
                 continue;
@@ -243,24 +266,33 @@ class KelolaPegawaiService
             $data = array_combine($header, $row);
             $rowErrors = [];
 
-            if (Pegawai::where('nip', $data['nip'])->exists()) {
-                $rowErrors[] = "NIP '{$data['nip']}' sudah terdaftar.";
+            if (Pegawai::where('nip', $data['nip'])->exists() || in_array($data['nip'], $seenNips)) {
+                $rowErrors[] = "NIP sudah terdaftar.";
             }
-            if (User::where('email', $data['email'])->exists()) {
-                $rowErrors[] = "Email '{$data['email']}' sudah digunakan.";
+            if (User::where('email', $data['email'])->exists() || in_array($data['email'], $seenEmails)) {
+                $rowErrors[] = "Email sudah digunakan.";
             }
             if (!in_array($data['role'], $validRoles)) {
-                $rowErrors[] = "Role '{$data['role']}' tidak valid.";
+                $rowErrors[] = "Role tidak valid.";
+            }
+            if (!empty($data['pangkat']) && !in_array($data['pangkat'], \App\Enums\Pangkat::values())) {
+                $rowErrors[] = "Pangkat tidak valid.";
+            }
+            if (!empty($data['golongan']) && !in_array($data['golongan'], \App\Enums\Golongan::values())) {
+                $rowErrors[] = "Golongan tidak valid.";
             }
             if (empty($data['nama_pegawai'])) {
-                $rowErrors[] = "Nama pegawai tidak boleh kosong.";
+                $rowErrors[] = "Nama kosong.";
             }
 
             if (!empty($rowErrors)) {
-                $errors[] = "Baris $rowNum: " . implode(' ', $rowErrors);
+                $errors[] = "Baris $rowNum diabaikan: " . implode(' ', $rowErrors);
                 $gagal++;
             } else {
+                $seenNips[] = $data['nip'];
+                $seenEmails[] = $data['email'];
                 $berhasil++;
+                
                 // Preview hanya 5 baris pertama yang valid
                 if (count($preview) < 5) {
                     $preview[] = [
@@ -284,7 +316,8 @@ class KelolaPegawaiService
         }
 
         return [
-            'valid'    => $gagal === 0 && $berhasil > 0,
+            // Selama ada yang berhasil, kita anggap file valid untuk diimport (mengabaikan yang gagal)
+            'valid'    => $berhasil > 0,
             'berhasil' => $berhasil,
             'gagal'    => $gagal,
             'errors'   => $errors,
@@ -298,7 +331,8 @@ class KelolaPegawaiService
      */
     public function importFromToken(string $token): array
     {
-        $path = storage_path('app/tmp/csv-import/' . $token . '.csv');
+        // Pada Laravel versi terbaru, disk 'local' default menunjuk ke storage/app/private
+        $path = storage_path('app/private/tmp/csv-import/' . $token . '.csv');
 
         if (!file_exists($path)) {
             throw new Exception('Token tidak valid atau sudah kadaluarsa. Silakan upload ulang.');
