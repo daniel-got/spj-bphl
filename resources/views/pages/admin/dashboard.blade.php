@@ -27,21 +27,21 @@
     @php
         $adminMenu = [
             [
-                'label'  => 'Dashboard',
-                'url'    => route('admin.dashboard'),
-                'icon'   => 'home',
+                'label' => 'Dashboard',
+                'url' => route('admin.dashboard'),
+                'icon' => 'home',
                 'active' => request()->routeIs('admin.dashboard'),
             ],
             [
-                'label'  => 'Kelola Pegawai',
-                'url'    => '#',
-                'icon'   => 'users',
-                'active' => request()->routeIs('admin.pegawai.*'),
+                'label' => 'Kelola Pegawai',
+                'url' => route('admin.kelolaPegawai'),
+                'icon' => 'users',
+                'active' => request()->routeIs('admin.kelolaPegawai.*'),
             ],
             [
-                'label'  => 'Kelola Dokumen',
-                'url'    => '#',
-                'icon'   => 'document-text',
+                'label' => 'Kelola Dokumen',
+                'url' => '#',
+                'icon' => 'document-text',
                 'active' => request()->routeIs('admin.dokumen.*'),
             ],
         ];
@@ -77,25 +77,20 @@
         <main class="flex-1 p-6 space-y-6 overflow-auto">
 
             {{-- Breadcrumb --}}
-            <x-layout.breadcrumb :items="[
-                ['label' => 'Admin'],
-                ['label' => 'Dashboard'],
-            ]" />
+            <x-layout.breadcrumb :items="[['label' => 'Admin'], ['label' => 'Dashboard']]" />
 
             {{-- Page Header --}}
-            <x-layout.page-header
-                title="Dashboard Administrator"
-                description="Ringkasan sistem dan aktivitas terkini SPJ BPHL Wilayah IV Jambi"
-            />
+            <x-layout.page-header title="Dashboard Administrator"
+                description="Ringkasan sistem dan aktivitas terkini SPJ BPHL Wilayah IV Jambi" />
 
             {{-- Flash message dari session --}}
-            @if(session('success'))
+            @if (session('success'))
                 <x-feedback.alert type="success" title="Berhasil!" :dismissible="true">
                     {{ session('success') }}
                 </x-feedback.alert>
             @endif
 
-            @if(session('error'))
+            @if (session('error'))
                 <x-feedback.alert type="error" title="Gagal!" :dismissible="true">
                     {{ session('error') }}
                 </x-feedback.alert>
@@ -106,14 +101,9 @@
                  Data dikirim oleh DashboardService::getStatCards()
             ============================================================ --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                @foreach($stats as $stat)
-                    <x-dashboard.stat-card
-                        :title="$stat['title']"
-                        :value="$stat['value']"
-                        :description="$stat['description']"
-                        :icon="$stat['icon']"
-                        :color="$stat['color']"
-                    />
+                @foreach ($stats as $stat)
+                    <x-dashboard.stat-card :title="$stat['title']" :value="$stat['value']" :description="$stat['description']" :icon="$stat['icon']"
+                        :color="$stat['color']" />
                 @endforeach
             </div>
 
@@ -126,15 +116,14 @@
                 <div class="lg:col-span-2">
                     <x-layout.card title="Pengguna Terbaru" subtitle="5 akun yang baru ditambahkan ke sistem">
 
-                        @if($recentUsers->isEmpty())
-                            <x-data.empty-state
-                                title="Belum ada pengguna"
-                                description="Belum ada akun yang dibuat di sistem ini."
-                            />
+                        @if ($recentUsers->isEmpty())
+                            <x-data.empty-state title="Belum ada pengguna"
+                                description="Belum ada akun yang dibuat di sistem ini." />
                         @else
                             <div class="divide-y divide-border-custom -mx-6 -mb-6">
-                                @foreach($recentUsers as $user)
-                                    <div class="flex items-center justify-between px-6 py-3 hover:bg-background transition-colors">
+                                @foreach ($recentUsers as $user)
+                                    <div
+                                        class="flex items-center justify-between px-6 py-3 hover:bg-background transition-colors">
                                         <div class="flex items-center gap-3 min-w-0">
                                             {{-- Avatar dengan inisial otomatis dari komponen --}}
                                             <x-utility.avatar :name="$user->name" size="sm" />
@@ -154,20 +143,18 @@
                                                 didukung komponen <x-data.badge>
                                             --}}
                                             @php
-                                                $roleColor = match($user->role) {
-                                                    'admin'                  => 'purple',
-                                                    'verifikator'            => 'blue',
+                                                $roleColor = match ($user->role) {
+                                                    'admin' => 'purple',
+                                                    'verifikator' => 'blue',
                                                     'kepala_balai',
                                                     'kepala_tu',
                                                     'kepala_seksi_pephphl',
-                                                    'kepala_seksi_ppphphl'   => 'yellow',
-                                                    default                  => 'gray',
+                                                    'kepala_seksi_ppphphl'
+                                                        => 'yellow',
+                                                    default => 'gray',
                                                 };
                                             @endphp
-                                            <x-data.badge
-                                                :label="$user->roleLabel()"
-                                                :color="$roleColor"
-                                            />
+                                            <x-data.badge :label="$user->roleLabel()" :color="$roleColor" />
                                             <span class="text-xs text-muted hidden sm:block whitespace-nowrap">
                                                 {{ $user->created_at->diffForHumans() }}
                                             </span>
@@ -184,14 +171,11 @@
                 <div class="lg:col-span-1">
                     <x-layout.card title="Status Dokumen" subtitle="Ringkasan SPT per status">
 
-                        @if(empty($documentSummary))
-                            <x-data.empty-state
-                                title="Belum ada dokumen"
-                                description="Belum ada SPT yang dibuat."
-                            />
+                        @if (empty($documentSummary))
+                            <x-data.empty-state title="Belum ada dokumen" description="Belum ada SPT yang dibuat." />
                         @else
                             <div class="space-y-3">
-                                @foreach($documentSummary as $doc)
+                                @foreach ($documentSummary as $doc)
                                     <div class="flex items-center justify-between py-1">
                                         {{--
                                             Status Badge — komponen khusus untuk status dokumen.

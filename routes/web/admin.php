@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 
+use App\Http\Controllers\Admin\KelolaPegawaiController;
+
 /*
 |--------------------------------------------------------------------------
 | Route Admin — Khusus role 'admin'
@@ -22,4 +24,5 @@ Route::middleware(['auth', 'role:admin'])
 
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/kelolaPegawai', [KelolaPegawaiController::class, 'index'])->name('kelolaPegawai');
     });
