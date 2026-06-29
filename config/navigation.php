@@ -28,7 +28,7 @@ return [
         ['label' => 'Dashboard',  'url' => '/dashboard',  'icon' => 'home'],
         ['label' => 'Pegawai',    'url' => '/pegawai',    'icon' => 'users'],
         ['label' => 'Daftar SPT', 'url' => '/spt',        'icon' => 'document-text'],
-        ['label' => 'Daftar SPD', 'url' => '/spd',        'icon' => 'clipboard'],
+            ['label' => 'Daftar SPD', 'url' => '/user/spd',        'icon' => 'clipboard'],
         ['label' => 'Laporan',    'url' => '/laporan',    'icon' => 'chart-bar'],
         ['label' => 'Pengaturan', 'url' => '/pengaturan', 'icon' => 'cog'],
     ],
@@ -45,7 +45,7 @@ return [
     'footer' => [
         'Layanan' => [
             ['label' => 'Surat Perintah Tugas (SPT)', 'url' => '/spt'],
-            ['label' => 'Surat Perjalanan Dinas (SPD)', 'url' => '/spd'],
+            ['label' => 'Surat Perjalanan Dinas (SPD)', 'url' => '/user/spd'],
             ['label' => 'Laporan Pertanggungjawaban',  'url' => '/lpj'],
         ],
         'Navigasi' => [
