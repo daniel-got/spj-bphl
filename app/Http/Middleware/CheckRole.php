@@ -18,16 +18,16 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CheckRole
 {
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
         // Pastikan user sudah login
         if (!auth()->check()) {
             return redirect()->route('login');
         }
 
-        // Pastikan role user sesuai
-        if (auth()->user()->role !== $role) {
-            abort(403, 'Akses Ditolak. Halaman ini hanya untuk role: ' . $role);
+        // Pastikan role user ada di dalam array $roles yang diizinkan
+        if (!in_array(auth()->user()->role, $roles)) {
+            abort(403, 'Akses Ditolak. Halaman ini butuh hak akses khusus.');
         }
 
         return $next($request);
