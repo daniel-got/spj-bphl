@@ -33,6 +33,8 @@ class Spd extends Model
         'nama_ppk',            // Nama PPK 
         'nip_ppk',             // NIP PPK 
         'pejabat_ditugaskan',  // Kolom tambahan untuk pejabat dinamis 
+        'status',              // Status SPD
+        'alasan',              // Alasan revisi/penolakan
     ];
 
     protected $casts = [
@@ -41,4 +43,43 @@ class Spd extends Model
         'tgl_berangkat' => 'date',
         'tgl_kembali' => 'date',
     ];
+
+    /**
+     * Get the tempat_tujuan attribute.
+     *
+     * @param  mixed  $value
+     * @return array
+     */
+    public function getTempatTujuanAttribute($value)
+    {
+        if (empty($value)) {
+            return [];
+        }
+
+        $decoded = json_decode($value, true);
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+
+        if (is_string($value)) {
+            return array_filter(array_map('trim', explode(',', $value)));
+        }
+
+        return [];
+    }
+
+    /**
+     * Set the tempat_tujuan attribute.
+     *
+     * @param  mixed  $value
+     * @return void
+     */
+    public function setTempatTujuanAttribute($value)
+    {
+        if (is_array($value)) {
+            $this->attributes['tempat_tujuan'] = json_encode(array_filter(array_map('trim', $value)));
+        } else {
+            $this->attributes['tempat_tujuan'] = $value;
+        }
+    }
 }
