@@ -1,14 +1,5 @@
 <x-layout.app title="Data SPD - SPJ BPHL 4">
 
-    @php
-        $counts = [
-            'all' => collect($allSpds ?? [])->count(),
-            'disetujui' => collect($allSpds ?? [])->where('status', 'disetujui')->count(),
-            'direvisi' => collect($allSpds ?? [])->where('status', 'direvisi')->count(),
-            'ditolak' => collect($allSpds ?? [])->where('status', 'ditolak')->count(),
-        ];
-    @endphp
-
     <x-layout.navbar />
 
     <main class="grow flex flex-col px-6 py-10">

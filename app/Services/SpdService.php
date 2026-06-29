@@ -8,6 +8,19 @@ use Illuminate\Support\Facades\DB;
 class SpdService
 {
     /**
+     * Get statistics count for SPDs (preventing N+1 memory loading).
+     */
+    public function getCounts(): array
+    {
+        return [
+            'all' => Spd::count(),
+            'disetujui' => Spd::where('status', 'disetujui')->count(),
+            'direvisi' => Spd::where('status', 'direvisi')->count(),
+            'ditolak' => Spd::where('status', 'ditolak')->count(),
+        ];
+    }
+
+    /**
      * Get all SPD records with optional search and filter.
      */
     public function getAllLatest(array $filters = [])

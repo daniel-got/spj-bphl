@@ -21,11 +21,11 @@ class SpdController extends Controller
      */
     public function index()
     {
-        $allSpds = $this->spdService->getAllLatest();
+        $counts = $this->spdService->getCounts();
         $filters = request()->only(['search', 'jenis_perjalanan', 'status']);
         $spds = $this->spdService->getAllLatest($filters);
         
-        return view('pages.spd.index', compact('spds', 'allSpds'));
+        return view('pages.spd.index', compact('spds', 'counts'));
     }
 
     /**
