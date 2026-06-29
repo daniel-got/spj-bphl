@@ -29,6 +29,8 @@ return new class extends Migration
             $table->string('nama_ppk')->nullable();
             $table->string('nip_ppk')->nullable();
             $table->json('pejabat_ditugaskan')->nullable();
+            $table->enum('status', ['draft', 'diajukan', 'direvisi', 'disetujui', 'ditolak'])->default('draft');
+            $table->text('alasan')->nullable();
             $table->timestamps();
         });
     }
