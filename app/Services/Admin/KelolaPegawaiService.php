@@ -6,6 +6,8 @@ use App\Models\Pegawai;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 use Exception;
 
@@ -193,5 +195,121 @@ class KelolaPegawaiService
             'gagal' => $gagal,
             'errors' => $errors,
         ];
+    }
+
+    /**
+     * Dry-run: Validasi CSV tanpa menyimpan ke database.
+     * Menyimpan file sementara di storage dan mengembalikan token.
+     */
+    public function validateCsvOnly(UploadedFile $file): array
+    {
+        $handle = fopen($file->getRealPath(), 'r');
+        $header = fgetcsv($handle, 1000, ',');
+
+        $expectedHeader = ['nama_pegawai', 'nip', 'pangkat_golongan', 'jabatan', 'sub_seksi', 'email', 'password', 'role'];
+        $header[0] = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $header[0]);
+
+        if ($header !== $expectedHeader) {
+            fclose($handle);
+            return [
+                'valid' => false,
+                'berhasil' => 0,
+                'gagal' => 0,
+                'errors' => ['Format kolom CSV tidak sesuai. Pastikan header CSV sesuai template.'],
+                'token' => null,
+                'preview' => [],
+            ];
+        }
+
+        $berhasil = 0;
+        $gagal = 0;
+        $errors = [];
+        $preview = [];
+        $rowNum = 2;
+        $validRoles = \App\Enums\UserRole::values();
+
+        while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+            if (empty(array_filter($row))) {
+                continue;
+            }
+
+            if (count($row) !== count($header)) {
+                $errors[] = "Baris $rowNum: Jumlah kolom tidak sesuai (seharusnya " . count($header) . " kolom).";
+                $gagal++;
+                $rowNum++;
+                continue;
+            }
+
+            $data = array_combine($header, $row);
+            $rowErrors = [];
+
+            if (Pegawai::where('nip', $data['nip'])->exists()) {
+                $rowErrors[] = "NIP '{$data['nip']}' sudah terdaftar.";
+            }
+            if (User::where('email', $data['email'])->exists()) {
+                $rowErrors[] = "Email '{$data['email']}' sudah digunakan.";
+            }
+            if (!in_array($data['role'], $validRoles)) {
+                $rowErrors[] = "Role '{$data['role']}' tidak valid.";
+            }
+            if (empty($data['nama_pegawai'])) {
+                $rowErrors[] = "Nama pegawai tidak boleh kosong.";
+            }
+
+            if (!empty($rowErrors)) {
+                $errors[] = "Baris $rowNum: " . implode(' ', $rowErrors);
+                $gagal++;
+            } else {
+                $berhasil++;
+                // Preview hanya 5 baris pertama yang valid
+                if (count($preview) < 5) {
+                    $preview[] = [
+                        'nama' => $data['nama_pegawai'],
+                        'nip'  => $data['nip'],
+                        'role' => $data['role'],
+                    ];
+                }
+            }
+
+            $rowNum++;
+        }
+
+        fclose($handle);
+
+        // Jika ada data valid, simpan file sementara dengan token unik
+        $token = null;
+        if ($berhasil > 0) {
+            $token = Str::random(40);
+            $file->storeAs('tmp/csv-import', $token . '.csv', 'local');
+        }
+
+        return [
+            'valid'    => $gagal === 0 && $berhasil > 0,
+            'berhasil' => $berhasil,
+            'gagal'    => $gagal,
+            'errors'   => $errors,
+            'token'    => $token,
+            'preview'  => $preview,
+        ];
+    }
+
+    /**
+     * Import dari file sementara menggunakan token.
+     */
+    public function importFromToken(string $token): array
+    {
+        $path = storage_path('app/tmp/csv-import/' . $token . '.csv');
+
+        if (!file_exists($path)) {
+            throw new Exception('Token tidak valid atau sudah kadaluarsa. Silakan upload ulang.');
+        }
+
+        $uploadedFile = new UploadedFile($path, basename($path), 'text/csv', null, true);
+        $result = $this->importCsv($uploadedFile);
+
+        // Hapus file sementara setelah berhasil diimport
+        @unlink($path);
+
+        return $result;
     }
 }

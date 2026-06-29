@@ -46,7 +46,12 @@ class KelolaPegawaiController extends Controller
     public function import(\App\Http\Requests\Admin\ImportPegawaiRequest $request)
     {
         try {
-            $result = $this->kelolaPegawaiService->importCsv($request->file('file'));
+            // Import dari token (file sementara hasil validasi)
+            if ($request->filled('import_token')) {
+                $result = $this->kelolaPegawaiService->importFromToken($request->input('import_token'));
+            } else {
+                $result = $this->kelolaPegawaiService->importCsv($request->file('file'));
+            }
 
             if ($result['gagal'] > 0) {
                 return redirect()->route('admin.kelolaPegawai')->with('warning', "Import selesai. Berhasil: {$result['berhasil']}, Gagal: {$result['gagal']}. Error: " . implode(' | ', $result['errors']));
@@ -58,4 +63,23 @@ class KelolaPegawaiController extends Controller
         }
     }
 
+    /**
+     * Validasi CSV tanpa menyimpan ke DB (dry-run). Mengembalikan JSON.
+     */
+    public function validateImport(\App\Http\Requests\Admin\ImportPegawaiRequest $request)
+    {
+        try {
+            $result = $this->kelolaPegawaiService->validateCsvOnly($request->file('file'));
+            return response()->json($result);
+        } catch (\Exception $e) {
+            return response()->json([
+                'valid'    => false,
+                'berhasil' => 0,
+                'gagal'    => 0,
+                'errors'   => [$e->getMessage()],
+                'token'    => null,
+                'preview'  => [],
+            ], 422);
+        }
+    }
 }

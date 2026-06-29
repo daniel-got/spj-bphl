@@ -24,7 +24,7 @@ class StorePegawaiRequest extends FormRequest
     {
         return [
             'nama_pegawai'     => ['required', 'string', 'max:255'],
-            'nip'              => ['required', 'string', 'max:50', 'unique:data_pegawai,nip'],
+            'nip'              => ['required', 'string', 'max:50', Rule::unique('data_pegawai', 'nip')],
             'email'            => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password'         => ['required', 'string', 'min:8'],
             'role'             => ['required', 'string', \Illuminate\Validation\Rule::in(\App\Enums\UserRole::values())],
