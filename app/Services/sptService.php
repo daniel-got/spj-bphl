@@ -8,7 +8,25 @@ use Illuminate\Support\Facades\DB;
 class SptService
 {
     /**
-     * Get statistics count for SPTs (preventing N+1 memory loading).
+     * Get all structured data needed for the SPT Index page.
+     */
+    public function getIndexPageData(array $requestData): array
+    {
+        $counts = $this->getCounts();
+
+        $filters = [
+            'search' => $requestData['search'] ?? null,
+            'status' => $requestData['status'] ?? null,
+        ];
+
+        $perPage = isset($requestData['per_page']) ? (int) $requestData['per_page'] : 10;
+        $spts = $this->getAllLatest($filters, $perPage);
+
+        return compact('counts', 'spts');
+    }
+
+    /**
+     * Get statistics count for SPTs.
      */
     public function getCounts(): array
     {
@@ -53,11 +71,14 @@ class SptService
     }
 
     /**
-     * Create a new SPT.
+     * Create a new SPT with internal data sanitization.
      */
-    public function createSpt(array $data)
+    public function createSpt(array $data, int $authId)
     {
-        return DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($data, $authId) {
+            $data['pembuat_id'] = $authId;
+            $data['status'] = $data['status'] ?? 'draft';
+
             return Spt::create($data);
         });
     }

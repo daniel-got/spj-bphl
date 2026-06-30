@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSptRequest;
 use App\Http\Requests\UpdateSptRequest;
 use App\Models\Pegawai;
-use App\Models\Spt;
 use App\Services\SptService;
 use Illuminate\Http\Request;
 
@@ -23,16 +22,10 @@ class SptController extends Controller
      */
     public function index(Request $request)
     {
-        $counts = $this->sptService->getCounts();
+        // Semua filter, pencarian, dan kalkulasi dipindah ke Service
+        $data = $this->sptService->getIndexPageData($request->all());
 
-        $filters = [
-            'search' => $request->input('search'),
-            'status' => $request->input('status'),
-        ];
-
-        $spts = $this->sptService->getAllLatest($filters, (int) $request->input('per_page', 10));
-
-        return view('pages.spt.index', compact('counts', 'spts'));
+        return view('pages.spt.index', $data);
     }
 
     /**
@@ -40,6 +33,7 @@ class SptController extends Controller
      */
     public function create()
     {
+        // Hanya mengambil data referensi untuk view dropdown
         $pegawaiList = Pegawai::orderBy('nama_pegawai')->get();
 
         return view('pages.spt.create', compact('pegawaiList'));
@@ -50,11 +44,8 @@ class SptController extends Controller
      */
     public function store(StoreSptRequest $request)
     {
-        $data = $request->validated();
-        $data['pembuat_id'] = auth()->id();
-        $data['status'] = $data['status'] ?? 'draft';
-
-        $this->sptService->createSpt($data);
+        // Penentuan status default dan pembuat_id ditangani di dalam Service
+        $this->sptService->createSpt($request->validated(), auth()->id());
 
         return redirect()
             ->route('user.spt.index')
@@ -88,9 +79,8 @@ class SptController extends Controller
     public function update(UpdateSptRequest $request, string $id)
     {
         $spt = $this->sptService->getSptById($id);
-        $data = $request->validated();
-
-        $this->sptService->updateSpt($spt, $data);
+        
+        $this->sptService->updateSpt($spt, $request->validated());
 
         return redirect()
             ->route('user.spt.index')
