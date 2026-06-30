@@ -27,17 +27,17 @@
                         </x-slot:actions>
                     </x-layout.page-header>
 
-                    {{-- Stats Section (Menyesuaikan compact variabel dari SptController) --}}
+                    {{-- Stats Section --}}
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <x-dashboard.stat-card title="Total SPT" value="{{ $totalSpt }}" description="Total data semua SPT"
+                        <x-dashboard.stat-card title="Total SPT" value="{{ $counts['all'] ?? 0 }}" description="Total data semua SPT"
                             icon="document-text" color="blue" href="{{ route('user.spt.index') }}" />
-                        <x-dashboard.stat-card title="Disetujui" value="{{ $disetujui }}"
+                        <x-dashboard.stat-card title="Disetujui" value="{{ $counts['disetujui'] ?? 0 }}"
                             description="Total SPT disetujui" icon="check-circle" color="green"
                             href="{{ route('user.spt.index', ['status' => 'disetujui']) }}" />
-                        <x-dashboard.stat-card title="Direvisi" value="{{ $direvisi }}"
+                        <x-dashboard.stat-card title="Direvisi" value="{{ $counts['direvisi'] ?? 0 }}"
                             description="Total SPT perlu direvisi" icon="exclamation-circle" color="yellow"
                             href="{{ route('user.spt.index', ['status' => 'direvisi']) }}" />
-                        <x-dashboard.stat-card title="Ditolak" value="{{ $ditolak }}" description="Total SPT ditolak"
+                        <x-dashboard.stat-card title="Ditolak" value="{{ $counts['ditolak'] ?? 0 }}" description="Total SPT ditolak"
                             icon="x-circle" color="red" href="{{ route('user.spt.index', ['status' => 'ditolak']) }}" />
                     </div>
 
@@ -102,15 +102,20 @@
 
                             {{-- Pengaturan Header dan Isi Baris Tabel Berdasarkan Struktur Data SPT --}}
                             @php
-                                // Menentukan Header Tabel Khusus SPT (Hapus 'Nomor ID' dan 'Aksi')
                                 $headers = [
                                     'No', 'Nomor SPT', 'Tgl SPT', 'Nama Pegawai', 'NIP', 'Pangkat/Golongan', 'Jabatan', 
                                     'Tujuan Kegiatan', 'Tempat Tujuan', 'Tgl. Berangkat', 'Tgl. Kembali', 'Lama (Hari)', 'Kode MAK'
                                 ];
 
-                                // Mapping data dari $dataSpt ke Baris Tabel
-                                $rows = collect($dataSpt ?? [])->map(function ($spt, $index) {
-                                    
+                                // Menggunakan index manual agar loop aman dari error tipe data swap
+                                $iteration = 1;
+
+                                $rows = collect($spts ?? [])->map(function ($spt) use (&$iteration) {
+                                    // Antisipasi jika data yang dilempar bukan objek Model
+                                    if (!is_object($spt)) {
+                                        return null;
+                                    }
+
                                     // Decode array / JSON Tempat Tujuan
                                     $destinations = $spt->tempat_tujuan;
                                     if (is_array($destinations)) {
@@ -126,15 +131,24 @@
                                     $tglBerangkat = $spt->tgl_berangkat ? \Carbon\Carbon::parse($spt->tgl_berangkat)->format('d/m/Y') : '-';
                                     $tglKembali = $spt->tgl_kembali ? \Carbon\Carbon::parse($spt->tgl_kembali)->format('d/m/Y') : '-';
 
-                                    // Link Detail pada Nomor SPT tetap dipertahankan agar user bisa klik baris data
+                                    // Ambil snapshot nama pegawai dari kolom JSON 'pegawai_ditugaskan'
+                                    $namaPegawai = '-';
+                                    if (is_array($spt->pegawai_ditugaskan) && isset($spt->pegawai_ditugaskan['nama'])) {
+                                        $namaPegawai = $spt->pegawai_ditugaskan['nama'];
+                                    } elseif (is_string($spt->pegawai_ditugaskan)) {
+                                        $pegawaiDecoded = json_decode($spt->pegawai_ditugaskan, true);
+                                        $namaPegawai = $pegawaiDecoded['nama'] ?? $spt->pegawai_ditugaskan;
+                                    }
+
+                                    // Link Detail pada Nomor SPT
                                     $nomorSptLink = '<a href="' . route('user.spt.show', $spt->id) . '" class="text-primary hover:underline font-semibold" title="Lihat Rincian">' . e($spt->nomor_spt ?? '') . '</a>';
                                     
                                     return [
-                                        $index + 1,
+                                        $iteration++,
                                         $nomorSptLink,
                                         $tglSpt,
-                                        e($spt->pegawai_ditugaskan ?? ''),
-                                        e($spt->nip_pegawai ?? ''),
+                                        e($namaPegawai),
+                                        e($spt->nip_pegawai ?? '-'),
                                         e($spt->pangkat_pegawai ?? '-'),
                                         e($spt->jabatan_pegawai ?? '-'),
                                         '<div class="max-w-xs whitespace-normal line-clamp-2" title="' . e($spt->tujuan_kegiatan ?? '') . '">' . e($spt->tujuan_kegiatan ?? '') . '</div>',
@@ -144,7 +158,7 @@
                                         e($spt->lama_kegiatan ?? '') . ' Hari',
                                         e($spt->kode_mak ?? '-')
                                     ];
-                                })->toArray();
+                                })->filter()->toArray();
                             @endphp
 
                             {{-- Render Component Table --}}

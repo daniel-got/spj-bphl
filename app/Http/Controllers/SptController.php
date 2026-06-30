@@ -2,67 +2,112 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreSptRequest;
+use App\Http\Requests\UpdateSptRequest;
+use App\Models\Pegawai;
+use App\Models\Spt;
+use App\Services\SptService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class SptController extends Controller
 {
-    public function index()
+    protected SptService $sptService;
+
+    public function __construct(SptService $sptService)
     {
-        // Mengambil data dari tabel data_spt
-        $dataSpt = DB::table('data_spt')->get();
-
-        // Hitung statistik untuk summary card atas
-        $totalSpt = $dataSpt->count();
-        $disetujui = $dataSpt->where('status', 'disetujui')->count(); 
-        $direvisi = $dataSpt->where('status', 'direvisi')->count();
-        $ditolak = $dataSpt->where('status', 'ditolak')->count();
-
-        // Mengarah ke path folder view yang baru: pages/spt/index.blade.php
-        return view('pages.spt.index', compact('dataSpt', 'totalSpt', 'disetujui', 'direvisi', 'ditolak'));
+        $this->sptService = $sptService;
     }
 
     /**
-     * Menampilkan halaman form tambah SPT
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $counts = $this->sptService->getCounts();
+
+        $filters = [
+            'search' => $request->input('search'),
+            'status' => $request->input('status'),
+        ];
+
+        $spts = $this->sptService->getAllLatest($filters, (int) $request->input('per_page', 10));
+
+        return view('pages.spt.index', compact('counts', 'spts'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
      */
     public function create()
     {
-        // Mengarah ke file pages/spt/create.blade.php yang baru Anda buat
-        return view('pages.spt.create');
+        $pegawaiList = Pegawai::orderBy('nama_pegawai')->get();
+
+        return view('pages.spt.create', compact('pegawaiList'));
     }
 
     /**
-     * Menyimpan data SPT baru ke database
+     * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreSptRequest $request)
     {
-        // 1. Validasi data yang dikirim dari form create.blade.php
-        $validated = $request->validate([
-            'nomor_spt'          => 'required|string|max:255',
-            'tgl_spt'            => 'required|date',
-            'pegawai_ditugaskan' => 'required|string|max:255',
-            'nip_pegawai'        => 'required|string|max:255',
-            'pangkat_pegawai'    => 'nullable|string|max:255',
-            'jabatan_pegawai'    => 'nullable|string|max:255',
-            'tujuan_kegiatan'    => 'required|string',
-            'tempat_tujuan'      => 'required|array', 
-            'tempat_tujuan.*'    => 'required|string|max:255',
-            'tgl_berangkat'      => 'required|date',
-            'tgl_kembali'        => 'required|date|after_or_equal:tgl_berangkat',
-            'lama_kegiatan'      => 'required|integer|min:1',
-            'kode_mak'           => 'nullable|string|max:255',
-        ]);
+        $data = $request->validated();
+        $data['pembuat_id'] = auth()->id();
+        $data['status'] = $data['status'] ?? 'draft';
 
-        // Mengubah array tempat_tujuan menjadi format JSON agar bisa disimpan di database
-        $validated['tempat_tujuan'] = json_encode($request->tempat_tujuan);
+        $this->sptService->createSpt($data);
 
-        // Tambahkan default status jika kolom status dibutuhkan di tabel data_spt Anda
-        $validated['status'] = 'pending'; // atau sesuaikan dengan alur aplikasi Anda (misal langsung disetujui)
+        return redirect()
+            ->route('user.spt.index')
+            ->with('success', 'SPT berhasil ditambahkan.');
+    }
 
-        // 2. Insert data ke tabel data_spt menggunakan Query Builder DB
-        DB::table('data_spt')->insert($validated);
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $spt = $this->sptService->getSptById($id);
 
-        // 3. Setelah sukses, redirect ke halaman index dengan pesan sukses
-        return redirect()->route('user.spt.index')->with('success', 'Data SPT baru berhasil ditambahkan!');
+        return view('pages.spt.show', compact('spt'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        $spt = $this->sptService->getSptById($id);
+        $pegawaiList = Pegawai::orderBy('nama_pegawai')->get();
+
+        return view('pages.spt.edit', compact('spt', 'pegawaiList'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateSptRequest $request, string $id)
+    {
+        $spt = $this->sptService->getSptById($id);
+        $data = $request->validated();
+
+        $this->sptService->updateSpt($spt, $data);
+
+        return redirect()
+            ->route('user.spt.index')
+            ->with('success', 'SPT berhasil diperbarui.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        $spt = $this->sptService->getSptById($id);
+
+        $this->sptService->deleteSpt($spt);
+
+        return redirect()
+            ->route('user.spt.index')
+            ->with('success', 'SPT berhasil dihapus.');
     }
 }

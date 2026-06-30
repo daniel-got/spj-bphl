@@ -29,7 +29,7 @@
             </div>
 
             {{-- Form --}}
-            <form action="{{ route('user.spt.store') }}" method="POST">
+            <form action="{{ route('user.spt.store') }}" method="POST" id="spt-form">
                 @csrf
 
                 <div class="bg-surface border border-border-custom rounded-xl shadow-sm p-6 space-y-6">
@@ -42,19 +42,70 @@
                             :error="$errors->first('tgl_spt')" />
                     </div>
 
-                    {{-- Pegawai yang Ditugaskan --}}
+                    {{-- Pegawai yang Ditugaskan (Dinamis) --}}
                     <div class="border-t border-border-custom pt-6">
-                        <h3 class="text-sm font-bold text-text-main mb-4">Pegawai yang Ditugaskan</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <x-form.input name="pegawai_ditugaskan" label="Nama Pegawai" placeholder="Nama Lengkap"
-                                :value="old('pegawai_ditugaskan')" :required="true" :error="$errors->first('pegawai_ditugaskan')" />
-                            <x-form.input name="nip_pegawai" label="NIP Pegawai" placeholder="NIP" :value="old('nip_pegawai')"
-                                :required="true" :error="$errors->first('nip_pegawai')" />
-                            <x-form.input name="pangkat_pegawai" label="Pangkat/Golongan" placeholder="Pangkat/Golongan"
-                                :value="old('pangkat_pegawai')" :error="$errors->first('pangkat_pegawai')" />
-                            <x-form.input name="jabatan_pegawai" label="Jabatan" placeholder="Jabatan"
-                                :value="old('jabatan_pegawai')" :error="$errors->first('jabatan_pegawai')" />
+                        <label class="text-sm font-medium text-text-main mb-2 block">
+                            Pegawai yang Ditugaskan <span class="text-danger">*</span>
+                        </label>
+
+                        <div id="pegawai-list" class="space-y-4">
+                            <div class="pegawai-item border border-border-custom rounded-lg p-4 bg-background/50">
+                                <div class="flex items-start gap-2">
+                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 grow">
+                                        <div class="flex flex-col">
+                                            <label class="text-xs font-medium text-text-main mb-1">Nama Pegawai</label>
+                                            <select required
+                                                class="pegawai-select w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary border-border-custom">
+                                                <option value="">Pilih Pegawai</option>
+                                                @foreach ($pegawaiList as $pegawai)
+                                                    <option value="{{ $pegawai->id }}"
+                                                        data-nama="{{ $pegawai->nama_pegawai }}"
+                                                        data-nip="{{ $pegawai->nip }}"
+                                                        data-pangkat="{{ $pegawai->pangkat }}{{ $pegawai->golongan ? ' / '.$pegawai->golongan : '' }}"
+                                                        data-jabatan="{{ $pegawai->jabatan }}">
+                                                        {{ $pegawai->nama_pegawai }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <label class="text-xs font-medium text-text-main mb-1">NIP</label>
+                                            <input type="text" readonly tabindex="-1"
+                                                class="pegawai-nip w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <label class="text-xs font-medium text-text-main mb-1">Pangkat/Golongan</label>
+                                            <input type="text" readonly tabindex="-1"
+                                                class="pegawai-pangkat w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <label class="text-xs font-medium text-text-main mb-1">Jabatan</label>
+                                            <input type="text" readonly tabindex="-1"
+                                                class="pegawai-jabatan w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                        <div class="mt-3">
+                            <button type="button" id="add-pegawai-btn"
+                                class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover transition duration-150">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4" />
+                                </svg>
+                                Tambah Pegawai
+                            </button>
+                        </div>
+
+                        {{-- Hidden input berisi snapshot JSON lengkap, diisi oleh JS sebelum submit --}}
+                        <input type="hidden" name="pegawai_ditugaskan" id="pegawai_ditugaskan_json"
+                            value="{{ old('pegawai_ditugaskan') }}">
+
+                        @if ($errors->has('pegawai_ditugaskan'))
+                            <p class="text-xs text-danger mt-1">{{ $errors->first('pegawai_ditugaskan') }}</p>
+                        @endif
                     </div>
 
                     {{-- Tujuan & Tempat --}}
@@ -63,64 +114,17 @@
                             placeholder="Tuliskan tujuan kegiatan perjalanan dinas..." :rows="3"
                             :value="old('tujuan_kegiatan')" :required="true" :error="$errors->first('tujuan_kegiatan')" />
 
-                        <div class="flex flex-col">
-                            <label class="text-sm font-medium text-text-main mb-2">
-                                Tempat Tujuan <span class="text-danger">*</span>
-                            </label>
-
-                            @php
-                                $destinations = old('tempat_tujuan');
-                                if (!$destinations || !is_array($destinations)) {
-                                    $destinations = [''];
-                                }
-                            @endphp
-
-                            <div id="destinations-list" class="space-y-3">
-                                @foreach ($destinations as $index => $destination)
-                                    <div class="flex items-center gap-2 destination-item">
-                                        <div class="grow">
-                                            <input type="text" name="tempat_tujuan[]" placeholder="Contoh: Jakarta"
-                                                value="{{ $destination }}" required
-                                                class="w-full px-3 py-2 text-sm border rounded-md shadow-sm placeholder-muted bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom" />
-                                        </div>
-                                        @if (count($destinations) > 1 || $index > 0)
-                                            <button type="button"
-                                                class="remove-destination-btn text-danger hover:text-red-700 transition duration-150 p-2">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
-
-                            <div class="mt-2">
-                                <button type="button" id="add-destination-btn"
-                                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover transition duration-150">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    Tambah Tempat Tujuan
-                                </button>
-                            </div>
-                            @if ($errors->has('tempat_tujuan'))
-                                <p class="text-xs text-danger mt-1">{{ $errors->first('tempat_tujuan') }}</p>
-                            @endif
-                        </div>
+                        <x-form.input name="tempat_tujuan" label="Tempat Tujuan" placeholder="Contoh: Jakarta"
+                            :value="old('tempat_tujuan')" :required="true" :error="$errors->first('tempat_tujuan')" />
                     </div>
 
-                    {{-- Tanggal Berangkat, Kembali, Lama Kegiatan --}}
+                    {{-- Tanggal Berangkat, Kembali, Durasi Penugasan --}}
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-border-custom pt-6">
                         <x-form.date-picker name="tgl_berangkat" label="Tanggal Berangkat" :value="old('tgl_berangkat')"
                             :required="true" :error="$errors->first('tgl_berangkat')" />
                         <x-form.date-picker name="tgl_kembali" label="Tanggal Kembali" :value="old('tgl_kembali')"
                             :required="true" :error="$errors->first('tgl_kembali')" />
-                        <x-form.input name="lama_kegiatan" label="Lama Kegiatan (hari)" type="number"
+                        <x-form.input name="lama_kegiatan" label="Durasi Penugasan (hari)" type="number"
                             placeholder="Otomatis dihitung" :value="old('lama_kegiatan')" :required="true"
                             :error="$errors->first('lama_kegiatan')" :readonly="true" />
                     </div>
@@ -128,7 +132,7 @@
                     {{-- Kode MAK --}}
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-border-custom pt-6">
                         <x-form.input name="kode_mak" label="Kode MAK" placeholder="Kode MAK" :value="old('kode_mak')"
-                            :error="$errors->first('kode_mak')" />
+                            :required="true" :error="$errors->first('kode_mak')" />
                     </div>
 
                 </div>
@@ -155,30 +159,48 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const container = document.getElementById('destinations-list');
-            const addBtn = document.getElementById('add-destination-btn');
+            const container = document.getElementById('pegawai-list');
+            const addBtn = document.getElementById('add-pegawai-btn');
+            const form = document.getElementById('spt-form');
+            const hiddenInput = document.getElementById('pegawai_ditugaskan_json');
             const tglBerangkat = document.getElementById('tgl_berangkat');
             const tglKembali = document.getElementById('tgl_kembali');
             const lamaKegiatan = document.getElementById('lama_kegiatan');
 
-            // Tambah / hapus tempat tujuan
+            const firstSelect = container.querySelector('.pegawai-select');
+            const optionsHTML = firstSelect ? firstSelect.innerHTML : '<option value="">Pilih Pegawai</option>';
+
+            function attachAutoFill(item) {
+                const select = item.querySelector('.pegawai-select');
+                const nipInput = item.querySelector('.pegawai-nip');
+                const pangkatInput = item.querySelector('.pegawai-pangkat');
+                const jabatanInput = item.querySelector('.pegawai-jabatan');
+
+                select.addEventListener('change', function() {
+                    const opt = select.options[select.selectedIndex];
+                    nipInput.value = opt.getAttribute('data-nip') || '';
+                    pangkatInput.value = opt.getAttribute('data-pangkat') || '';
+                    jabatanInput.value = opt.getAttribute('data-jabatan') || '';
+                });
+            }
+
             function updateRemoveButtons() {
-                const items = container.querySelectorAll('.destination-item');
+                const items = container.querySelectorAll('.pegawai-item');
                 items.forEach((item) => {
-                    let removeBtn = item.querySelector('.remove-destination-btn');
+                    let removeBtn = item.querySelector('.remove-pegawai-btn');
                     if (items.length > 1) {
                         if (!removeBtn) {
                             removeBtn = document.createElement('button');
                             removeBtn.type = 'button';
                             removeBtn.className =
-                                'remove-destination-btn text-danger hover:text-red-700 transition duration-150 p-2';
+                                'remove-pegawai-btn text-danger hover:text-red-700 transition duration-150 p-2 mt-5';
                             removeBtn.innerHTML =
                                 `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
                             removeBtn.addEventListener('click', function() {
                                 item.remove();
                                 updateRemoveButtons();
                             });
-                            item.appendChild(removeBtn);
+                            item.querySelector('.flex.items-start').appendChild(removeBtn);
                         }
                     } else {
                         if (removeBtn) removeBtn.remove();
@@ -188,32 +210,72 @@
 
             addBtn.addEventListener('click', function() {
                 const newItem = document.createElement('div');
-                newItem.className = 'flex items-center gap-2 destination-item';
+                newItem.className = 'pegawai-item border border-border-custom rounded-lg p-4 bg-background/50';
                 newItem.innerHTML = `
-                    <div class="grow">
-                        <input
-                            type="text"
-                            name="tempat_tujuan[]"
-                            placeholder="Contoh: Jakarta"
-                            required
-                            class="w-full px-3 py-2 text-sm border rounded-md shadow-sm placeholder-muted bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom"
-                        />
+                    <div class="flex items-start gap-2">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 grow">
+                            <div class="flex flex-col">
+                                <label class="text-xs font-medium text-text-main mb-1">Nama Pegawai</label>
+                                <select required
+                                    class="pegawai-select w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary border-border-custom">
+                                    ${optionsHTML}
+                                </select>
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-xs font-medium text-text-main mb-1">NIP</label>
+                                <input type="text" readonly tabindex="-1"
+                                    class="pegawai-nip w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-xs font-medium text-text-main mb-1">Pangkat/Golongan</label>
+                                <input type="text" readonly tabindex="-1"
+                                    class="pegawai-pangkat w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-xs font-medium text-text-main mb-1">Jabatan</label>
+                                <input type="text" readonly tabindex="-1"
+                                    class="pegawai-jabatan w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
+                            </div>
+                        </div>
                     </div>
                 `;
                 container.appendChild(newItem);
+                attachAutoFill(newItem);
                 updateRemoveButtons();
             });
 
-            container.querySelectorAll('.remove-destination-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    btn.closest('.destination-item').remove();
-                    updateRemoveButtons();
-                });
-            });
-
+            container.querySelectorAll('.pegawai-item').forEach(attachAutoFill);
             updateRemoveButtons();
 
-            // Hitung lama kegiatan otomatis
+            // Sebelum submit, kumpulkan semua baris pegawai jadi array JSON snapshot lengkap
+            form.addEventListener('submit', function(e) {
+                const items = container.querySelectorAll('.pegawai-item');
+                const pegawaiData = [];
+
+                items.forEach((item) => {
+                    const select = item.querySelector('.pegawai-select');
+                    const opt = select.options[select.selectedIndex];
+                    if (select.value) {
+                        pegawaiData.push({
+                            pegawai_id: select.value,
+                            nama_pegawai: opt.getAttribute('data-nama') || '',
+                            nip: opt.getAttribute('data-nip') || '',
+                            pangkat: opt.getAttribute('data-pangkat') || '',
+                            jabatan: opt.getAttribute('data-jabatan') || '',
+                        });
+                    }
+                });
+
+                if (pegawaiData.length === 0) {
+                    e.preventDefault();
+                    alert('Pilih minimal satu pegawai yang ditugaskan.');
+                    return;
+                }
+
+                hiddenInput.value = JSON.stringify(pegawaiData);
+            });
+
+            // Hitung durasi penugasan otomatis
             function hitungHari() {
                 const tgl1 = tglBerangkat ? new Date(tglBerangkat.value) : null;
                 const tgl2 = tglKembali ? new Date(tglKembali.value) : null;
