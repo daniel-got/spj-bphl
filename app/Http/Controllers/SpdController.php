@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSpdRequest;
 use App\Http\Requests\UpdateSpdRequest;
 use App\Models\Spd;
+use App\Models\Pegawai;
 use App\Services\SpdService;
 
 class SpdController extends Controller
@@ -34,7 +35,8 @@ class SpdController extends Controller
      */
     public function create()
     {
-        return view('pages.spd.create');
+        $pegawais = Pegawai::orderBy('nama_pegawai', 'asc')->get();
+        return view('pages.spd.create', compact('pegawais'));
     }
 
     /**
@@ -62,7 +64,8 @@ class SpdController extends Controller
      */
     public function edit(Spd $spd)
     {
-        return view('pages.spd.edit', compact('spd'));
+        $pegawais = Pegawai::orderBy('nama_pegawai', 'asc')->get();
+        return view('pages.spd.edit', compact('spd', 'pegawais'));
     }
 
     /**
