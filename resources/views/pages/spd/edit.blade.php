@@ -47,9 +47,15 @@
                     <div class="border-t border-border-custom pt-6">
                         <h3 class="text-sm font-bold text-text-main mb-4">Pegawai yang Ditugaskan</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <x-form.input name="pegawai_ditugaskan" label="Nama Pegawai" placeholder="Nama Lengkap"
-                                :value="old('pegawai_ditugaskan', $spd->pegawai_ditugaskan)" :required="true" :error="$errors->first('pegawai_ditugaskan')" />
-                            <x-form.input name="nip_pegawai" label="NIP Pegawai" placeholder="NIP" :value="old('nip_pegawai', $spd->nip_pegawai)"
+                            @php
+                                $pegawaiOptions = [];
+                                foreach ($pegawais as $pegawai) {
+                                    $pegawaiOptions[$pegawai->nama_pegawai] = $pegawai->nama_pegawai;
+                                }
+                            @endphp
+                            <x-form.select name="pegawai_ditugaskan" label="Nama Pegawai" :options="$pegawaiOptions"
+                                :selected="old('pegawai_ditugaskan', $spd->pegawai_ditugaskan)" :required="true" :error="$errors->first('pegawai_ditugaskan')" placeholder="Pilih Pegawai" />
+                            <x-form.input name="nip_pegawai" label="NIP" placeholder="NIP" :value="old('nip_pegawai', $spd->nip_pegawai)"
                                 :required="true" :error="$errors->first('nip_pegawai')" />
                             <x-form.input name="pangkat_pegawai" label="Pangkat/Golongan" placeholder="Pangkat/Golongan"
                                 :value="old('pangkat_pegawai', $spd->pangkat_pegawai)" :error="$errors->first('pangkat_pegawai')" />
@@ -132,7 +138,7 @@
                             :required="true" :error="$errors->first('tgl_berangkat')" />
                         <x-form.date-picker name="tgl_kembali" label="Tanggal Kembali" :value="old('tgl_kembali', $spd->tgl_kembali)"
                             :required="true" :error="$errors->first('tgl_kembali')" />
-                        <x-form.input name="lama_kegiatan" label="Lama Kegiatan (hari)" type="number"
+                        <x-form.input name="lama_kegiatan" label="Durasi Penugasan (hari)" type="number"
                             placeholder="Jumlah hari" :value="old('lama_kegiatan', $spd->lama_kegiatan)" :required="true" :error="$errors->first('lama_kegiatan')" />
                     </div>
 
@@ -194,10 +200,63 @@
 
     <x-layout.footer />
 
+    <script id="pegawai-data" type="application/json">
+        @json($pegawais)
+    </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const container = document.getElementById('destinations-list');
             const addBtn = document.getElementById('add-destination-btn');
+
+            // --- Auto Fill Pegawai Data ---
+            const selectPegawai = document.getElementById('pegawai_ditugaskan');
+            const nipInput = document.getElementById('nip_pegawai');
+            const pangkatInput = document.getElementById('pangkat_pegawai');
+            const jabatanInput = document.getElementById('jabatan_pegawai');
+            const pegawaiData = JSON.parse(document.getElementById('pegawai-data').textContent);
+
+            selectPegawai.addEventListener('change', function() {
+                const selectedName = this.value;
+                const employee = pegawaiData.find(p => p.nama_pegawai === selectedName);
+                if (employee) {
+                    nipInput.value = employee.nip || '';
+                    pangkatInput.value = employee.pangkat || '';
+                    jabatanInput.value = employee.jabatan || '';
+                } else {
+                    nipInput.value = '';
+                    pangkatInput.value = '';
+                    jabatanInput.value = '';
+                }
+            });
+
+            // --- Auto Calculate Lama Kegiatan (hari) ---
+            const tglBerangkatInput = document.getElementById('tgl_berangkat');
+            const tglKembaliInput = document.getElementById('tgl_kembali');
+            const lamaKegiatanInput = document.getElementById('lama_kegiatan');
+
+            function calculateDays() {
+                const startVal = tglBerangkatInput.value;
+                const endVal = tglKembaliInput.value;
+                if (startVal && endVal) {
+                    const startDate = new Date(startVal);
+                    const endDate = new Date(endVal);
+                    
+                    // Reset hours to avoid timezone/DST differences
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate.setHours(0, 0, 0, 0);
+
+                    const timeDiff = endDate.getTime() - startDate.getTime();
+                    const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+                    
+                    lamaKegiatanInput.value = dayDiff > 0 ? dayDiff : '';
+                } else {
+                    lamaKegiatanInput.value = '';
+                }
+            }
+
+            tglBerangkatInput.addEventListener('change', calculateDays);
+            tglKembaliInput.addEventListener('change', calculateDays);
 
             function updateRemoveButtons() {
                 const items = container.querySelectorAll('.destination-item');

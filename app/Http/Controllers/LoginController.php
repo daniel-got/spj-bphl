@@ -26,9 +26,13 @@ class LoginController extends Controller
                 return redirect()->intended(route('admin.dashboard'));
             }
 
-            // PERBAIKAN FINAL: Diarahkan ke nama rute index SPD yang valid milik user
-            // URL aslinya akan mengarah ke: http://127.0.0.1:8000/user/spd
-            return redirect()->intended(route('user.spd.index'));
+
+            if ($user->isPegawai()) {
+                return redirect()->intended(route('user.spd.index'));
+            }
+
+            // Default: arahkan ke dashboard umum (akan dibuat nanti per role)
+            return redirect()->intended('/dashboard');
         }
 
         return back()->withErrors([
