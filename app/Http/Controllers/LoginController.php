@@ -20,12 +20,12 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             // Role-Based Redirect — sesuai pola developing_clean.md
-            // Masing-masing role diarahkan ke dashboard yang berbeda
             $user = Auth::user();
 
             if ($user->isAdmin()) {
                 return redirect()->intended(route('admin.dashboard'));
             }
+
 
             if ($user->isPegawai()) {
                 return redirect()->intended(route('user.spd.index'));
