@@ -18,5 +18,7 @@ Route::middleware(['auth', 'role:user'])
         // Route::delete('/kelolaPegawai/{pegawai}', [KelolaPegawaiController::class, 'destroy'])->name('kelolaPegawai.destroy');
         // Route::post('/kelolaPegawai/import', [KelolaPegawaiController::class, 'import'])->name('kelolaPegawai.import');
         // Route::post('/kelolaPegawai/validate-import', [KelolaPegawaiController::class, 'validateImport'])->name('kelolaPegawai.validateImport');
+        Route::get('spt/search', [SpdController::class, 'searchSpt'])->name('spt.search');
+        Route::get('spt/{id}/ajax', [SpdController::class, 'getSptAjax'])->name('spt.ajax');
         Route::resource('spd', SpdController::class);
     });

@@ -2,6 +2,79 @@
 
     <x-layout.navbar />
 
+    <!-- jQuery & Select2 CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <style>
+        /* Custom Select2 Styling to match premium theme */
+        .select2-container {
+            width: 100% !important;
+        }
+        .select2-container--default .select2-selection--single {
+            background-color: var(--color-surface, #ffffff);
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #1f2937;
+            font-size: 0.875rem;
+            padding-left: 0.75rem;
+            padding-right: 2rem;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px;
+            right: 8px;
+        }
+        .select2-dropdown {
+            background-color: #ffffff;
+            border-color: #e5e7eb;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            z-index: 1050;
+        }
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            background-color: #f9fafb;
+            color: #1f2937;
+            font-size: 0.875rem;
+            padding: 6px 10px;
+        }
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .select2-container--default .select2-results__option {
+            font-size: 0.875rem;
+            padding: 8px 12px;
+            color: #1f2937;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #9ca3af;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__clear {
+            position: absolute;
+            right: 32px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.125rem;
+            color: #9ca3af;
+            cursor: pointer;
+            font-weight: normal;
+            margin-right: 0;
+            line-height: 1;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__clear:hover {
+            color: #ef4444;
+        }
+    </style>
+
     <main class="grow flex flex-col px-6 py-10">
 
         <div class="max-w-5xl mx-auto w-full">
@@ -28,11 +101,23 @@
                 </h1>
             </div>
 
-            {{-- Form --}}
             <form action="{{ route('user.spd.store') }}" method="POST">
                 @csrf
 
                 <div class="bg-surface border border-border-custom rounded-xl shadow-sm p-6 space-y-6">
+
+                    {{-- Pencarian SPT (Select2 Autocomplete) --}}
+                    <div class="pb-6 flex flex-col gap-1 border-b border-border-custom">
+                        <label for="spt_id" class="text-sm font-semibold text-text-main">
+                            Masukkan No SPT
+                        </label>
+                        <select name="spt_id" id="spt_id" class="w-full">
+                            <option value="">Contoh: 094/01/SPT/2026</option>
+                        </select>
+                        @if ($errors->has('spt_id'))
+                            <p class="text-xs text-danger mt-1">{{ $errors->first('spt_id') }}</p>
+                        @endif
+                    </div>
 
                     {{-- Nomor & Tanggal --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -215,6 +300,129 @@
                     nipInput.value = '';
                     pangkatInput.value = '';
                     jabatanInput.value = '';
+                }
+            });
+
+            // --- Select2 for Referensi SPT ---
+            $('#spt_id').select2({
+                placeholder: 'Contoh: 094/01/SPT/2026',
+                allowClear: true,
+                ajax: {
+                    url: '{{ route("user.spt.search") }}',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            q: params.term
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.results
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $('#spt_id').on('select2:select', function (e) {
+                const sptId = e.params.data.id;
+                if (sptId) {
+                    let url = '{{ route("user.spt.ajax", ["id" => ":id"]) }}';
+                    url = url.replace(':id', sptId);
+
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.tujuan_kegiatan) {
+                                document.getElementById('tujuan_kegiatan').value = data.tujuan_kegiatan;
+                            }
+                            if (data.kode_mak) {
+                                document.getElementById('kode_mak').value = data.kode_mak;
+                            }
+                            if (data.tgl_berangkat) {
+                                document.getElementById('tgl_berangkat').value = data.tgl_berangkat;
+                            }
+                            if (data.tgl_kembali) {
+                                document.getElementById('tgl_kembali').value = data.tgl_kembali;
+                            }
+                            if (data.lama_kegiatan) {
+                                document.getElementById('lama_kegiatan').value = data.lama_kegiatan;
+                            }
+                            
+                            if (data.tempat_tujuan) {
+                                const destinationsList = document.getElementById('destinations-list');
+                                destinationsList.innerHTML = '';
+                                
+                                const places = data.tempat_tujuan.split(',').map(p => p.trim()).filter(p => p !== '');
+                                if (places.length > 0) {
+                                    places.forEach(place => {
+                                        const newItem = document.createElement('div');
+                                        newItem.className = 'flex items-center gap-2 destination-item';
+                                        newItem.innerHTML = `
+                                            <div class="grow">
+                                                <input
+                                                    type="text"
+                                                    name="tempat_tujuan[]"
+                                                    placeholder="Contoh: Jakarta"
+                                                    value="${place}"
+                                                    required
+                                                    class="w-full px-3 py-2 text-sm border rounded-md shadow-sm placeholder-muted bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom"
+                                                />
+                                            </div>
+                                        `;
+                                        destinationsList.appendChild(newItem);
+                                    });
+                                } else {
+                                    const newItem = document.createElement('div');
+                                    newItem.className = 'flex items-center gap-2 destination-item';
+                                    newItem.innerHTML = `
+                                        <div class="grow">
+                                            <input
+                                                type="text"
+                                                name="tempat_tujuan[]"
+                                                placeholder="Contoh: Jakarta"
+                                                required
+                                                class="w-full px-3 py-2 text-sm border rounded-md shadow-sm placeholder-muted bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom"
+                                            />
+                                        </div>
+                                    `;
+                                    destinationsList.appendChild(newItem);
+                                }
+                                updateRemoveButtons();
+                            }
+
+                            if (data.pegawai_list && data.pegawai_list.length > 0) {
+                                const firstPegawai = data.pegawai_list[0];
+                                const name = firstPegawai.nama_pegawai;
+                                
+                                const selectPeg = document.getElementById('pegawai_ditugaskan');
+                                if (selectPeg) {
+                                    let optionExists = false;
+                                    for (let i = 0; i < selectPeg.options.length; i++) {
+                                        if (selectPeg.options[i].value === name) {
+                                            optionExists = true;
+                                            selectPeg.selectedIndex = i;
+                                            break;
+                                        }
+                                    }
+                                    if (!optionExists) {
+                                        const newOpt = document.createElement('option');
+                                        newOpt.value = name;
+                                        newOpt.text = name;
+                                        newOpt.selected = true;
+                                        selectPeg.appendChild(newOpt);
+                                    }
+                                    
+                                    // Trigger change event to fill NIP/pangkat/jabatan
+                                    const event = new Event('change');
+                                    selectPeg.dispatchEvent(event);
+                                }
+                            }
+                        }
+                    });
                 }
             });
 

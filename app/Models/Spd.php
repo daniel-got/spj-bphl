@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Spd extends Model
 {
@@ -35,6 +36,8 @@ class Spd extends Model
         'pejabat_ditugaskan',  // Kolom tambahan untuk pejabat dinamis 
         'status',              // Status SPD
         'alasan',              // Alasan revisi/penolakan
+        'spt_id',              // Referensi SPT
+        'pembuat_id',          // Pembuat SPD
     ];
 
     protected $casts = [
@@ -81,5 +84,13 @@ class Spd extends Model
         } else {
             $this->attributes['tempat_tujuan'] = $value;
         }
+    }
+
+    /**
+     * Hubungan ke model SPT.
+     */
+    public function spt(): BelongsTo
+    {
+        return $this->belongsTo(Spt::class, 'spt_id');
     }
 }

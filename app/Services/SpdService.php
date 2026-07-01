@@ -62,6 +62,7 @@ class SpdService
     public function createSpd(array $data)
     {
         return DB::transaction(function () use ($data) {
+            $data['pembuat_id'] = $data['pembuat_id'] ?? auth()->id();
             return Spd::create($data);
         });
     }

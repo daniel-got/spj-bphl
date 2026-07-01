@@ -44,6 +44,7 @@ class UpdateSpdRequest extends FormRequest
             'ppk'                 => 'required|string|in:Pejabat Pembuat Komitmen 1,Pejabat Pembuat Komitmen 2,Pejabat Pembuat Komitmen 3,Bendahara Pengeluaran',
             'nama_ppk'            => 'required|string|max:255',
             'nip_ppk'             => 'required|string|max:50',
+            'spt_id'              => 'nullable|exists:data_spt,id',
         ];
     }
 }
