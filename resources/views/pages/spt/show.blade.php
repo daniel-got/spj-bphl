@@ -159,7 +159,16 @@
                         </div>
                         <div>
                             <span class="text-xs font-semibold text-muted uppercase tracking-wider">Alat Angkut</span>
-                            <p class="text-sm font-medium text-text-main mt-1">{{ $spd->alat_angkut ?? '-' }}</p>
+                            @php
+                                $vehicles = $spd->alat_angkut;
+                                if (is_array($vehicles)) {
+                                    $vehiclesText = implode(', ', $vehicles);
+                                } else {
+                                    $decoded = json_decode($vehicles, true);
+                                    $vehiclesText = is_array($decoded) ? implode(', ', $decoded) : (string) $vehicles;
+                                }
+                            @endphp
+                            <p class="text-sm font-medium text-text-main mt-1">{{ $vehiclesText ?: '-' }}</p>
                         </div>
                         <div class="md:col-span-3 border-t border-border-custom pt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
