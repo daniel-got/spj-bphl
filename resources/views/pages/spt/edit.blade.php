@@ -1,13 +1,11 @@
-<x-layout.app title="Tambah SPT - SPJ BPHL 4">
+<x-layout.app title="Edit SPT - SPJ BPHL 4">
 
     {{-- CDN Tom Select untuk Dropdown Search --}}
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 
-
-    {{-- Perbaikan CSS Mutakhir untuk Tampilan Search Tom Select --}}
+    {{-- CSS sama persis dengan create.blade.php agar tampilan konsisten --}}
     <style>
-        /* 1. Atur kontainer utama Tom Select agar tingginya pas (38px) dan serasi dengan input lain */
         .ts-wrapper .ts-control {
             min-height: 38px !important;
             height: 38px !important;
@@ -21,15 +19,11 @@
             cursor: text !important;
         }
 
-        /* 2. Saat dropdown TERTUTUP dan sudah ada pegawai terpilih: sembunyikan placeholder,
-              cukup tampilkan nama pegawai yang sedang aktif */
         .ts-wrapper.has-items:not(.dropdown-active) .ts-control > input::placeholder {
             color: transparent !important;
             opacity: 0 !important;
         }
 
-        /* 2b. Saat dropdown DIBUKA (mau ganti nama): sembunyikan teks nama yang sedang
-               terpilih, lalu tampilkan kotak ketik pencarian secara penuh & jelas */
         .ts-wrapper.dropdown-active .ts-control > .item {
             display: none !important;
         }
@@ -44,7 +38,6 @@
             opacity: 1 !important;
         }
 
-        /* 3. Atur kotak input pencarian agar menyatu rapi di dalam dropdown */
         .ts-wrapper .ts-control > input {
             font-size: 14px !important;
             height: 100% !important;
@@ -55,7 +48,6 @@
             max-width: 100% !important;
         }
 
-        /* 4. Format teks nama pegawai terpilih agar memanjang rapi dan tidak patah/turun ke bawah */
         .ts-wrapper .ts-control > .item {
             display: inline-block !important;
             white-space: nowrap !important;
@@ -71,7 +63,6 @@
             cursor: pointer !important;
         }
 
-        /* 5. Tampilan list hasil pencarian dropdown agar melayang rapi di atas input bawahnya */
         .ts-dropdown {
             margin-top: 4px !important;
             border-radius: 0.375rem !important;
@@ -102,21 +93,35 @@
                     ← Kembali
                 </a>
                 <h1 class="text-2xl font-extrabold tracking-tight text-text-main">
-                    Tambah SPT Baru
+                    Edit SPT
                 </h1>
             </div>
 
+            @php
+                // Decode data pegawai yang sudah tersimpan supaya bisa dipakai untuk
+                // mengisi baris-baris awal form edit (bisa lebih dari 1 pegawai).
+                $existingPegawai = $spt->pegawai_ditugaskan;
+                if (is_string($existingPegawai)) {
+                    $existingPegawai = json_decode($existingPegawai, true);
+                }
+                $existingPegawai = is_array($existingPegawai) && count($existingPegawai) > 0
+                    ? $existingPegawai
+                    : [[]]; // minimal 1 baris kosong kalau data lama tidak ada
+            @endphp
+
             {{-- Form --}}
-            <form action="{{ route('user.spt.store') }}" method="POST" id="spt-form">
+            <form action="{{ route('user.spt.update', $spt->id) }}" method="POST" id="spt-form">
                 @csrf
+                @method('PUT')
 
                 <div class="bg-surface border border-border-custom rounded-xl shadow-sm p-6 space-y-6">
 
                     {{-- Nomor & Tanggal --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <x-form.input name="nomor_spt" label="Nomor SPT" placeholder="Contoh: 094/01/SPT/2026"
-                            :value="old('nomor_spt')" :required="true" :error="$errors->first('nomor_spt')" />
-                        <x-form.date-picker name="tgl_spt" label="Tanggal SPT" :value="old('tgl_spt')" :required="true"
+                            :value="old('nomor_spt', $spt->nomor_spt)" :required="true" :error="$errors->first('nomor_spt')" />
+                        <x-form.date-picker name="tgl_spt" label="Tanggal SPT"
+                            :value="old('tgl_spt', optional($spt->tgl_spt)->format('m/d/Y'))" :required="true"
                             :error="$errors->first('tgl_spt')" />
                     </div>
 
@@ -127,42 +132,48 @@
                         </label>
 
                         <div id="pegawai-list" class="space-y-4">
-                            <div class="pegawai-item border border-border-custom rounded-lg p-4 bg-background/50">
-                                <div class="flex items-end gap-2">
-                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 grow">
-                                        <div class="flex flex-col">
-                                            <label class="text-xs font-medium text-text-main mb-1">Nama Pegawai</label>
-                                            <select required class="pegawai-select w-full">
-                                                <option value="">Pilih Pegawai</option>
-                                                @foreach ($pegawaiList as $pegawai)
-                                                    <option value="{{ $pegawai->id }}"
-                                                        data-nama="{{ $pegawai->nama_pegawai }}"
-                                                        data-nip="{{ $pegawai->nip }}"
-                                                        data-pangkat="{{ $pegawai->pangkat }}{{ $pegawai->golongan ? ' / '.$pegawai->golongan : '' }}"
-                                                        data-jabatan="{{ $pegawai->jabatan }}">
-                                                        {{ $pegawai->nama_pegawai }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <label class="text-xs font-medium text-text-main mb-1">NIP</label>
-                                            <input type="text" readonly tabindex="-1"
-                                                class="pegawai-nip w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <label class="text-xs font-medium text-text-main mb-1">Pangkat/Golongan</label>
-                                            <input type="text" readonly tabindex="-1"
-                                                class="pegawai-pangkat w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <label class="text-xs font-medium text-text-main mb-1">Jabatan</label>
-                                            <input type="text" readonly tabindex="-1"
-                                                class="pegawai-jabatan w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
+                            @foreach ($existingPegawai as $index => $pegawaiTersimpan)
+                                <div class="pegawai-item border border-border-custom rounded-lg p-4 bg-background/50">
+                                    <div class="flex items-end gap-2">
+                                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 grow">
+                                            <div class="flex flex-col">
+                                                <label class="text-xs font-medium text-text-main mb-1">Nama Pegawai</label>
+                                                <select required class="pegawai-select w-full">
+                                                    <option value="">Pilih Pegawai</option>
+                                                    @foreach ($pegawaiList as $pegawai)
+                                                        <option value="{{ $pegawai->id }}"
+                                                            data-nama="{{ $pegawai->nama_pegawai }}"
+                                                            data-nip="{{ $pegawai->nip }}"
+                                                            data-pangkat="{{ $pegawai->pangkat }}{{ $pegawai->golongan ? ' / '.$pegawai->golongan : '' }}"
+                                                            data-jabatan="{{ $pegawai->jabatan }}"
+                                                            @selected(($pegawaiTersimpan['pegawai_id'] ?? null) == $pegawai->id)>
+                                                            {{ $pegawai->nama_pegawai }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <label class="text-xs font-medium text-text-main mb-1">NIP</label>
+                                                <input type="text" readonly tabindex="-1"
+                                                    value="{{ $pegawaiTersimpan['nip'] ?? '' }}"
+                                                    class="pegawai-nip w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <label class="text-xs font-medium text-text-main mb-1">Pangkat/Golongan</label>
+                                                <input type="text" readonly tabindex="-1"
+                                                    value="{{ $pegawaiTersimpan['pangkat'] ?? '' }}"
+                                                    class="pegawai-pangkat w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <label class="text-xs font-medium text-text-main mb-1">Jabatan</label>
+                                                <input type="text" readonly tabindex="-1"
+                                                    value="{{ $pegawaiTersimpan['jabatan'] ?? '' }}"
+                                                    class="pegawai-jabatan w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endforeach
                         </div>
 
                         <div class="mt-3">
@@ -189,26 +200,38 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-border-custom pt-6">
                         <x-form.textarea name="tujuan_kegiatan" label="Tujuan Kegiatan"
                             placeholder="Tuliskan tujuan kegiatan perjalanan dinas..." :rows="3"
-                            :value="old('tujuan_kegiatan')" :required="true" :error="$errors->first('tujuan_kegiatan')" />
+                            :value="old('tujuan_kegiatan', $spt->tujuan_kegiatan)" :required="true" :error="$errors->first('tujuan_kegiatan')" />
 
+                        @php
+                            // Antisipasi jika tempat_tujuan tersimpan sebagai JSON array (multi tujuan)
+                            $tempatTujuanValue = $spt->tempat_tujuan;
+                            if (is_array($tempatTujuanValue)) {
+                                $tempatTujuanValue = implode(', ', $tempatTujuanValue);
+                            } else {
+                                $decodedTujuan = json_decode($tempatTujuanValue, true);
+                                $tempatTujuanValue = is_array($decodedTujuan) ? implode(', ', $decodedTujuan) : $tempatTujuanValue;
+                            }
+                        @endphp
                         <x-form.input name="tempat_tujuan" label="Tempat Tujuan" placeholder="Contoh: Jakarta"
-                            :value="old('tempat_tujuan')" :required="true" :error="$errors->first('tempat_tujuan')" />
+                            :value="old('tempat_tujuan', $tempatTujuanValue)" :required="true" :error="$errors->first('tempat_tujuan')" />
                     </div>
 
                     {{-- Tanggal Berangkat, Kembali, Durasi Penugasan --}}
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-border-custom pt-6">
-                        <x-form.date-picker name="tgl_berangkat" label="Tanggal Berangkat" :value="old('tgl_berangkat')"
+                        <x-form.date-picker name="tgl_berangkat" label="Tanggal Berangkat"
+                            :value="old('tgl_berangkat', optional($spt->tgl_berangkat)->format('m/d/Y'))"
                             :required="true" :error="$errors->first('tgl_berangkat')" />
-                        <x-form.date-picker name="tgl_kembali" label="Tanggal Kembali" :value="old('tgl_kembali')"
+                        <x-form.date-picker name="tgl_kembali" label="Tanggal Kembali"
+                            :value="old('tgl_kembali', optional($spt->tgl_kembali)->format('m/d/Y'))"
                             :required="true" :error="$errors->first('tgl_kembali')" />
                         <x-form.input name="lama_kegiatan" label="Durasi Penugasan (hari)" type="number"
-                            placeholder="Otomatis dihitung" :value="old('lama_kegiatan')" :required="true"
+                            placeholder="Otomatis dihitung" :value="old('lama_kegiatan', $spt->lama_kegiatan)" :required="true"
                             :error="$errors->first('lama_kegiatan')" :readonly="true" />
                     </div>
 
                     {{-- Kode MAK --}}
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-border-custom pt-6">
-                        <x-form.input name="kode_mak" label="Kode MAK" placeholder="Kode MAK" :value="old('kode_mak')"
+                        <x-form.input name="kode_mak" label="Kode MAK" placeholder="Kode MAK" :value="old('kode_mak', $spt->kode_mak)"
                             :required="true" :error="$errors->first('kode_mak')" />
                     </div>
 
@@ -222,7 +245,7 @@
                     </a>
                     <button type="submit"
                         class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-2.5 px-5 rounded-md transition duration-150 ease-in-out border border-transparent">
-                        Simpan
+                        Simpan Perubahan
                     </button>
                 </div>
 
@@ -231,8 +254,6 @@
         </div>
 
     </main>
-
-    <x-layout.footer />
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -244,7 +265,7 @@
             const tglKembali = document.getElementById('tgl_kembali');
             const lamaKegiatan = document.getElementById('lama_kegiatan');
 
-            // Menyimpan daftar option mentah dari database
+            // Menyimpan daftar option mentah dari database (diambil dari select baris pertama)
             const firstSelect = container.querySelector('.pegawai-select');
             const masterOptions = [];
             if (firstSelect) {
@@ -261,13 +282,11 @@
                 });
             }
 
-            // Cache data pegawai untuk kebutuhan auto-fill
             const cacheOptions = {};
             masterOptions.forEach(opt => {
                 cacheOptions[opt.id] = opt;
             });
 
-            // Mendapatkan daftar ID pegawai yang sedang aktif dipilih
             function getSelectedPegawaiIds() {
                 const ids = [];
                 container.querySelectorAll('.pegawai-select').forEach(select => {
@@ -278,9 +297,6 @@
                 return ids;
             }
 
-            // Sinkronisasi pilihan dropdown agar tidak bisa memilih nama yang sama di baris berbeda
-            // PENTING: option milik baris itu sendiri (currentValue) selalu ikut didaftarkan ulang,
-            // sehingga baris yang SUDAH punya nama tetap bisa dicari & diganti ke nama lain yang masih tersedia.
             function syncAllDropdowns() {
                 const selectedIds = getSelectedPegawaiIds();
 
@@ -291,11 +307,9 @@
                     const ts = select.tomselect;
                     const currentValue = ts.getValue();
 
-                    ts.off('change'); // Matikan sementara listener agar tidak looping infinity
+                    ts.off('change');
                     ts.clearOptions();
 
-                    // Daftarkan ulang opsi yang belum dipilih di baris lain
-                    // + opsi milik baris ini sendiri, supaya bisa dicari ulang untuk diganti
                     masterOptions.forEach(opt => {
                         if (!selectedIds.includes(opt.id) || opt.id === currentValue) {
                             ts.addOption({ value: opt.id, text: opt.text });
@@ -303,7 +317,7 @@
                     });
 
                     ts.refreshOptions(false);
-                    ts.setValue(currentValue, true); // pastikan nilai terpilih tidak hilang setelah re-render opsi
+                    ts.setValue(currentValue, true);
 
                     ts.on('change', function(value) {
                         handleDropdownChange(item, value);
@@ -311,7 +325,6 @@
                 });
             }
 
-            // Aksi ketika pilihan dropdown berubah (Auto-fill data pendukung)
             function handleDropdownChange(item, value) {
                 const nipInput = item.querySelector('.pegawai-nip');
                 const pangkatInput = item.querySelector('.pegawai-pangkat');
@@ -331,7 +344,8 @@
                 syncAllDropdowns();
             }
 
-            // Fungsi Inisialisasi Tom Select Baru (Mendukung Search Aktual)
+            // Fungsi Inisialisasi Tom Select. Untuk halaman Edit, select bisa sudah punya
+            // <option selected> dari data lama -> Tom Select otomatis membaca itu sebagai nilai awal.
             function initPegawaiRow(item) {
                 const select = item.querySelector('.pegawai-select');
 
@@ -343,11 +357,8 @@
                     create: false,
                     maxOptions: 100,
                     placeholder: "Cari & Pilih Pegawai...",
-                    // FIX: hapus custom controlInput string HTML (tidak valid untuk Tom Select
-                    // dan menyebabkan kotak pencarian tidak berfungsi saat mau mengganti nama
-                    // yang sudah terpilih). Biarkan Tom Select membuat input pencarian bawaannya.
                     searchField: ['text'],
-                    openOnFocus: true, // klik pada item yang sudah terisi langsung membuka dropdown + siap diketik
+                    openOnFocus: true,
                     score: function(search) {
                         search = search.toLowerCase().trim();
                         if (!search.length) return function() { return 1; };
@@ -365,7 +376,6 @@
                     }
                 });
 
-                // Terapkan class Tailwind tanpa menimpa arsitektur default Tom Select
                 const tsWrapper = item.querySelector('.ts-wrapper');
                 if (tsWrapper) {
                     tsWrapper.style.border = 'none';
@@ -387,7 +397,6 @@
                 });
             }
 
-            // Manajemen tombol hapus baris dinamis
             function updateRemoveButtons() {
                 const items = container.querySelectorAll('.pegawai-item');
                 items.forEach((item) => {
@@ -397,9 +406,6 @@
                         if (!removeBtn) {
                             removeBtn = document.createElement('button');
                             removeBtn.type = 'button';
-                            // p-2 dipakai supaya area klik cukup besar (accessibility),
-                            // posisi vertikal kini otomatis sejajar dengan bawah input
-                            // lewat class items-end pada container, bukan margin tebakan (mt-5).
                             removeBtn.className = 'remove-pegawai-btn text-danger hover:text-red-700 transition duration-150 p-2';
                             removeBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
                             removeBtn.addEventListener('click', function() {
@@ -418,7 +424,6 @@
                 });
             }
 
-            // Tambah baris baru pegawai
             addBtn.addEventListener('click', function() {
                 const newItem = document.createElement('div');
                 newItem.className = 'pegawai-item border border-border-custom rounded-lg p-4 bg-background/50';
@@ -461,7 +466,7 @@
                 syncAllDropdowns();
             });
 
-            // Menjalankan inisialisasi awal saat halaman dibuka
+            // Inisialisasi semua baris yang sudah ada (termasuk baris hasil data lama dari server)
             container.querySelectorAll('.pegawai-item').forEach(initPegawaiRow);
             updateRemoveButtons();
             syncAllDropdowns();
@@ -496,7 +501,6 @@
                 hiddenInput.value = JSON.stringify(pegawaiData);
             });
 
-            // Logika penghitung otomatis selisih durasi hari kegiatan
             function hitungHari() {
                 const tgl1 = tglBerangkat ? new Date(tglBerangkat.value) : null;
                 const tgl2 = tglKembali ? new Date(tglKembali.value) : null;
