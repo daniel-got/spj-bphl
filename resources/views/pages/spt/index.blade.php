@@ -104,13 +104,20 @@
                             @php
                                 $headers = [
                                     'No', 'Nomor SPT', 'Tgl SPT', 'Nama Pegawai', 'NIP', 'Pangkat/Golongan', 'Jabatan', 
-                                    'Tujuan Kegiatan', 'Tempat Tujuan', 'Tgl. Berangkat', 'Tgl. Kembali', 'Lama (Hari)', 'Kode MAK'
+                                    'Tujuan Kegiatan', 'Tempat Tujuan', 'Tgl. Berangkat', 'Tgl. Kembali', 'Lama (Hari)', 'Kode MAK', 'Aksi'
                                 ];
 
                                 // Menggunakan index manual agar loop aman dari error tipe data swap
                                 $iteration = 1;
 
-                                $rows = collect($spts ?? [])->map(function ($spt) use (&$iteration) {
+                                // PENTING: $spts adalah objek Paginator, BUKAN array/collection biasa.
+                                // Jika collect() dipanggil langsung ke Paginator, Laravel memanggil toArray()
+                                // bawaan Paginator yang isinya metadata (current_page, total, data, dll),
+                                // bukan daftar item SPT-nya langsung. Ini yang membuat tabel selalu kosong.
+                                // Solusinya: ambil dulu isi datanya lewat ->items().
+                                $sptItems = ($spts ?? null) && method_exists($spts, 'items') ? $spts->items() : ($spts ?? []);
+
+                                $rows = collect($sptItems)->map(function ($spt) use (&$iteration) {
                                     // Antisipasi jika data yang dilempar bukan objek Model
                                     if (!is_object($spt)) {
                                         return null;
@@ -131,14 +138,35 @@
                                     $tglBerangkat = $spt->tgl_berangkat ? \Carbon\Carbon::parse($spt->tgl_berangkat)->format('d/m/Y') : '-';
                                     $tglKembali = $spt->tgl_kembali ? \Carbon\Carbon::parse($spt->tgl_kembali)->format('d/m/Y') : '-';
 
-                                    // Ambil snapshot nama pegawai dari kolom JSON 'pegawai_ditugaskan'
-                                    $namaPegawai = '-';
-                                    if (is_array($spt->pegawai_ditugaskan) && isset($spt->pegawai_ditugaskan['nama'])) {
-                                        $namaPegawai = $spt->pegawai_ditugaskan['nama'];
-                                    } elseif (is_string($spt->pegawai_ditugaskan)) {
-                                        $pegawaiDecoded = json_decode($spt->pegawai_ditugaskan, true);
-                                        $namaPegawai = $pegawaiDecoded['nama'] ?? $spt->pegawai_ditugaskan;
+                                    // Ambil snapshot data pegawai dari kolom JSON 'pegawai_ditugaskan'.
+                                    // Kolom ini berisi ARRAY DAFTAR pegawai (bisa lebih dari satu orang),
+                                    // masing-masing item punya key 'nama_pegawai', 'nip', 'pangkat', 'jabatan'
+                                    // (bukan key 'nama' seperti sebelumnya).
+                                    $pegawaiData = $spt->pegawai_ditugaskan;
+                                    if (is_string($pegawaiData)) {
+                                        $pegawaiData = json_decode($pegawaiData, true);
                                     }
+
+                                    $namaPegawaiList = [];
+                                    $nipList = [];
+                                    $pangkatList = [];
+                                    $jabatanList = [];
+
+                                    if (is_array($pegawaiData)) {
+                                        foreach ($pegawaiData as $pegawai) {
+                                            if (is_array($pegawai)) {
+                                                $namaPegawaiList[] = $pegawai['nama_pegawai'] ?? '-';
+                                                $nipList[] = $pegawai['nip'] ?? '-';
+                                                $pangkatList[] = $pegawai['pangkat'] ?? '-';
+                                                $jabatanList[] = $pegawai['jabatan'] ?? '-';
+                                            }
+                                        }
+                                    }
+
+                                    $namaPegawai = !empty($namaPegawaiList) ? implode(', ', $namaPegawaiList) : '-';
+                                    $nipPegawai = !empty($nipList) ? implode(', ', $nipList) : '-';
+                                    $pangkatPegawai = !empty($pangkatList) ? implode(', ', $pangkatList) : '-';
+                                    $jabatanPegawai = !empty($jabatanList) ? implode(', ', $jabatanList) : '-';
 
                                     // Link Detail pada Nomor SPT
                                     $nomorSptLink = '<a href="' . route('user.spt.show', $spt->id) . '" class="text-primary hover:underline font-semibold" title="Lihat Rincian">' . e($spt->nomor_spt ?? '') . '</a>';
@@ -148,15 +176,16 @@
                                         $nomorSptLink,
                                         $tglSpt,
                                         e($namaPegawai),
-                                        e($spt->nip_pegawai ?? '-'),
-                                        e($spt->pangkat_pegawai ?? '-'),
-                                        e($spt->jabatan_pegawai ?? '-'),
+                                        e($nipPegawai),
+                                        e($pangkatPegawai),
+                                        e($jabatanPegawai),
                                         '<div class="max-w-xs whitespace-normal line-clamp-2" title="' . e($spt->tujuan_kegiatan ?? '') . '">' . e($spt->tujuan_kegiatan ?? '') . '</div>',
                                         '<div class="max-w-xs whitespace-normal" title="' . $destinationsText . '">' . $destinationsText . '</div>',
                                         $tglBerangkat,
                                         $tglKembali,
                                         e($spt->lama_kegiatan ?? '') . ' Hari',
-                                        e($spt->kode_mak ?? '-')
+                                        e($spt->kode_mak ?? '-'),
+                                        '<a href="' . route('user.spt.edit', $spt->id) . '" class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover" title="Edit SPT">Edit</a>'
                                     ];
                                 })->filter()->toArray();
                             @endphp
