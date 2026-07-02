@@ -7,15 +7,13 @@ use App\Http\Requests\UpdateSpdRequest;
 use App\Models\Spd;
 use App\Models\Pegawai;
 use App\Services\SpdService;
+use Illuminate\Http\Request;
 
 class SpdController extends Controller
 {
-    protected $spdService;
-
-    public function __construct(SpdService $spdService)
-    {
-        $this->spdService = $spdService;
-    }
+    public function __construct(
+        private SpdService $spdService
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -91,23 +89,11 @@ class SpdController extends Controller
     /**
      * Search SPT for autocomplete/Select2.
      */
-    public function searchSpt()
+    public function searchSpt(Request $request)
     {
-        $search = request('q');
-        $spts = \App\Models\Spt::where('nomor_spt', 'like', "%{$search}%")
-            ->orWhere('tujuan_kegiatan', 'like', "%{$search}%")
-            ->limit(15)
-            ->get();
-
-        $results = [];
-        foreach ($spts as $spt) {
-            $results[] = [
-                'id' => $spt->id,
-                'text' => $spt->nomor_spt,
-            ];
-        }
-
-        return response()->json(['results' => $results]);
+        return response()->json([
+            'results' => $this->spdService->searchSpt($request->q),
+        ]);
     }
 
     /**
@@ -115,22 +101,8 @@ class SpdController extends Controller
      */
     public function getSptAjax($id)
     {
-        $spt = \App\Models\Spt::findOrFail($id);
-
-        $pegawaiList = is_string($spt->pegawai_ditugaskan)
-            ? json_decode($spt->pegawai_ditugaskan, true)
-            : $spt->pegawai_ditugaskan;
-
-        return response()->json([
-            'id' => $spt->id,
-            'nomor_spt' => $spt->nomor_spt,
-            'tujuan_kegiatan' => $spt->tujuan_kegiatan,
-            'tempat_tujuan' => $spt->tempat_tujuan,
-            'tgl_berangkat' => $spt->tgl_berangkat ? $spt->tgl_berangkat->format('Y-m-d') : null,
-            'tgl_kembali' => $spt->tgl_kembali ? $spt->tgl_kembali->format('Y-m-d') : null,
-            'lama_kegiatan' => $spt->lama_kegiatan,
-            'kode_mak' => $spt->kode_mak,
-            'pegawai_list' => $pegawaiList,
-        ]);
+        return response()->json(
+            $this->spdService->getSptAjax($id)
+        );
     }
 }
