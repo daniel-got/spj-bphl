@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Spd;
+use App\Models\Spt;
 use Illuminate\Support\Facades\DB;
 
 class SpdService
@@ -62,6 +63,7 @@ class SpdService
     public function createSpd(array $data)
     {
         return DB::transaction(function () use ($data) {
+            $data['pembuat_id'] = $data['pembuat_id'] ?? auth()->id();
             return Spd::create($data);
         });
     }
@@ -88,5 +90,48 @@ class SpdService
 
             return true;
         });
+    }
+
+    /**
+     * Search SPT for autocomplete/Select2.
+     */
+    public function searchSpt(?string $search): array
+    {
+        return Spt::query()
+            ->when($search, function ($query) use ($search) {
+                $query->where('nomor_spt', 'like', "%{$search}%")
+                      ->orWhere('tujuan_kegiatan', 'like', "%{$search}%");
+            })
+            ->limit(15)
+            ->get()
+            ->map(fn ($spt) => [
+                'id' => $spt->id,
+                'text' => $spt->nomor_spt,
+            ])
+            ->toArray();
+    }
+
+    /**
+     * Get single SPT data via AJAX.
+     */
+    public function getSptAjax(string $id): array
+    {
+        $spt = Spt::findOrFail($id);
+
+        $pegawaiList = is_string($spt->pegawai_ditugaskan)
+            ? json_decode($spt->pegawai_ditugaskan, true)
+            : $spt->pegawai_ditugaskan;
+
+        return [
+            'id' => $spt->id,
+            'nomor_spt' => $spt->nomor_spt,
+            'tujuan_kegiatan' => $spt->tujuan_kegiatan,
+            'tempat_tujuan' => $spt->tempat_tujuan,
+            'tgl_berangkat' => $spt->tgl_berangkat ? $spt->tgl_berangkat->format('Y-m-d') : null,
+            'tgl_kembali' => $spt->tgl_kembali ? $spt->tgl_kembali->format('Y-m-d') : null,
+            'lama_kegiatan' => $spt->lama_kegiatan,
+            'kode_mak' => $spt->kode_mak,
+            'pegawai_list' => $pegawaiList,
+        ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Spd extends Model
 {
@@ -35,6 +36,8 @@ class Spd extends Model
         'pejabat_ditugaskan',  // Kolom tambahan untuk pejabat dinamis 
         'status',              // Status SPD
         'alasan',              // Alasan revisi/penolakan
+        'spt_id',              // Referensi SPT
+        'pembuat_id',          // Pembuat SPD
     ];
 
     protected $casts = [
@@ -81,5 +84,52 @@ class Spd extends Model
         } else {
             $this->attributes['tempat_tujuan'] = $value;
         }
+    }
+
+    /**
+     * Get the alat_angkut attribute.
+     *
+     * @param  mixed  $value
+     * @return array
+     */
+    public function getAlatAngkutAttribute($value)
+    {
+        if (empty($value)) {
+            return [];
+        }
+
+        $decoded = json_decode($value, true);
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+
+        if (is_string($value)) {
+            return array_filter(array_map('trim', explode(',', $value)));
+        }
+
+        return [];
+    }
+
+    /**
+     * Set the alat_angkut attribute.
+     *
+     * @param  mixed  $value
+     * @return void
+     */
+    public function setAlatAngkutAttribute($value)
+    {
+        if (is_array($value)) {
+            $this->attributes['alat_angkut'] = json_encode(array_filter(array_map('trim', $value)));
+        } else {
+            $this->attributes['alat_angkut'] = $value;
+        }
+    }
+
+    /**
+     * Hubungan ke model SPT.
+     */
+    public function spt(): BelongsTo
+    {
+        return $this->belongsTo(Spt::class, 'spt_id');
     }
 }

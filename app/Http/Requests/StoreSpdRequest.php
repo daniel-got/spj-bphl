@@ -37,10 +37,12 @@ class StoreSpdRequest extends FormRequest
             'kode_mak'            => 'required|string|max:255',
             'jenis_perjalanan'    => 'required|string|in:Dalam Kota,Luar Kota',
             'berangkat_dari'      => 'required|string|max:255',
-            'alat_angkut'         => 'required|string|in:Kendaraan Dinas,Kendaraan Pribadi,Kendaraan Sewa,Kendaraan Umum,Pesawat Terbang',
+            'alat_angkut'         => 'required|array|min:1',
+            'alat_angkut.*'       => 'required|string|max:255',
             'ppk'                 => 'required|string|in:Pejabat Pembuat Komitmen 1,Pejabat Pembuat Komitmen 2,Pejabat Pembuat Komitmen 3,Bendahara Pengeluaran',
             'nama_ppk'            => 'required|string|max:255',
             'nip_ppk'             => 'required|string|max:50',
+            'spt_id'              => 'nullable|exists:data_spt,id',
         ];
     }
 }
