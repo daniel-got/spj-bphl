@@ -6,12 +6,12 @@
         'icon' => 'home',
         'active' => request()->routeIs('user.dashboard'),
     ],
-    {{--[--}}
-    {{--    'label' => 'Data SPT',--}}
-    {{--    'url' => route('user.spt'),--}}
-    {{--    'icon' => 'users',--}}
-    {{--    'active' => request()->routeIs('admin.kelolaPegawai') || request()->routeIs('admin.kelolaPegawai.*'),--}}
-    {{--],--}}
+   [
+        'label' => 'Data SPT',
+        'url' => '/user/spt',
+        'icon' => 'document-text',
+        'active' => request()->is('user/spt*'),
+    ],
     [
         'label' => 'Data SPD',
         'url' => route('user.spd.index'),

@@ -27,8 +27,8 @@ return [
     'sidebar' => [
         ['label' => 'Dashboard',  'url' => '/dashboard',  'icon' => 'home'],
         ['label' => 'Pegawai',    'url' => '/pegawai',    'icon' => 'users'],
-        ['label' => 'Daftar SPT', 'url' => '/spt',        'icon' => 'document-text'],
-            ['label' => 'Daftar SPD', 'url' => '/user/spd',        'icon' => 'clipboard'],
+        ['label' => 'Daftar SPT', 'url' => '/user/spt',        'icon' => 'document-text'],
+        ['label' => 'Daftar SPD', 'url' => '/user/spd',   'icon' => 'clipboard'],
         ['label' => 'Laporan',    'url' => '/laporan',    'icon' => 'chart-bar'],
         ['label' => 'Pengaturan', 'url' => '/pengaturan', 'icon' => 'cog'],
     ],

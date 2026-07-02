@@ -23,7 +23,8 @@ class Spt extends Model
         'tgl_kembali',         // Tgl. Kembali 
         'lama_kegiatan',       // Lama Kegiatan 
         'kode_mak',            // Kode MAK 
-        'pembuat_id',          // Pembuat SPT
+        'pembuat_id',          // ID user yang membuat SPT (kolom NOT NULL, wajib ada di fillable)
+        'status',              // Status SPT (draft/disetujui/direvisi/ditolak)
     ];
 
     // Konversi otomatis data JSON dari PostgreSQL menjadi array PHP 
