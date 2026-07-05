@@ -55,7 +55,7 @@ class User extends Authenticatable
 
     public function rincianDiverifikasi(): HasMany
     {
-        return $this->hasMany(Rincian::class, 'verifikator_id')
+        return $this->hasMany(Rincian::class, 'verifikator_id');
     }
 
 

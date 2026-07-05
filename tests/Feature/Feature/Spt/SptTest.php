@@ -1,0 +1,133 @@
+<?php
+
+namespace Tests\Feature\Feature\Spt;
+
+use App\Models\Spt;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class SptTest extends TestCase
+{
+    use RefreshDatabase;
+
+    // -------------------------------------------------------------------------
+    // INDEX - Melihat Daftar SPT
+    // -------------------------------------------------------------------------
+
+    public function test_user_dapat_melihat_halaman_daftar_spt(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+
+        $response = $this->actingAs($user)->get(route('user.spt.index'));
+
+        $response->assertStatus(200);
+    }
+
+    public function test_tamu_diarahkan_ke_login(): void
+    {
+        $response = $this->get(route('user.spt.index'));
+
+        $response->assertRedirect(route('login'));
+    }
+
+    // -------------------------------------------------------------------------
+    // CREATE - Form Tambah SPT
+    // -------------------------------------------------------------------------
+
+    public function test_user_dapat_membuka_halaman_tambah_spt(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+
+        $response = $this->actingAs($user)->get(route('user.spt.create'));
+
+        $response->assertStatus(200);
+    }
+
+    // -------------------------------------------------------------------------
+    // STORE - Simpan SPT Baru
+    // -------------------------------------------------------------------------
+
+    public function test_user_dapat_mengajukan_spt_baru(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+
+        $payload = [
+            'nomor_spt' => 'SPT/001/BPHL/'.now()->year,
+            'tgl_spt' => now()->format('Y-m-d'),
+            'tujuan_kegiatan' => 'Menghadiri Rapat Koordinasi Nasional',
+            'tempat_tujuan' => 'Jakarta',
+            'tgl_berangkat' => now()->addDays(5)->format('Y-m-d'),
+            'tgl_kembali' => now()->addDays(7)->format('Y-m-d'),
+            'lama_kegiatan' => 3,
+            'kode_mak' => '5311.001.001',
+            'pegawai_ditugaskan' => json_encode([
+                ['nama' => 'Budi Santoso', 'nip' => '198501012010011001', 'pangkat' => 'Penata', 'jabatan' => 'Staf'],
+            ]),
+        ];
+
+        $response = $this->actingAs($user)->post(route('user.spt.store'), $payload);
+
+        $response->assertRedirect(route('user.spt.index'));
+        $this->assertDatabaseHas('data_spt', ['nomor_spt' => 'SPT/001/BPHL/'.now()->year]);
+    }
+
+    public function test_gagal_membuat_spt_jika_nomor_spt_sudah_ada(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Spt::factory()->create(['nomor_spt' => 'SPT/001/BPHL/'.now()->year, 'pembuat_id' => $user->id]);
+
+        $payload = [
+            'nomor_spt' => 'SPT/001/BPHL/'.now()->year, // Nomor duplikat
+            'tgl_spt' => now()->format('Y-m-d'),
+            'tujuan_kegiatan' => 'Rapat',
+            'tempat_tujuan' => 'Bandung',
+            'tgl_berangkat' => now()->addDays(1)->format('Y-m-d'),
+            'tgl_kembali' => now()->addDays(2)->format('Y-m-d'),
+            'lama_kegiatan' => 2,
+            'kode_mak' => '5311.001.001',
+        ];
+
+        $response = $this->actingAs($user)->post(route('user.spt.store'), $payload);
+
+        $response->assertSessionHasErrors('nomor_spt');
+    }
+
+    public function test_gagal_membuat_spt_jika_field_wajib_kosong(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+
+        $response = $this->actingAs($user)->post(route('user.spt.store'), []);
+
+        $response->assertSessionHasErrors(['nomor_spt', 'tgl_spt', 'tujuan_kegiatan']);
+    }
+
+    // -------------------------------------------------------------------------
+    // SHOW - Lihat Detail SPT
+    // -------------------------------------------------------------------------
+
+    public function test_user_dapat_melihat_detail_spt(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $spt = Spt::factory()->create(['pembuat_id' => $user->id]);
+
+        $response = $this->actingAs($user)->get(route('user.spt.show', $spt));
+
+        $response->assertStatus(200);
+    }
+
+    // -------------------------------------------------------------------------
+    // DESTROY - Hapus SPT
+    // -------------------------------------------------------------------------
+
+    public function test_user_dapat_menghapus_spt_miliknya(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $spt = Spt::factory()->create(['pembuat_id' => $user->id]);
+
+        $response = $this->actingAs($user)->delete(route('user.spt.destroy', $spt));
+
+        $response->assertRedirect(route('user.spt.index'));
+        $this->assertDatabaseMissing('data_spt', ['id' => $spt->id]);
+    }
+}
