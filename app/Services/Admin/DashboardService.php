@@ -2,10 +2,10 @@
 
 namespace App\Services\Admin;
 
-use App\Models\User;
 use App\Models\Pegawai;
 use App\Models\Spt;
-use App\Enums\UserRole;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * DashboardService — Logika bisnis untuk Dashboard Admin.
@@ -18,15 +18,13 @@ class DashboardService
     /**
      * Mengumpulkan semua data yang dibutuhkan untuk halaman Dashboard Admin.
      * Return type array agar mudah di-unpack ke View (compact-style).
-     *
-     * @return array
      */
     public function getDashboardData(): array
     {
         return [
-            'stats'            => $this->getStatCards(),
-            'recentUsers'      => $this->getRecentUsers(),
-            'documentSummary'  => $this->getDocumentSummary(),
+            'stats' => $this->getStatCards(),
+            'recentUsers' => $this->getRecentUsers(),
+            'documentSummary' => $this->getDocumentSummary(),
         ];
     }
 
@@ -39,48 +37,48 @@ class DashboardService
      */
     private function getStatCards(): array
     {
-        $totalPegawai    = User::has('pegawai')->count();
-        $totalAdmin      = User::admin()->count();
+        $totalPegawai = User::rolePegawai()->count();
+        $totalAdmin = User::admin()->count();
         $totalVerifikator = User::verifikator()->count();
-        $totalPegawai2   = User::has('pegawai')->count();
+        $totalPegawai2 = User::has('pegawai')->count();
 
         // Hitung dokumen berdasarkan status jika model Spt tersedia
         $dokumenDiajukan = 0;
         $dokumenDisetujui = 0;
 
         if (class_exists(Spt::class)) {
-            $dokumenDiajukan  = Spt::where('status', 'diajukan')->count();
+            $dokumenDiajukan = Spt::where('status', 'diajukan')->count();
             $dokumenDisetujui = Spt::where('status', 'disetujui')->count();
         }
 
         return [
             [
-                'title'       => 'Total Pengguna',
-                'value'       => $totalPegawai,
+                'title' => 'Total Pengguna',
+                'value' => $totalPegawai,
                 'description' => 'Seluruh akun terdaftar',
-                'icon'        => 'users',
-                'color'       => 'blue',
+                'icon' => 'users',
+                'color' => 'blue',
             ],
             [
-                'title'       => 'Pegawai Aktif',
-                'value'       => $totalPegawai2,
+                'title' => 'Pegawai Aktif',
+                'value' => $totalPegawai2,
                 'description' => 'Dengan role User',
-                'icon'        => 'user-group',
-                'color'       => 'green',
+                'icon' => 'user-group',
+                'color' => 'green',
             ],
             [
-                'title'       => 'Dokumen Diajukan',
-                'value'       => $dokumenDiajukan,
+                'title' => 'Dokumen Diajukan',
+                'value' => $dokumenDiajukan,
                 'description' => 'Menunggu verifikasi',
-                'icon'        => 'document-text',
-                'color'       => 'yellow',
+                'icon' => 'document-text',
+                'color' => 'yellow',
             ],
             [
-                'title'       => 'Dokumen Disetujui',
-                'value'       => $dokumenDisetujui,
+                'title' => 'Dokumen Disetujui',
+                'value' => $dokumenDisetujui,
                 'description' => 'Selesai diproses',
-                'icon'        => 'check-circle',
-                'color'       => 'green',
+                'icon' => 'check-circle',
+                'color' => 'green',
             ],
         ];
     }
@@ -89,12 +87,12 @@ class DashboardService
      * 5 pengguna terbaru yang baru mendaftar/dibuat oleh Admin.
      * Menggunakan Eager Loading agar data pegawai ikut terbawa (hindari N+1).
      */
-    private function getRecentUsers(): \Illuminate\Database\Eloquent\Collection
+    private function getRecentUsers(): Collection
     {
         return User::with('pegawai')
-                   ->latest()
-                   ->limit(5)
-                   ->get();
+            ->latest()
+            ->limit(5)
+            ->get();
     }
 
     /**
@@ -102,12 +100,12 @@ class DashboardService
      */
     private function getDocumentSummary(): array
     {
-        if (!class_exists(Spt::class)) {
+        if (! class_exists(Spt::class)) {
             return [];
         }
 
         $statuses = ['draft', 'diajukan', 'direvisi', 'disetujui', 'ditolak'];
-        $summary  = [];
+        $summary = [];
 
         foreach ($statuses as $status) {
             $summary[] = [

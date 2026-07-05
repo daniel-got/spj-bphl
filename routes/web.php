@@ -9,3 +9,4 @@ require __DIR__ . '/web/auth.php';
 require __DIR__ . '/web/admin.php';
 require __DIR__ . '/web/spd.php';
 require __DIR__ . '/web/spt.php';
+require __DIR__ . '/web/rincian.php';
