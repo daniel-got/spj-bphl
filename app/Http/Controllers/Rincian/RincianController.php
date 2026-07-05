@@ -35,10 +35,7 @@ class RincianController extends Controller
      */
     public function create()
     {
-        // Menyediakan data SPD untuk dropdown pilihan
-        $spds = Spd::latest()->get(['id', 'nomor_spd', 'pegawai_ditugaskan']);
-
-        return view('pages.rincian.create', compact('spds'));
+        return view('pages.rincian.create');
     }
 
     /**
