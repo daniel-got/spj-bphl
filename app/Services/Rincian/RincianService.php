@@ -82,10 +82,7 @@ class RincianService
                 'nip_ppk' => $spd->nip_ppk,
 
                 // Manual inputs
-                'biaya_transport' => $data['biaya_transport'] ?? null,
-                'penginapan' => $data['penginapan'] ?? null,
-                'hotel_ril' => $data['hotel_ril'] ?? null,
-                'detail_transportasi' => $data['detail_transportasi'] ?? null,
+                'rincian_biaya' => $data['rincian_biaya'] ?? null,
 
                 'status' => 'draft',
                 'pembuat_id' => $authId,

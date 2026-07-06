@@ -20,11 +20,11 @@ class UpdateRincianRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'biaya_transport' => 'nullable|numeric|min:0',
-            'penginapan' => 'nullable|integer|min:0|max:100',
-            'hotel_ril' => 'nullable|numeric|min:0',
-            'detail_transportasi' => 'nullable|array',
-            'status' => 'nullable|in:draft,diajukan,direvisi,disetujui,ditolak',
+            'rincian_biaya'                   => 'required|array|min:1',
+            'rincian_biaya.*.biaya_transport'  => 'nullable|numeric|min:0',
+            'rincian_biaya.*.penginapan'       => 'nullable|integer|in:30,100',
+            'rincian_biaya.*.hotel_ril'        => 'nullable|numeric|min:0',
+            'status'                           => 'nullable|in:draft,diajukan,direvisi,disetujui,ditolak',
         ];
     }
 }

@@ -63,19 +63,59 @@
                         <x-form.input name="nip_ppk" label="NIP PPK" :value="$rincian->nip_ppk" disabled="true" />
                     </div>
 
-                    {{-- Field Khusus Rincian (Editable) --}}
+                    {{-- Field Khusus Rincian (Editable + Dinamis) --}}
                     <div class="border-t border-border-custom pt-6 space-y-4">
-                        <h3 class="text-base font-bold text-text-main mb-2">Biaya Rincian</h3>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <x-form.input name="biaya_transport" label="Biaya Transport (Rp)" type="number" placeholder="Contoh: 150000"
-                                :value="old('biaya_transport', (int) $rincian->biaya_transport)" :error="$errors->first('biaya_transport')" />
-                            
-                            <x-form.input name="penginapan" label="Lama Penginapan (Malam)" type="number" placeholder="Contoh: 2"
-                                :value="old('penginapan', $rincian->penginapan)" :error="$errors->first('penginapan')" />
-                                
-                            <x-form.input name="hotel_ril" label="Biaya Hotel/Penginapan (Rp)" type="number" placeholder="Contoh: 500000"
-                                :value="old('hotel_ril', (int) $rincian->hotel_ril)" :error="$errors->first('hotel_ril')" />
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-base font-bold text-text-main">Biaya Rincian</h3>
+                            <button type="button" id="btn-tambah-biaya"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-primary text-primary text-sm font-medium hover:bg-primary hover:text-white transition duration-150">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                Tambah Rincian
+                            </button>
+                        </div>
+
+                        <div id="rincian-biaya-container" class="space-y-4">
+                            @php
+                                $existingBiaya = old('rincian_biaya', $rincian->rincian_biaya ?? []);
+                                if (empty($existingBiaya)) {
+                                    $existingBiaya = [['biaya_transport' => '', 'penginapan' => '', 'hotel_ril' => '']];
+                                }
+                            @endphp
+
+                            @foreach ($existingBiaya as $i => $baris)
+                                <div class="rincian-row bg-background border border-border-custom rounded-lg p-4 relative">
+                                    <button type="button"
+                                        class="btn-hapus-baris absolute top-3 right-3 text-muted hover:text-danger transition {{ count($existingBiaya) <= 1 ? 'hidden' : '' }}"
+                                        title="Hapus baris ini">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div class="flex flex-col gap-1">
+                                            <label class="text-sm font-semibold text-text-main">Biaya Transport (Rp)</label>
+                                            <input type="number" name="rincian_biaya[{{ $i }}][biaya_transport]" min="0"
+                                                value="{{ $baris['biaya_transport'] ?? '' }}"
+                                                placeholder="Contoh: 150000"
+                                                class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary" />
+                                        </div>
+                                        <div class="flex flex-col gap-1">
+                                            <label class="text-sm font-semibold text-text-main">Penginapan (%)</label>
+                                            <select name="rincian_biaya[{{ $i }}][penginapan]"
+                                                class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary">
+                                                <option value="">-- Pilih --</option>
+                                                <option value="100" {{ ($baris['penginapan'] ?? '') == 100 ? 'selected' : '' }}>100%</option>
+                                                <option value="30" {{ ($baris['penginapan'] ?? '') == 30 ? 'selected' : '' }}>30%</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex flex-col gap-1">
+                                            <label class="text-sm font-semibold text-text-main">Biaya Hotel / Penginapan (Rp)</label>
+                                            <input type="number" name="rincian_biaya[{{ $i }}][hotel_ril]" min="0"
+                                                value="{{ $baris['hotel_ril'] ?? '' }}"
+                                                placeholder="Contoh: 500000"
+                                                class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary" />
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
 
@@ -95,4 +135,81 @@
         </div>
     </main>
     <x-layout.footer />
+
+    <script>
+        // -----------------------------------------------------------------------
+        // Dynamic Rincian Biaya Rows (Edit)
+        // -----------------------------------------------------------------------
+        (function () {
+            const container = document.getElementById('rincian-biaya-container');
+            const btnTambah = document.getElementById('btn-tambah-biaya');
+
+            function buildRow(index) {
+                return `
+                    <div class="rincian-row bg-background border border-border-custom rounded-lg p-4 relative">
+                        <button type="button"
+                            class="btn-hapus-baris absolute top-3 right-3 text-muted hover:text-danger transition"
+                            title="Hapus baris ini">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="flex flex-col gap-1">
+                                <label class="text-sm font-semibold text-text-main">Biaya Transport (Rp)</label>
+                                <input type="number" name="rincian_biaya[${index}][biaya_transport]" min="0"
+                                    placeholder="Contoh: 150000"
+                                    class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary" />
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-sm font-semibold text-text-main">Penginapan (%)</label>
+                                <select name="rincian_biaya[${index}][penginapan]"
+                                    class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option value="">-- Pilih --</option>
+                                    <option value="100">100%</option>
+                                    <option value="30">30%</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-sm font-semibold text-text-main">Biaya Hotel / Penginapan (Rp)</label>
+                                <input type="number" name="rincian_biaya[${index}][hotel_ril]" min="0"
+                                    placeholder="Contoh: 500000"
+                                    class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary" />
+                            </div>
+                        </div>
+                    </div>`;
+            }
+
+            function reindex() {
+                container.querySelectorAll('.rincian-row').forEach(function (row, i) {
+                    row.querySelectorAll('input, select').forEach(function (el) {
+                        if (el.name) {
+                            el.name = el.name.replace(/\[\d+\]/, '[' + i + ']');
+                        }
+                    });
+                });
+                const rows = container.querySelectorAll('.rincian-row');
+                rows.forEach(function (row) {
+                    const btn = row.querySelector('.btn-hapus-baris');
+                    if (btn) btn.classList.toggle('hidden', rows.length === 1);
+                });
+            }
+
+            btnTambah.addEventListener('click', function () {
+                const index = container.querySelectorAll('.rincian-row').length;
+                container.insertAdjacentHTML('beforeend', buildRow(index));
+                reindex();
+            });
+
+            container.addEventListener('click', function (e) {
+                const btn = e.target.closest('.btn-hapus-baris');
+                if (!btn) return;
+                const row = btn.closest('.rincian-row');
+                if (container.querySelectorAll('.rincian-row').length > 1) {
+                    row.remove();
+                    reindex();
+                }
+            });
+
+            reindex();
+        })();
+    </script>
 </x-layout.app>

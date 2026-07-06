@@ -35,9 +35,13 @@ class RincianFactory extends Factory
             'ppk' => fake()->numerify('##################'),
             'nama_ppk' => fake()->name(),
             'nip_ppk' => fake()->numerify('##################'),
-            'biaya_transport' => fake()->randomElement([null, 150000, 300000, 500000]),
-            'penginapan' => fake()->randomElement([null, 1, 2, 3]),
-            'hotel_ril' => fake()->randomElement([null, 350000, 500000, 750000]),
+            'rincian_biaya' => [
+                [
+                    'biaya_transport' => fake()->randomElement([150000, 300000, 500000]),
+                    'penginapan' => fake()->randomElement([30, 100]),
+                    'hotel_ril' => fake()->randomElement([350000, 500000, 750000]),
+                ]
+            ],
             'status' => 'draft',
             'pembuat_id' => User::factory(),
         ];

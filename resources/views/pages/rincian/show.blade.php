@@ -104,22 +104,43 @@
                     </div>
                 </x-layout.card>
 
-                {{-- Card 3: Rincian Anggaran Tambahan --}}
-                <x-layout.card title="Detail Rincian Biaya Tambahan">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-                        <div>
-                            <span class="text-xs font-semibold text-muted uppercase tracking-wider">Biaya Transport</span>
-                            <p class="text-sm font-bold text-text-main mt-1">Rp {{ number_format($rincian->biaya_transport ?? 0, 0, ',', '.') }}</p>
+                {{-- Card 3: Rincian Biaya Dinamis --}}
+                <x-layout.card title="Detail Rincian Biaya">
+                    @php
+                        $rincianBiaya = $rincian->rincian_biaya ?? [];
+                    @endphp
+                    @if (!empty($rincianBiaya))
+                        <div class="overflow-x-auto mt-4">
+                            <table class="min-w-full divide-y divide-border-custom text-sm">
+                                <thead class="bg-background text-muted uppercase text-[10px] font-bold tracking-wider">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left w-12">#</th>
+                                        <th class="px-4 py-3 text-left">Biaya Transport</th>
+                                        <th class="px-4 py-3 text-left">Penginapan (%)</th>
+                                        <th class="px-4 py-3 text-right">Biaya Hotel / Penginapan</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-border-custom bg-surface">
+                                    @foreach ($rincianBiaya as $i => $baris)
+                                        <tr>
+                                            <td class="px-4 py-3 text-muted font-medium">{{ $i + 1 }}</td>
+                                            <td class="px-4 py-3 text-text-main">
+                                                Rp {{ number_format($baris['biaya_transport'] ?? 0, 0, ',', '.') }}
+                                            </td>
+                                            <td class="px-4 py-3 text-text-main">
+                                                {{ $baris['penginapan'] ?? '-' }}%
+                                            </td>
+                                            <td class="px-4 py-3 text-text-main text-right">
+                                                Rp {{ number_format($baris['hotel_ril'] ?? 0, 0, ',', '.') }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                        <div>
-                            <span class="text-xs font-semibold text-muted uppercase tracking-wider">Lama Penginapan</span>
-                            <p class="text-sm font-bold text-text-main mt-1">{{ $rincian->penginapan ?? 0 }} Malam</p>
-                        </div>
-                        <div>
-                            <span class="text-xs font-semibold text-muted uppercase tracking-wider">Biaya Hotel / Penginapan</span>
-                            <p class="text-sm font-bold text-text-main mt-1">Rp {{ number_format($rincian->hotel_ril ?? 0, 0, ',', '.') }}</p>
-                        </div>
-                    </div>
+                    @else
+                        <p class="text-sm text-muted mt-4 italic">Belum ada data rincian biaya.</p>
+                    @endif
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6 border-t border-border-custom pt-4">
                         <div>
                             <span class="text-xs font-semibold text-muted uppercase tracking-wider">Kode MAK</span>

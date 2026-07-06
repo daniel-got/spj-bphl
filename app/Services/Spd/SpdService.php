@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Spd;
 
 use App\Models\Spd;
 use App\Models\Spt;
@@ -64,6 +64,7 @@ class SpdService
     {
         return DB::transaction(function () use ($data) {
             $data['pembuat_id'] = $data['pembuat_id'] ?? auth()->id();
+
             return Spd::create($data);
         });
     }
@@ -100,7 +101,7 @@ class SpdService
         return Spt::query()
             ->when($search, function ($query) use ($search) {
                 $query->where('nomor_spt', 'like', "%{$search}%")
-                      ->orWhere('tujuan_kegiatan', 'like', "%{$search}%");
+                    ->orWhere('tujuan_kegiatan', 'like', "%{$search}%");
             })
             ->limit(15)
             ->get()

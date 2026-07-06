@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Feature\Rincian;
+namespace Tests\Feature\Rincian;
 
 use App\Models\Rincian;
 use App\Models\Spd;
@@ -84,23 +84,44 @@ class RincianTest extends TestCase
     // STORE - Simpan Rincian Baru (otomatis copy data dari SPD)
     // -------------------------------------------------------------------------
 
-    public function test_user_dapat_membuat_rincian_dari_spd(): void
+    public function test_user_dapat_membuat_rincian_dari_spd_dengan_data_dinamis_ganda(): void
     {
         $user = User::factory()->create(['role' => 'user']);
-        $spd = Spd::factory()->create(['pembuat_id' => $user->id]);
+        
+        // Buat SPD dengan pegawai > 1 dan alat_angkut > 1
+        $spd = Spd::factory()->create([
+            'pembuat_id' => $user->id,
+            'pegawai_ditugaskan' => 'Andi, Budi, Clara',
+            'alat_angkut' => ['Pesawat', 'Kereta Api', 'Taksi'],
+        ]);
 
         $response = $this->actingAs($user)->post(route('user.rincian.store'), [
             'spd_id' => $spd->id,
-            'biaya_transport' => 150000,
-            'penginapan' => 2,
-            'hotel_ril' => 500000,
+            'rincian_biaya' => [
+                [
+                    'biaya_transport' => 150000,
+                    'penginapan' => 30,
+                    'hotel_ril' => 500000,
+                ],
+                [
+                    'biaya_transport' => 200000,
+                    'penginapan' => 100,
+                    'hotel_ril' => 700000,
+                ]
+            ],
         ]);
 
         $response->assertRedirect(route('user.rincian.index'));
         $this->assertDatabaseHas('data_rincian', [
             'nomor_spd' => $spd->nomor_spd,
-            'biaya_transport' => 150000,
+            'pegawai_ditugaskan' => 'Andi, Budi, Clara', // Pastikan tersalin utuh
+            'alat_angkut' => 'Pesawat, Kereta Api, Taksi', // Pastikan array alat_angkut di-implode dengan benar
         ]);
+        
+        $rincian = Rincian::where('nomor_spd', $spd->nomor_spd)->first();
+        $this->assertCount(2, $rincian->rincian_biaya); // Pastikan rincian biaya > 1 tersimpan
+        $this->assertEquals(150000, $rincian->rincian_biaya[0]['biaya_transport']);
+        $this->assertEquals(200000, $rincian->rincian_biaya[1]['biaya_transport']);
     }
 
     public function test_gagal_membuat_rincian_tanpa_spd_id(): void
@@ -108,7 +129,11 @@ class RincianTest extends TestCase
         $user = User::factory()->create(['role' => 'user']);
 
         $response = $this->actingAs($user)->post(route('user.rincian.store'), [
-            'biaya_transport' => 150000,
+            'rincian_biaya' => [
+                [
+                    'biaya_transport' => 150000,
+                ]
+            ],
         ]);
 
         $response->assertSessionHasErrors('spd_id');
@@ -143,22 +168,32 @@ class RincianTest extends TestCase
     // UPDATE - Edit Rincian
     // -------------------------------------------------------------------------
 
-    public function test_user_dapat_mengedit_biaya_rincian(): void
+    public function test_user_dapat_mengedit_biaya_rincian_menjadi_ganda(): void
     {
         $user = User::factory()->create(['role' => 'user']);
         $rincian = Rincian::factory()->create(['pembuat_id' => $user->id]);
 
         $response = $this->actingAs($user)->put(route('user.rincian.update', $rincian), [
-            'biaya_transport' => 250000,
-            'penginapan' => 3,
-            'hotel_ril' => 750000,
+            'rincian_biaya' => [
+                [
+                    'biaya_transport' => 250000,
+                    'penginapan' => 100,
+                    'hotel_ril' => 750000,
+                ],
+                [
+                    'biaya_transport' => 50000,
+                    'penginapan' => 30,
+                    'hotel_ril' => 0,
+                ]
+            ],
         ]);
 
         $response->assertRedirect(route('user.rincian.index'));
-        $this->assertDatabaseHas('data_rincian', [
-            'id' => $rincian->id,
-            'biaya_transport' => 250000,
-        ]);
+        
+        $rincian->refresh();
+        $this->assertCount(2, $rincian->rincian_biaya);
+        $this->assertEquals(250000, $rincian->rincian_biaya[0]['biaya_transport']);
+        $this->assertEquals(50000, $rincian->rincian_biaya[1]['biaya_transport']);
     }
 
     // -------------------------------------------------------------------------
