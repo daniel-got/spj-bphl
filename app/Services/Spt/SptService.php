@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Spt;
 
 use App\Models\Spt;
 use Illuminate\Support\Facades\DB;
@@ -107,4 +107,3 @@ class SptService
         });
     }
 }
-//revisi selesai

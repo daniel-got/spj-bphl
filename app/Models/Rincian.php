@@ -30,10 +30,7 @@ class Rincian extends Model
         'ppk',                  // PPK
         'nama_ppk',             // Nama PPK
         'nip_ppk',              // NIP PPK
-        'biaya_transport',      // Biaya Transport
-        'penginapan',           // Penginapan (%)
-        'hotel_ril',            // Hotel Ril
-        'detail_transportasi',  // Menyimpan komponen detail transportasi dinamis
+        'rincian_biaya',        // Array JSON dari set biaya (biaya_transport, penginapan %, hotel_ril)
         'status',
         'pembuat_id',
         'verifikator_id',
@@ -41,11 +38,8 @@ class Rincian extends Model
     ];
 
     protected $casts = [
-        'detail_transportasi' => 'array', // Mengakomodasi penambahan baris transportasi dinamis
-        'tgl_spd' => 'date',
-        'biaya_transport' => 'decimal:2',
-        'penginapan' => 'integer',
-        'hotel_ril' => 'decimal:2',
+        'rincian_biaya' => 'array', // Mengakomodasi banyak set biaya dinamis
+        'tgl_spd'       => 'date',
     ];
 
     // -------------------------------------------------------------------------

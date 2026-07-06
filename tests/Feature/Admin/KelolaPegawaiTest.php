@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Feature\Admin;
+namespace Tests\Feature\Admin;
 
 use App\Models\Pegawai;
 use App\Models\User;

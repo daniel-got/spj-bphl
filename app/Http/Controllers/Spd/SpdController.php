@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Spd;
 
-use App\Http\Requests\StoreSpdRequest;
-use App\Http\Requests\UpdateSpdRequest;
-use App\Models\Spd;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Spd\StoreSpdRequest;
+use App\Http\Requests\Spd\UpdateSpdRequest;
 use App\Models\Pegawai;
-use App\Services\SpdService;
+use App\Models\Spd;
+use App\Services\Spd\SpdService;
 use Illuminate\Http\Request;
 
 class SpdController extends Controller
@@ -34,6 +35,7 @@ class SpdController extends Controller
     public function create()
     {
         $pegawais = Pegawai::orderBy('nama_pegawai', 'asc')->get();
+
         return view('pages.spd.create', compact('pegawais'));
     }
 
@@ -63,6 +65,7 @@ class SpdController extends Controller
     public function edit(Spd $spd)
     {
         $pegawais = Pegawai::orderBy('nama_pegawai', 'asc')->get();
+
         return view('pages.spd.edit', compact('spd', 'pegawais'));
     }
 

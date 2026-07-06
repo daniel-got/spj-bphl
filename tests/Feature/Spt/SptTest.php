@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Feature\Spt;
+namespace Tests\Feature\Spt;
 
 use App\Models\Spt;
 use App\Models\User;

@@ -20,11 +20,11 @@ class StoreRincianRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'spd_id' => 'required|exists:data_spd,id',
-            'biaya_transport' => 'nullable|numeric|min:0',
-            'penginapan' => 'nullable|integer|min:0|max:100',
-            'hotel_ril' => 'nullable|numeric|min:0',
-            'detail_transportasi' => 'nullable|array',
+            'spd_id'                      => 'required|exists:data_spd,id',
+            'rincian_biaya'               => 'required|array|min:1',
+            'rincian_biaya.*.biaya_transport' => 'nullable|numeric|min:0',
+            'rincian_biaya.*.penginapan'  => 'nullable|integer|in:30,100',
+            'rincian_biaya.*.hotel_ril'   => 'nullable|numeric|min:0',
         ];
     }
 }

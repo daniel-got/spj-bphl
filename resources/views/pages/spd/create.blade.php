@@ -6,78 +6,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <style>
-        /* Custom Select2 Styling to match premium theme */
-        .select2-container {
-            width: 100% !important;
-        }
-        .select2-container--default .select2-selection--single {
-            background-color: var(--color-surface, #ffffff);
-            border: 1px solid #e5e7eb;
-            border-radius: 0.375rem;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            position: relative;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            color: #1f2937;
-            font-size: 0.875rem;
-            padding-left: 0.75rem;
-            padding-right: 2rem;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 40px;
-            right: 8px;
-        }
-        .select2-dropdown {
-            background-color: #ffffff;
-            border-color: #e5e7eb;
-            border-radius: 0.375rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            z-index: 1050;
-        }
-        .select2-container--default .select2-search--dropdown .select2-search__field {
-            border: 1px solid #e5e7eb;
-            border-radius: 0.25rem;
-            background-color: #f9fafb;
-            color: #1f2937;
-            font-size: 0.875rem;
-            padding: 6px 10px;
-        }
-        .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #3b82f6;
-            color: white;
-        }
-        .select2-container--default .select2-results__option {
-            font-size: 0.875rem;
-            padding: 8px 12px;
-            color: #1f2937;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__placeholder {
-            color: #9ca3af;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__clear {
-            position: absolute;
-            right: 32px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.125rem;
-            color: #9ca3af;
-            cursor: pointer;
-            font-weight: normal;
-            margin-right: 0;
-            line-height: 1;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__clear:hover {
-            color: #ef4444;
-        }
-        /* Limit Select2 search dropdown results to 5 items and enable scroll */
-        .select2-container--default .select2-results > .select2-results__options {
-            max-height: 185px !important;
-            overflow-y: auto !important;
-        }
-    </style>
+    <x-style.select2 />
 
     <main class="grow flex flex-col px-6 py-10">
 
@@ -170,10 +99,10 @@
                                 }
                             @endphp
 
-                           <div id="destinations-list" class="space-y-3">
+                            <div id="destinations-list" class="space-y-3">
                                 @foreach ($destinations as $index => $destination)
                                     <div class="flex items-center gap-2 destination-item">
-                                         <div class="grow">
+                                        <div class="grow">
                                             <input type="text" name="tempat_tujuan[]" placeholder="Contoh: Jakarta"
                                                 value="{{ $destination }}" required
                                                 class="w-full px-3 py-2 text-sm border rounded-md shadow-sm placeholder-muted bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom" />
@@ -193,7 +122,7 @@
                                 @endforeach
                             </div>
 
-                           
+
                             @if ($errors->has('tempat_tujuan'))
                                 <p class="text-xs text-danger mt-1">{{ $errors->first('tempat_tujuan') }}</p>
                             @endif
@@ -208,7 +137,7 @@
                             :required="true" :error="$errors->first('tgl_kembali')" />
                         <x-form.input name="lama_kegiatan" label="Durasi Penugasan (hari)" type="number"
                             placeholder="Jumlah hari" :value="old('lama_kegiatan')" :required="true" :error="$errors->first('lama_kegiatan')" />
-                    </div>                    {{-- Kode, Jenis, Berangkat, Alat Angkut --}}
+                    </div> {{-- Kode, Jenis, Berangkat, Alat Angkut --}}
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 border-t border-border-custom pt-6">
                         <x-form.input name="kode_mak" label="Kode MAK" placeholder="Kode MAK" :value="old('kode_mak')"
                             :required="true" :error="$errors->first('kode_mak')" />
@@ -254,16 +183,18 @@
                                     $alatangkuts = [''];
                                 }
                             @endphp
-                        
+
                             <div id="alatangkuts-list" class="space-y-3">
                                 @foreach ($alatangkuts as $index => $val)
                                     <div class="flex items-center gap-2 alatangkut-item">
                                         <div class="grow">
                                             <select name="alat_angkut[]" required
                                                 class="w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom">
-                                                <option value="" disabled {{ !$val ? 'selected' : '' }}>Pilih Alat Angkut</option>
+                                                <option value="" disabled {{ !$val ? 'selected' : '' }}>Pilih Alat
+                                                    Angkut</option>
                                                 @foreach ($alatAngkutOptions as $optValue => $optLabel)
-                                                    <option value="{{ $optValue }}" {{ $val == $optValue ? 'selected' : '' }}>
+                                                    <option value="{{ $optValue }}"
+                                                        {{ $val == $optValue ? 'selected' : '' }}>
                                                         {{ $optLabel }}
                                                     </option>
                                                 @endforeach
@@ -287,7 +218,7 @@
                             @if ($errors->has('alat_angkut'))
                                 <p class="text-xs text-danger mt-1">{{ $errors->first('alat_angkut') }}</p>
                             @endif
-                        
+
                             <div class="mt-2">
                                 <button type="button" id="add-alatangkut-btn"
                                     class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover transition duration-150">
@@ -379,15 +310,15 @@
                 placeholder: 'Contoh: 094/01/SPT/2026',
                 allowClear: true,
                 ajax: {
-                    url: '{{ route("user.spt.search") }}',
+                    url: '{{ route('user.spt.search') }}',
                     dataType: 'json',
                     delay: 250,
-                    data: function (params) {
+                    data: function(params) {
                         return {
                             q: params.term
                         };
                     },
-                    processResults: function (data) {
+                    processResults: function(data) {
                         return {
                             results: data.results
                         };
@@ -396,40 +327,45 @@
                 }
             });
 
-            $('#spt_id').on('select2:select', function (e) {
+            $('#spt_id').on('select2:select', function(e) {
                 const sptId = e.params.data.id;
                 if (sptId) {
-                    let url = '{{ route("user.spt.ajax", ["id" => ":id"]) }}';
+                    let url = '{{ route('user.spt.ajax', ['id' => ':id']) }}';
                     url = url.replace(':id', sptId);
 
                     $.ajax({
                         url: url,
                         type: 'GET',
                         dataType: 'json',
-                        success: function (data) {
+                        success: function(data) {
                             // Note: tujuan_kegiatan is NOT auto-filled from SPT, per user requirement.
                             if (data.kode_mak) {
                                 document.getElementById('kode_mak').value = data.kode_mak;
                             }
                             if (data.tgl_berangkat) {
-                                document.getElementById('tgl_berangkat').value = data.tgl_berangkat;
+                                document.getElementById('tgl_berangkat').value = data
+                                    .tgl_berangkat;
                             }
                             if (data.tgl_kembali) {
                                 document.getElementById('tgl_kembali').value = data.tgl_kembali;
                             }
                             if (data.lama_kegiatan) {
-                                document.getElementById('lama_kegiatan').value = data.lama_kegiatan;
+                                document.getElementById('lama_kegiatan').value = data
+                                    .lama_kegiatan;
                             }
-                            
+
                             if (data.tempat_tujuan) {
-                                const destinationsList = document.getElementById('destinations-list');
+                                const destinationsList = document.getElementById(
+                                    'destinations-list');
                                 destinationsList.innerHTML = '';
-                                
-                                const places = data.tempat_tujuan.split(',').map(p => p.trim()).filter(p => p !== '');
+
+                                const places = data.tempat_tujuan.split(',').map(p => p.trim())
+                                    .filter(p => p !== '');
                                 if (places.length > 0) {
                                     places.forEach(place => {
                                         const newItem = document.createElement('div');
-                                        newItem.className = 'flex items-center gap-2 destination-item';
+                                        newItem.className =
+                                            'flex items-center gap-2 destination-item';
                                         newItem.innerHTML = `
                                             <div class="grow">
                                                 <input
@@ -446,7 +382,8 @@
                                     });
                                 } else {
                                     const newItem = document.createElement('div');
-                                    newItem.className = 'flex items-center gap-2 destination-item';
+                                    newItem.className =
+                                        'flex items-center gap-2 destination-item';
                                     newItem.innerHTML = `
                                         <div class="grow">
                                             <input
@@ -465,7 +402,7 @@
                             if (data.pegawai_list && data.pegawai_list.length > 0) {
                                 const firstPegawai = data.pegawai_list[0];
                                 const name = firstPegawai.nama_pegawai;
-                                
+
                                 const selectPeg = $('#pegawai_ditugaskan');
                                 if (selectPeg.length) {
                                     let optionExists = false;
@@ -499,14 +436,14 @@
                 if (startVal && endVal) {
                     const startDate = new Date(startVal);
                     const endDate = new Date(endVal);
-                    
+
                     // Reset hours to avoid timezone/DST differences
                     startDate.setHours(0, 0, 0, 0);
                     endDate.setHours(0, 0, 0, 0);
 
                     const timeDiff = endDate.getTime() - startDate.getTime();
                     const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
-                    
+
                     lamaKegiatanInput.value = dayDiff > 0 ? dayDiff : '';
                 } else {
                     lamaKegiatanInput.value = '';
@@ -551,7 +488,7 @@
             addBtn.addEventListener('click', function() {
                 const newItem = document.createElement('div');
                 newItem.className = 'flex items-center gap-2 alatangkut-item';
-                
+
                 let optionsHtml = '<option value="" disabled selected>Pilih Alat Angkut</option>';
                 const options = {
                     'Angkutan Umum': 'Angkutan Umum (Angkot)',
@@ -578,7 +515,7 @@
                     'Transportasi Online': 'Transportasi Online',
                     'Travel': 'Travel'
                 };
-                
+
                 for (const [val, label] of Object.entries(options)) {
                     optionsHtml += `<option value="${val}">${label}</option>`;
                 }
@@ -592,7 +529,7 @@
                     </div>
                 `;
                 container.appendChild(newItem);
-                
+
                 // Initialize Select2 on the dynamically created select element with tags: true
                 $(newItem).find('select').select2({
                     placeholder: 'Pilih Alat Angkut',
