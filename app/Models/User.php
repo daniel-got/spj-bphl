@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
 
 class User extends Authenticatable
@@ -39,11 +40,24 @@ class User extends Authenticatable
     /**
      * Setiap User memiliki satu profil Pegawai (relasi 1:1).
      * Akses: Auth::user()->pegawai->nip
+     * Setiap User memiliki banyak data Rincian (relasi 1:M)
+     * Akses: Rincian::rincian()->user->peagawai->nip
      */
     public function pegawai(): HasOne
     {
         return $this->hasOne(Pegawai::class, 'user_id');
     }
+
+    public function rincianDibuat(): HasMany
+    {
+        return $this->hasMany(Rincian::class, 'pembuat_id');
+    }
+
+    public function rincianDiverifikasi(): HasMany
+    {
+        return $this->hasMany(Rincian::class, 'verifikator_id');
+    }
+
 
     // -------------------------------------------------------------------------
     // Query Scopes
@@ -59,7 +73,7 @@ class User extends Authenticatable
         return $query->where('role', UserRole::VERIFIKATOR->value);
     }
 
-    public function scopePegawai(Builder $query): Builder
+    public function scopeRolePegawai(Builder $query): Builder
     {
         return $query->where('role', UserRole::USER->value);
     }

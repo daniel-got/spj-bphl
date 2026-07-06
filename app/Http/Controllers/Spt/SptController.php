@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Spt;
 
-use App\Http\Requests\StoreSptRequest;
-use App\Http\Requests\UpdateSptRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Spt\StoreSptRequest;
+use App\Http\Requests\Spt\UpdateSptRequest;
 use App\Models\Pegawai;
-use App\Services\SptService;
+use App\Services\Spt\SptService;
 use Illuminate\Http\Request;
 
 class SptController extends Controller
@@ -79,7 +80,7 @@ class SptController extends Controller
     public function update(UpdateSptRequest $request, string $id)
     {
         $spt = $this->sptService->getSptById($id);
-        
+
         $this->sptService->updateSpt($spt, $request->validated());
 
         return redirect()

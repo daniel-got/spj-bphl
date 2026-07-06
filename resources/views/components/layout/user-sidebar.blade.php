@@ -8,9 +8,9 @@
     ],
    [
         'label' => 'Data SPT',
-        'url' => '/user/spt',
+        'url' => route('user.spt.index'),
         'icon' => 'document-text',
-        'active' => request()->is('user/spt*'),
+        'active' => request()->routeIs('user.spt.*'),
     ],
     [
         'label' => 'Data SPD',
@@ -20,9 +20,9 @@
     ],
     [
         'label' => 'Data Rincian',
-        'url' => 'user.rincian',
+        'url' => route('user.rincian.index'),
         'icon' => 'document-text',
-        'active' => request()->routeIs('admin.dokumen.*'),
+        'active' => request()->routeIs('user.rincian.*'),
     ],
 ]">
     <x-slot:footer>

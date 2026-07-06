@@ -211,15 +211,11 @@
                                 'Pejabat Pembuat (PPK)',
                                 'Nama PPK',
                                 'NIP PPK',
+                                'Status',
+                                'Aksi',
                             ];
 
-                            $showStatusAndDetails = in_array(request('status'), ['disetujui', 'ditolak', 'direvisi']);
-                            if ($showStatusAndDetails) {
-                                $headers[] = 'Status';
-                                $headers[] = 'Alasan / Keterangan';
-                            }
-
-                            $rows = collect($spds->items() ?? [])->map(function ($spd, $index) use ($showStatusAndDetails, $spds) {
+                            $rows = collect($spds->items() ?? [])->map(function ($spd, $index) use ($spds) {
                                 $destinations = $spd->tempat_tujuan;
                                 if (is_array($destinations)) {
                                     $destinationsText = implode(', ', $destinations);
@@ -230,6 +226,17 @@
                                         : (string) $destinations;
                                 }
                                 $destinationsText = e($destinationsText);
+
+                                $vehicles = $spd->alat_angkut;
+                                if (is_array($vehicles)) {
+                                    $vehiclesText = implode(', ', $vehicles);
+                                } else {
+                                    $decoded = json_decode($vehicles, true);
+                                    $vehiclesText = is_array($decoded)
+                                        ? implode(', ', $decoded)
+                                        : (string) $vehicles;
+                                }
+                                $vehiclesText = e($vehiclesText);
 
                                 $tglSpd =
                                     $spd->tgl_spd instanceof \Carbon\Carbon
@@ -258,6 +265,44 @@
                                     e($spd->nomor_spd ?? '') .
                                     '</a>';
 
+                                $statusMap = [
+                                    'draft' => ['label' => 'Draft', 'class' => 'bg-gray-100 text-gray-800'],
+                                    'diajukan' => ['label' => 'Diajukan', 'class' => 'bg-blue-100 text-blue-800'],
+                                    'direvisi' => [
+                                        'label' => 'Direvisi',
+                                        'class' => 'bg-orange-100 text-orange-800',
+                                    ],
+                                    'disetujui' => [
+                                        'label' => 'Disetujui',
+                                        'class' => 'bg-green-100 text-green-800',
+                                    ],
+                                    'ditolak' => ['label' => 'Ditolak', 'class' => 'bg-red-100 text-red-800'],
+                                ];
+                                $config = $statusMap[$spd->status] ?? [
+                                    'label' => ucfirst($spd->status),
+                                    'class' => 'bg-gray-100 text-gray-800',
+                                ];
+                                $badgeHtml =
+                                    '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ' .
+                                    $config['class'] .
+                                    '">' .
+                                    $config['label'] .
+                                    '</span>';
+
+                                $aksiButtons =
+                                    '<div class="flex items-center gap-2">
+                                    <a href="' .
+                                    route('user.spd.show', $spd->id) .
+                                    '" class="inline-flex items-center bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors duration-150 border border-blue-200/50" title="Detail">
+                                        Detail
+                                    </a>
+                                    <a href="' .
+                                    route('user.spd.edit', $spd->id) .
+                                    '" class="inline-flex items-center bg-yellow-50 hover:bg-yellow-600 text-yellow-700 hover:text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors duration-150 border border-yellow-200/50" title="Edit">
+                                        Edit
+                                    </a>
+                                </div>';
+
                                 $row = [
                                     ($spds->firstItem() ?? 1) + $index,
                                     $nomorSpdLink,
@@ -282,50 +327,13 @@
                                     e($spd->kode_mak ?? ''),
                                     e($spd->jenis_perjalanan ?? ''),
                                     e($spd->berangkat_dari ?? ''),
-                                    e($spd->alat_angkut ?? ''),
+                                    $vehiclesText,
                                     e($spd->ppk ?? ''),
                                     e($spd->nama_ppk ?? ''),
                                     e($spd->nip_ppk ?? ''),
+                                    $badgeHtml,
+                                    $aksiButtons,
                                 ];
-
-                                if ($showStatusAndDetails) {
-                                    // Status badge html
-                                    $statusMap = [
-                                        'draft' => ['label' => 'Draft', 'class' => 'bg-gray-100 text-gray-800'],
-                                        'diajukan' => ['label' => 'Diajukan', 'class' => 'bg-blue-100 text-blue-800'],
-                                        'direvisi' => [
-                                            'label' => 'Direvisi',
-                                            'class' => 'bg-orange-100 text-orange-800',
-                                        ],
-                                        'disetujui' => [
-                                            'label' => 'Disetujui',
-                                            'class' => 'bg-green-100 text-green-800',
-                                        ],
-                                        'ditolak' => ['label' => 'Ditolak', 'class' => 'bg-red-100 text-red-800'],
-                                    ];
-                                    $config = $statusMap[$spd->status] ?? [
-                                        'label' => ucfirst($spd->status),
-                                        'class' => 'bg-gray-100 text-gray-800',
-                                    ];
-                                    $badgeHtml =
-                                        '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ' .
-                                        $config['class'] .
-                                        '">' .
-                                        $config['label'] .
-                                        '</span>';
-
-                                    $row[] = $badgeHtml;
-
-                                    // Detail/alasan
-                                    if ($spd->status === 'disetujui') {
-                                        $row[] = '<span class="text-xs text-muted italic">Tidak butuh alasan</span>';
-                                    } else {
-                                        $row[] =
-                                            '<span class="text-xs font-semibold text-text-main">' .
-                                            e($spd->alasan ?? '-') .
-                                            '</span>';
-                                    }
-                                }
 
                                 return $row;
                             });

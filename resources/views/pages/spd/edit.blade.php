@@ -1,5 +1,12 @@
 <x-layout.app title="Edit SPD - SPJ BPHL 4">
 
+    <!-- jQuery & Select2 CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <x-style.select2 />
+
     <x-layout.navbar />
 
     <main class="grow flex flex-col px-6 py-10">
@@ -145,22 +152,106 @@
                     {{-- Kode, Jenis, Berangkat, Alat Angkut --}}
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 border-t border-border-custom pt-6">
                         <x-form.input name="kode_mak" label="Kode MAK" placeholder="Kode MAK" :value="old('kode_mak', $spd->kode_mak)"
-                            :error="$errors->first('kode_mak')" />
+                            :required="true" :error="$errors->first('kode_mak')" />
                         <x-form.select name="jenis_perjalanan" label="Jenis Perjalanan Dinas" :options="[
                             'Dalam Kota' => 'Dalam Kota',
                             'Luar Kota' => 'Luar Kota',
                         ]"
-                            :selected="old('jenis_perjalanan', $spd->jenis_perjalanan)" :error="$errors->first('jenis_perjalanan')" placeholder="Pilih Jenis" />
+                            :selected="old('jenis_perjalanan', $spd->jenis_perjalanan)" :required="true" :error="$errors->first('jenis_perjalanan')" placeholder="Pilih Jenis" />
                         <x-form.input name="berangkat_dari" label="Berangkat Dari" placeholder="Asal keberangkatan"
-                            :value="old('berangkat_dari', $spd->berangkat_dari)" :error="$errors->first('berangkat_dari')" />
-                        <x-form.select name="alat_angkut" label="Alat Angkut" :options="[
-                            'Kendaraan Dinas' => 'Kendaraan Dinas',
-                            'Kendaraan Pribadi' => 'Kendaraan Pribadi',
-                            'Kendaraan Sewa' => 'Kendaraan Sewa',
-                            'Kendaraan Umum' => 'Kendaraan Umum',
-                            'Pesawat Terbang' => 'Pesawat Terbang',
-                        ]" :selected="old('alat_angkut', $spd->alat_angkut)"
-                            :error="$errors->first('alat_angkut')" placeholder="Pilih Alat Angkut" />
+                            :value="old('berangkat_dari', $spd->berangkat_dari)" :required="true" :error="$errors->first('berangkat_dari')" />
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-text-main mb-2">
+                                Alat Angkut <span class="text-danger">*</span>
+                            </label>
+                            @php
+                                $alatAngkutOptions = [
+                                    'Angkutan Umum' => 'Angkutan Umum (Angkot)',
+                                    'Bus' => 'Bus',
+                                    'Drop Out' => 'Drop Out',
+                                    'GoCar' => 'GoCar',
+                                    'GoJek' => 'GoJek',
+                                    'Kapal Laut' => 'Kapal Laut',
+                                    'Kereta' => 'Kereta',
+                                    'KRL' => 'KRL',
+                                    'Mobil Dinas' => 'Mobil Dinas',
+                                    'Mobil Pribadi' => 'Mobil Pribadi',
+                                    'Mobil Travel' => 'Mobil Travel',
+                                    'Motor Dinas' => 'Motor Dinas',
+                                    'Motor Pribadi' => 'Motor Pribadi',
+                                    'Perahu Ces' => 'Perahu Ces',
+                                    'Perahu Dinas' => 'Perahu Dinas',
+                                    'Perahu Klotok' => 'Perahu Klotok',
+                                    'Perahu Sungai' => 'Perahu Sungai/Sampan',
+                                    'Pesawat' => 'Pesawat',
+                                    'Pesawat Tanpa Merek' => 'Pesawat (Tanpa Merk Maskapai)',
+                                    'Sewa' => 'Sewa Mobil',
+                                    'Taxi' => 'Taxi',
+                                    'Transportasi Online' => 'Transportasi Online',
+                                    'Travel' => 'Travel',
+                                ];
+                                
+                                $alatangkuts = old('alat_angkut');
+                                if (!$alatangkuts) {
+                                    $alatangkuts = $spd->alat_angkut;
+                                    if (!is_array($alatangkuts)) {
+                                        $alatangkuts = json_decode($alatangkuts, true);
+                                    }
+                                    if (!is_array($alatangkuts)) {
+                                        $alatangkuts = array_filter(
+                                            array_map('trim', explode(',', $spd->alat_angkut)),
+                                        );
+                                    }
+                                }
+                                if (!$alatangkuts || !is_array($alatangkuts)) {
+                                    $alatangkuts = [''];
+                                }
+                            @endphp
+                        
+                            <div id="alatangkuts-list" class="space-y-3">
+                                @foreach ($alatangkuts as $index => $val)
+                                    <div class="flex items-center gap-2 alatangkut-item">
+                                        <div class="grow">
+                                            <select name="alat_angkut[]" required
+                                                class="w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom">
+                                                <option value="" disabled {{ !$val ? 'selected' : '' }}>Pilih Alat Angkut</option>
+                                                @foreach ($alatAngkutOptions as $optValue => $optLabel)
+                                                    <option value="{{ $optValue }}" {{ $val == $optValue ? 'selected' : '' }}>
+                                                        {{ $optLabel }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        @if ($index > 0)
+                                            <button type="button"
+                                                class="remove-alatangkut-btn text-danger hover:text-red-700 transition duration-150 p-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            @if ($errors->has('alat_angkut'))
+                                <p class="text-xs text-danger mt-1">{{ $errors->first('alat_angkut') }}</p>
+                            @endif
+                        
+                            <div class="mt-2">
+                                <button type="button" id="add-alatangkut-btn"
+                                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover transition duration-150">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    Tambah Alat Angkut
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     {{-- PPK --}}
@@ -171,11 +262,11 @@
                             'Pejabat Pembuat Komitmen 3' => 'Pejabat Pembuat Komitmen 3',
                             'Bendahara Pengeluaran' => 'Bendahara Pengeluaran',
                         ]" :selected="old('ppk', $spd->ppk)"
-                            :error="$errors->first('ppk')" placeholder="Pilih Pejabat Pembuat" />
+                            :required="true" :error="$errors->first('ppk')" placeholder="Pilih Pejabat Pembuat" />
                         <x-form.input name="nama_ppk" label="Nama Pejabat PPK" placeholder="Nama Pejabat"
-                            :value="old('nama_ppk', $spd->nama_ppk)" :error="$errors->first('nama_ppk')" />
+                            :value="old('nama_ppk', $spd->nama_ppk)" :required="true" :error="$errors->first('nama_ppk')" />
                         <x-form.input name="nip_ppk" label="NIP Pejabat PPK" placeholder="NIP Pejabat"
-                            :value="old('nip_ppk', $spd->nip_ppk)" :error="$errors->first('nip_ppk')" />
+                            :value="old('nip_ppk', $spd->nip_ppk)" :required="true" :error="$errors->first('nip_ppk')" />
                     </div>
 
                 </div>
@@ -206,17 +297,19 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const container = document.getElementById('destinations-list');
-            const addBtn = document.getElementById('add-destination-btn');
+            // --- Select2 for Pegawai ---
+            $('#pegawai_ditugaskan').select2({
+                placeholder: 'Pilih Pegawai',
+                allowClear: true
+            });
 
             // --- Auto Fill Pegawai Data ---
-            const selectPegawai = document.getElementById('pegawai_ditugaskan');
             const nipInput = document.getElementById('nip_pegawai');
             const pangkatInput = document.getElementById('pangkat_pegawai');
             const jabatanInput = document.getElementById('jabatan_pegawai');
             const pegawaiData = JSON.parse(document.getElementById('pegawai-data').textContent);
 
-            selectPegawai.addEventListener('change', function() {
+            $('#pegawai_ditugaskan').on('change', function() {
                 const selectedName = this.value;
                 const employee = pegawaiData.find(p => p.nama_pegawai === selectedName);
                 if (employee) {
@@ -229,6 +322,162 @@
                     jabatanInput.value = '';
                 }
             });
+
+            // --- Destinations Dynamic List ---
+            const destContainer = document.getElementById('destinations-list');
+            const destAddBtn = document.getElementById('add-destination-btn');
+
+            function updateDestRemoveButtons() {
+                const items = destContainer.querySelectorAll('.destination-item');
+                items.forEach((item, index) => {
+                    let removeBtn = item.querySelector('.remove-destination-btn');
+                    if (items.length > 1) {
+                        if (!removeBtn) {
+                            removeBtn = document.createElement('button');
+                            removeBtn.type = 'button';
+                            removeBtn.className =
+                                'remove-destination-btn text-danger hover:text-red-700 transition duration-150 p-2';
+                            removeBtn.innerHTML =
+                                `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
+                            removeBtn.addEventListener('click', function() {
+                                item.remove();
+                                updateDestRemoveButtons();
+                            });
+                            item.appendChild(removeBtn);
+                        }
+                    } else {
+                        if (removeBtn) {
+                            removeBtn.remove();
+                        }
+                    }
+                });
+            }
+
+            destAddBtn.addEventListener('click', function() {
+                const newItem = document.createElement('div');
+                newItem.className = 'flex items-center gap-2 destination-item';
+                newItem.innerHTML = `
+                    <div class="grow">
+                        <input
+                            type="text"
+                            name="tempat_tujuan[]"
+                            placeholder="Contoh: Jakarta"
+                            required
+                            class="w-full px-3 py-2 text-sm border rounded-md shadow-sm placeholder-muted bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom"
+                        />
+                    </div>
+                `;
+                destContainer.appendChild(newItem);
+                updateDestRemoveButtons();
+            });
+
+            destContainer.querySelectorAll('.remove-destination-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    btn.closest('.destination-item').remove();
+                    updateDestRemoveButtons();
+                });
+            });
+
+            updateDestRemoveButtons();
+
+            // Initialize Select2 for existing alat_angkut fields with tags: true to allow manual typing
+            $('select[name="alat_angkut[]"]').select2({
+                placeholder: 'Pilih Alat Angkut',
+                tags: true
+            });
+
+            // --- Transportation Dynamic List ---
+            const transportContainer = document.getElementById('alatangkuts-list');
+            const transportAddBtn = document.getElementById('add-alatangkut-btn');
+
+            function updateTransportRemoveButtons() {
+                const items = transportContainer.querySelectorAll('.alatangkut-item');
+                items.forEach((item, index) => {
+                    let removeBtn = item.querySelector('.remove-alatangkut-btn');
+                    if (index > 0) {
+                        if (!removeBtn) {
+                            removeBtn = document.createElement('button');
+                            removeBtn.type = 'button';
+                            removeBtn.className =
+                                'remove-alatangkut-btn text-danger hover:text-red-700 transition duration-150 p-1';
+                            removeBtn.innerHTML =
+                                `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
+                            removeBtn.addEventListener('click', function() {
+                                item.remove();
+                                updateTransportRemoveButtons();
+                            });
+                            item.appendChild(removeBtn);
+                        }
+                    } else {
+                        if (removeBtn) {
+                            removeBtn.remove();
+                        }
+                    }
+                });
+            }
+
+            transportAddBtn.addEventListener('click', function() {
+                const newItem = document.createElement('div');
+                newItem.className = 'flex items-center gap-2 alatangkut-item';
+                
+                let optionsHtml = '<option value="" disabled selected>Pilih Alat Angkut</option>';
+                const options = {
+                    'Angkutan Umum': 'Angkutan Umum (Angkot)',
+                    'Bus': 'Bus',
+                    'Drop Out': 'Drop Out',
+                    'GoCar': 'GoCar',
+                    'GoJek': 'GoJek',
+                    'Kapal Laut': 'Kapal Laut',
+                    'Kereta': 'Kereta',
+                    'KRL': 'KRL',
+                    'Mobil Dinas': 'Mobil Dinas',
+                    'Mobil Pribadi': 'Mobil Pribadi',
+                    'Mobil Travel': 'Mobil Travel',
+                    'Motor Dinas': 'Motor Dinas',
+                    'Motor Pribadi': 'Motor Pribadi',
+                    'Perahu Ces': 'Perahu Ces',
+                    'Perahu Dinas': 'Perahu Dinas',
+                    'Perahu Klotok': 'Perahu Klotok',
+                    'Perahu Sungai': 'Perahu Sungai/Sampan',
+                    'Pesawat': 'Pesawat',
+                    'Pesawat Tanpa Merek': 'Pesawat (Tanpa Merk Maskapai)',
+                    'Sewa': 'Sewa Mobil',
+                    'Taxi': 'Taxi',
+                    'Transportasi Online': 'Transportasi Online',
+                    'Travel': 'Travel'
+                };
+                
+                for (const [val, label] of Object.entries(options)) {
+                    optionsHtml += `<option value="${val}">${label}</option>`;
+                }
+
+                newItem.innerHTML = `
+                    <div class="grow">
+                        <select name="alat_angkut[]" required
+                            class="w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom">
+                            ${optionsHtml}
+                        </select>
+                    </div>
+                `;
+                transportContainer.appendChild(newItem);
+                
+                // Initialize Select2 on the dynamically created select element with tags: true
+                $(newItem).find('select').select2({
+                    placeholder: 'Pilih Alat Angkut',
+                    tags: true
+                });
+
+                updateTransportRemoveButtons();
+            });
+
+            transportContainer.querySelectorAll('.remove-alatangkut-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    btn.closest('.alatangkut-item').remove();
+                    updateTransportRemoveButtons();
+                });
+            });
+
+            updateTransportRemoveButtons();
 
             // --- Auto Calculate Lama Kegiatan (hari) ---
             const tglBerangkatInput = document.getElementById('tgl_berangkat');
@@ -257,59 +506,6 @@
 
             tglBerangkatInput.addEventListener('change', calculateDays);
             tglKembaliInput.addEventListener('change', calculateDays);
-
-            function updateRemoveButtons() {
-                const items = container.querySelectorAll('.destination-item');
-                items.forEach((item, index) => {
-                    let removeBtn = item.querySelector('.remove-destination-btn');
-                    if (items.length > 1) {
-                        if (!removeBtn) {
-                            removeBtn = document.createElement('button');
-                            removeBtn.type = 'button';
-                            removeBtn.className =
-                                'remove-destination-btn text-danger hover:text-red-700 transition duration-150 p-2';
-                            removeBtn.innerHTML =
-                                `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
-                            removeBtn.addEventListener('click', function() {
-                                item.remove();
-                                updateRemoveButtons();
-                            });
-                            item.appendChild(removeBtn);
-                        }
-                    } else {
-                        if (removeBtn) {
-                            removeBtn.remove();
-                        }
-                    }
-                });
-            }
-
-            addBtn.addEventListener('click', function() {
-                const newItem = document.createElement('div');
-                newItem.className = 'flex items-center gap-2 destination-item';
-                newItem.innerHTML = `
-                <div class="grow">
-                    <input
-                        type="text"
-                        name="tempat_tujuan[]"
-                        placeholder="Contoh: Jakarta"
-                        required
-                        class="w-full px-3 py-2 text-sm border rounded-md shadow-sm placeholder-muted bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom"
-                    />
-                </div>
-            `;
-                container.appendChild(newItem);
-                updateRemoveButtons();
-            });
-
-            container.querySelectorAll('.remove-destination-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    btn.closest('.destination-item').remove();
-                    updateRemoveButtons();
-                });
-            });
-
-            updateRemoveButtons();
         });
     </script>
 

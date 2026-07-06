@@ -1,21 +1,20 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Spd;
 
-use App\Http\Requests\StoreSpdRequest;
-use App\Http\Requests\UpdateSpdRequest;
-use App\Models\Spd;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Spd\StoreSpdRequest;
+use App\Http\Requests\Spd\UpdateSpdRequest;
 use App\Models\Pegawai;
-use App\Services\SpdService;
+use App\Models\Spd;
+use App\Services\Spd\SpdService;
+use Illuminate\Http\Request;
 
 class SpdController extends Controller
 {
-    protected $spdService;
-
-    public function __construct(SpdService $spdService)
-    {
-        $this->spdService = $spdService;
-    }
+    public function __construct(
+        private SpdService $spdService
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -36,6 +35,7 @@ class SpdController extends Controller
     public function create()
     {
         $pegawais = Pegawai::orderBy('nama_pegawai', 'asc')->get();
+
         return view('pages.spd.create', compact('pegawais'));
     }
 
@@ -65,6 +65,7 @@ class SpdController extends Controller
     public function edit(Spd $spd)
     {
         $pegawais = Pegawai::orderBy('nama_pegawai', 'asc')->get();
+
         return view('pages.spd.edit', compact('spd', 'pegawais'));
     }
 
@@ -86,5 +87,25 @@ class SpdController extends Controller
         $this->spdService->deleteSpd($spd);
 
         return redirect()->route('user.spd.index')->with('success', 'Data SPD berhasil dihapus');
+    }
+
+    /**
+     * Search SPT for autocomplete/Select2.
+     */
+    public function searchSpt(Request $request)
+    {
+        return response()->json([
+            'results' => $this->spdService->searchSpt($request->q),
+        ]);
+    }
+
+    /**
+     * Get single SPT data via AJAX.
+     */
+    public function getSptAjax($id)
+    {
+        return response()->json(
+            $this->spdService->getSptAjax($id)
+        );
     }
 }
