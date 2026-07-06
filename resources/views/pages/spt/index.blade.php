@@ -19,12 +19,14 @@
 
                     {{-- Header Halaman --}}
                     <x-layout.page-header title="Data SPT" subtitle="Daftar Surat Perintah Tugas">
-                        <x-slot:actions>
-                            <a href="{{ route('user.spt.create') }}"
-                                class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-150 h-[38px]">
-                                + Tambah Baru
-                            </a>
-                        </x-slot:actions>
+                        @if (in_array(Auth::user()->role, ['admin', 'pembuat_spt']))
+                            <x-slot:actions>
+                                <a href="{{ route('user.spt.create') }}"
+                                    class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-150 h-[38px]">
+                                    + Tambah Baru
+                                </a>
+                            </x-slot:actions>
+                        @endif
                     </x-layout.page-header>
 
                     {{-- Stats Section --}}
@@ -155,7 +157,8 @@
                                     if (is_array($pegawaiData)) {
                                         foreach ($pegawaiData as $pegawai) {
                                             if (is_array($pegawai)) {
-                                                $namaPegawaiList[] = $pegawai['nama_pegawai'] ?? '-';
+                                                $peranStr = !empty($pegawai['peran']) ? ' (' . $pegawai['peran'] . ')' : '';
+                                                $namaPegawaiList[] = ($pegawai['nama_pegawai'] ?? '-') . $peranStr;
                                                 $nipList[] = $pegawai['nip'] ?? '-';
                                                 $pangkatList[] = $pegawai['pangkat'] ?? '-';
                                                 $jabatanList[] = $pegawai['jabatan'] ?? '-';
@@ -171,6 +174,11 @@
                                     // Link Detail pada Nomor SPT
                                     $nomorSptLink = '<a href="' . route('user.spt.show', $spt->id) . '" class="text-primary hover:underline font-semibold" title="Lihat Rincian">' . e($spt->nomor_spt ?? '') . '</a>';
                                     
+                                    $hasAccess = in_array(Auth::user()->role, ['admin', 'pembuat_spt']);
+                                    $editLink = $hasAccess
+                                        ? '<a href="' . route('user.spt.edit', $spt->id) . '" class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover" title="Edit SPT">Edit</a>'
+                                        : '<span class="text-muted text-xs">-</span>';
+
                                     return [
                                         $iteration++,
                                         $nomorSptLink,
@@ -185,7 +193,7 @@
                                         $tglKembali,
                                         e($spt->lama_kegiatan ?? '') . ' Hari',
                                         e($spt->kode_mak ?? '-'),
-                                        '<a href="' . route('user.spt.edit', $spt->id) . '" class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover" title="Edit SPT">Edit</a>'
+                                        $editLink
                                     ];
                                 })->filter()->toArray();
                             @endphp

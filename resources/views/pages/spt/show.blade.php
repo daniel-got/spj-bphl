@@ -15,7 +15,7 @@
                     </a>
                     <div>
                         <h1 class="text-2xl font-extrabold tracking-tight text-text-main">
-                            Detail spt
+                            Detail SPT
                         </h1>
                         <p class="text-xs text-muted mt-0.5">Detail parameter dan status surat perjalanan dinas secara rinci</p>
                     </div>
@@ -92,24 +92,28 @@
 
                             <div class="mt-3 space-y-3">
                                 @forelse($pegawaiList as $pegawai)
-                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-background border border-border-custom rounded-lg px-4 py-3">
-                                        <div>
-                                            <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Nama Pegawai</span>
-                                            <p class="text-sm font-bold text-text-main mt-0.5">{{ $pegawai['nama_pegawai'] ?? '-' }}</p>
-                                        </div>
-                                        <div>
-                                            <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">NIP</span>
-                                            <p class="text-sm font-medium text-text-main mt-0.5">{{ $pegawai['nip'] ?? '-' }}</p>
-                                        </div>
-                                        <div>
-                                            <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Pangkat / Golongan</span>
-                                            <p class="text-sm font-medium text-text-main mt-0.5">{{ $pegawai['pangkat'] ?? '-' }}</p>
-                                        </div>
-                                        <div>
-                                            <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Jabatan</span>
-                                            <p class="text-sm font-medium text-text-main mt-0.5">{{ $pegawai['jabatan'] ?? '-' }}</p>
-                                        </div>
-                                    </div>
+                                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4 bg-background border border-border-custom rounded-lg px-4 py-3">
+                                         <div>
+                                             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Nama Pegawai</span>
+                                             <p class="text-sm font-bold text-text-main mt-0.5">{{ $pegawai['nama_pegawai'] ?? '-' }}</p>
+                                         </div>
+                                         <div>
+                                             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Peran SPT</span>
+                                             <p class="text-sm font-bold text-primary mt-0.5">{{ $pegawai['peran'] ?? 'Anggota' }}</p>
+                                         </div>
+                                         <div>
+                                             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">NIP</span>
+                                             <p class="text-sm font-medium text-text-main mt-0.5">{{ $pegawai['nip'] ?? '-' }}</p>
+                                         </div>
+                                         <div>
+                                             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Pangkat / Golongan</span>
+                                             <p class="text-sm font-medium text-text-main mt-0.5">{{ $pegawai['pangkat'] ?? '-' }}</p>
+                                         </div>
+                                         <div>
+                                             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Jabatan</span>
+                                             <p class="text-sm font-medium text-text-main mt-0.5">{{ $pegawai['jabatan'] ?? '-' }}</p>
+                                         </div>
+                                     </div>
                                 @empty
                                     <p class="text-sm text-muted italic">Belum ada pegawai yang ditugaskan.</p>
                                 @endforelse
