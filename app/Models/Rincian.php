@@ -16,35 +16,33 @@ class Rincian extends Model
 
     // Kolom fillable berdasarkan komponen rincian biaya
     protected $fillable = [
-        'nomor_spd',            // Nomor SPD
-        'tgl_spd',              // Tgl SPD
-        'pegawai_ditugaskan',   // Pegawai yg ditugaskan
-        'nip_pegawai',          // NIP Pegawai
-        'tujuan_kegiatan',      // Tujuan Kegiatan
-        'berangkat_dari',       // Berangkat dari
-        'tempat_tujuan',        // Tempat Tujuan
-        'lama_kegiatan',        // Lama Kegiatan
-        'jenis_perjalanan',     // Jenis Perjalanan
-        'alat_angkut',          // Alat Angkut
-        'kode_mak',             // Kode MAK
-        'ppk',                  // PPK
-        'nama_ppk',             // Nama PPK
-        'nip_ppk',              // NIP PPK
-        'rincian_biaya',        // Rincian Biaya (JSON)
+        'spd_id',
+        'rincian_biaya',        // Rincian Biaya (JSON Array of Objects)
         'status',
         'pembuat_id',
         'verifikator_id',
         'catatan_verifikator',
+        'lampiran',             // Path file lampiran PDF
     ];
+
+    const STATUS_DRAFT = 'draft';
+    const STATUS_SUBMITTED = 'diajukan'; // Diajukan ke Verifikator
+    const STATUS_REVISED = 'direvisi';
+    const STATUS_APPROVED = 'disetujui';
+    const STATUS_REJECTED = 'ditolak';
 
     protected $casts = [
         'rincian_biaya' => 'array', // Mengakomodasi banyak set biaya dinamis
-        'tgl_spd'       => 'date',
     ];
 
     // -------------------------------------------------------------------------
     // Relationships
     // -------------------------------------------------------------------------
+
+    public function spd(): BelongsTo
+    {
+        return $this->belongsTo(Spd::class, 'spd_id');
+    }
 
     public function pembuat(): BelongsTo
     {

@@ -94,32 +94,12 @@ class RincianService
     public function createRincian(array $data, int $authId)
     {
         return DB::transaction(function () use ($data, $authId) {
-            $spd = Spd::findOrFail($data['spd_id']);
-
-            $rincianData = [
-                'nomor_spd' => $spd->nomor_spd,
-                'tgl_spd' => $spd->tgl_spd,
-                'pegawai_ditugaskan' => $spd->pegawai_ditugaskan,
-                'nip_pegawai' => $spd->nip_pegawai,
-                'tujuan_kegiatan' => $spd->tujuan_kegiatan,
-                'berangkat_dari' => $spd->berangkat_dari,
-                'tempat_tujuan' => is_array($spd->tempat_tujuan) ? implode(', ', $spd->tempat_tujuan) : $spd->tempat_tujuan,
-                'lama_kegiatan' => $spd->lama_kegiatan,
-                'jenis_perjalanan' => $spd->jenis_perjalanan,
-                'alat_angkut' => is_array($spd->alat_angkut) ? implode(', ', $spd->alat_angkut) : $spd->alat_angkut,
-                'kode_mak' => $spd->kode_mak,
-                'ppk' => $spd->ppk,
-                'nama_ppk' => $spd->nama_ppk,
-                'nip_ppk' => $spd->nip_ppk,
-
-                // Manual inputs
-                'rincian_biaya' => $data['rincian_biaya'] ?? null,
-
+            return Rincian::create([
+                'spd_id' => $data['spd_id'],
+                'rincian_biaya' => $data['rincian_biaya'] ?? [],
                 'status' => 'draft',
                 'pembuat_id' => $authId,
-            ];
-
-            return Rincian::create($rincianData);
+            ]);
         });
     }
 
@@ -129,7 +109,10 @@ class RincianService
     public function updateRincian(Rincian $rincian, array $data)
     {
         return DB::transaction(function () use ($rincian, $data) {
-            $rincian->update($data);
+            $rincian->update([
+                'rincian_biaya' => $data['rincian_biaya'] ?? $rincian->rincian_biaya,
+                'status' => $data['status'] ?? $rincian->status,
+            ]);
 
             return $rincian;
         });
@@ -165,7 +148,7 @@ class RincianService
 
     public function getSpdAjax($id)
     {
-        $spd = Spd::find($id);
+        $spd = Spd::with('spt')->find($id);
 
         if (! $spd) {
             return [];
@@ -174,7 +157,7 @@ class RincianService
         return [
             'nomor_spd' => $spd->nomor_spd,
             'tgl_spd' => $spd->tgl_spd,
-            'pegawai_ditugaskan' => $spd->pegawai_ditugaskan,
+            'pegawai_ditugaskan' => $spd->spt?->pegawai_ditugaskan,
             'nip_pegawai' => $spd->nip_pegawai,
             'tujuan_kegiatan' => $spd->tujuan_kegiatan,
             'berangkat_dari' => $spd->berangkat_dari,

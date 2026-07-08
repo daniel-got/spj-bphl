@@ -81,13 +81,11 @@ class SptService
         }
 
         // Jika role user biasa / pembuat_spt, filter berdasarkan pegawai_id mereka di json pegawai_ditugaskan
-        $pegawaiId = Pegawai::where('user_id', $user->id)->value('id');
+        $pegawaiId = (int) Pegawai::where('user_id', $user->id)->value('id');
 
         if ($pegawaiId) {
-            $query->where(function ($q) use ($pegawaiId) {
-                $q->where('pegawai_ditugaskan', 'like', '%"pegawai_id":"'.$pegawaiId.'"%')
-                    ->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id":'.$pegawaiId.'%');
-            });
+            $query->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
+                  ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
         } else {
             // Jika user tidak punya data pegawai (harusnya tidak terjadi), sembunyikan semua SPT
             $query->whereRaw('1 = 0');

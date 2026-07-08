@@ -150,10 +150,6 @@ class SpdService
     {
         $spt = Spt::findOrFail($id);
 
-        $pegawaiList = is_string($spt->pegawai_ditugaskan)
-            ? json_decode($spt->pegawai_ditugaskan, true)
-            : $spt->pegawai_ditugaskan;
-
         return [
             'id' => $spt->id,
             'nomor_spt' => $spt->nomor_spt,
@@ -163,7 +159,7 @@ class SpdService
             'tgl_kembali' => $spt->tgl_kembali ? $spt->tgl_kembali->format('Y-m-d') : null,
             'lama_kegiatan' => $spt->lama_kegiatan,
             'kode_mak' => $spt->kode_mak,
-            'pegawai_list' => $pegawaiList,
+            'pegawai_list' => $spt->pegawai_ditugaskan,
         ];
     }
 }

@@ -17,17 +17,7 @@ class Spd extends Model
     protected $fillable = [
         'nomor_spd',           // Nomor SPD
         'tgl_spd',             // Tgl SPD
-        'pegawai_ditugaskan',  // Pegawai yg ditugaskan
         'nip_pegawai',         // NIP Pegawai
-        'pangkat_pegawai',     // Pangkat Pegawai
-        'jabatan_pegawai',     // Jabatan pegawai
-        'tujuan_kegiatan',     // Tujuan Kegiatan
-        'tempat_tujuan',       // Tempat Tujuan
-        'tgl_berangkat',       // Tgl. Berangkat
-        'tgl_kembali',         // Tgl. Kembali
-        'lama_kegiatan',       // Lama Kegiatan
-        'kode_mak',            // Kode MAK
-        'jenis_perjalanan',    // Jenis Perjalanan
         'berangkat_dari',      // Berangkat dari
         'alat_angkut',         // Alat Angkut
         'ppk',                 // PPK
@@ -42,87 +32,56 @@ class Spd extends Model
 
     protected $casts = [
         'pejabat_ditugaskan' => 'array', // Mendukung penambahan pejabat secara dinamis
+        'alat_angkut' => 'array',
         'tgl_spd' => 'date',
-        'tgl_berangkat' => 'date',
-        'tgl_kembali' => 'date',
     ];
 
     /**
-     * Get the tempat_tujuan attribute.
-     *
-     * @param  mixed  $value
-     * @return array
+     * Get the tempat_tujuan attribute from SPT.
      */
-    public function getTempatTujuanAttribute($value)
+    public function getTempatTujuanAttribute()
     {
-        if (empty($value)) {
-            return [];
-        }
-
-        $decoded = json_decode($value, true);
-        if (is_array($decoded)) {
-            return $decoded;
-        }
-
-        if (is_string($value)) {
-            return array_filter(array_map('trim', explode(',', $value)));
-        }
-
-        return [];
+        return $this->spt?->tempat_tujuan ?? [];
     }
 
     /**
-     * Set the tempat_tujuan attribute.
-     *
-     * @param  mixed  $value
-     * @return void
+     * Get the tujuan_kegiatan attribute from SPT.
      */
-    public function setTempatTujuanAttribute($value)
+    public function getTujuanKegiatanAttribute()
     {
-        if (is_array($value)) {
-            $this->attributes['tempat_tujuan'] = json_encode(array_filter(array_map('trim', $value)));
-        } else {
-            $this->attributes['tempat_tujuan'] = $value;
-        }
+        return $this->spt?->tujuan_kegiatan;
     }
 
     /**
-     * Get the alat_angkut attribute.
-     *
-     * @param  mixed  $value
-     * @return array
+     * Get the tgl_berangkat attribute from SPT.
      */
-    public function getAlatAngkutAttribute($value)
+    public function getTglBerangkatAttribute()
     {
-        if (empty($value)) {
-            return [];
-        }
-
-        $decoded = json_decode($value, true);
-        if (is_array($decoded)) {
-            return $decoded;
-        }
-
-        if (is_string($value)) {
-            return array_filter(array_map('trim', explode(',', $value)));
-        }
-
-        return [];
+        return $this->spt?->tgl_berangkat;
     }
 
     /**
-     * Set the alat_angkut attribute.
-     *
-     * @param  mixed  $value
-     * @return void
+     * Get the tgl_kembali attribute from SPT.
      */
-    public function setAlatAngkutAttribute($value)
+    public function getTglKembaliAttribute()
     {
-        if (is_array($value)) {
-            $this->attributes['alat_angkut'] = json_encode(array_filter(array_map('trim', $value)));
-        } else {
-            $this->attributes['alat_angkut'] = $value;
-        }
+        return $this->spt?->tgl_kembali;
+    }
+
+    /**
+     * Get the lama_kegiatan attribute from SPT.
+     */
+    public function getLamaKegiatanAttribute()
+    {
+        return $this->spt?->lama_kegiatan;
+    }
+
+    /**
+     * Get the kode_mak attribute from SPT.
+     */
+    public function getKodeMakAttribute()
+    {
+        return $this->spt?->kode_mak;
     }
 
     /**
@@ -132,27 +91,7 @@ class Spd extends Model
      */
     protected static function booted()
     {
-        static::updated(function ($spd) {
-            $rincian = Rincian::where('nomor_spd', $spd->getOriginal('nomor_spd'))->first();
-            if ($rincian) {
-                $rincian->update([
-                    'nomor_spd' => $spd->nomor_spd,
-                    'tgl_spd' => $spd->tgl_spd,
-                    'pegawai_ditugaskan' => $spd->pegawai_ditugaskan,
-                    'nip_pegawai' => $spd->nip_pegawai,
-                    'tujuan_kegiatan' => $spd->tujuan_kegiatan,
-                    'berangkat_dari' => $spd->berangkat_dari,
-                    'tempat_tujuan' => is_array($spd->tempat_tujuan) ? implode(', ', $spd->tempat_tujuan) : $spd->tempat_tujuan,
-                    'lama_kegiatan' => $spd->lama_kegiatan,
-                    'jenis_perjalanan' => $spd->jenis_perjalanan,
-                    'alat_angkut' => is_array($spd->alat_angkut) ? implode(', ', $spd->alat_angkut) : $spd->alat_angkut,
-                    'kode_mak' => $spd->kode_mak,
-                    'ppk' => $spd->ppk,
-                    'nama_ppk' => $spd->nama_ppk,
-                    'nip_ppk' => $spd->nip_ppk,
-                ]);
-            }
-        });
+        // Method booted dikosongkan karena duplikasi data ke Rincian sudah tidak diperlukan
     }
 
     /**
