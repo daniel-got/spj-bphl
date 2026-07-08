@@ -83,11 +83,11 @@ class RincianService
     }
 
     /**
-     * Get a Rincian by ID.
+     * Get a Rincian by ID with full chain relations (Bundel SPJ).
      */
     public function getRincianById(string $id)
     {
-        return Rincian::findOrFail($id);
+        return Rincian::with(['spd.spt', 'pembuat', 'verifikator'])->findOrFail($id);
     }
 
     /**

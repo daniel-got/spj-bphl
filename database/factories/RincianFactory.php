@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Rincian;
+use App\Models\Spd;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -21,26 +22,20 @@ class RincianFactory extends Factory
     public function definition(): array
     {
         return [
-            'nomor_spd' => 'SPD/'.fake()->unique()->numerify('###').'/BPHL/'.now()->year,
-            'tgl_spd' => fake()->date(),
-            'pegawai_ditugaskan' => fake()->name(),
-            'nip_pegawai' => fake()->numerify('##################'),
-            'tujuan_kegiatan' => fake()->sentence(8),
-            'berangkat_dari' => fake()->city(),
-            'tempat_tujuan' => fake()->city(),
-            'lama_kegiatan' => fake()->numberBetween(1, 14),
-            'jenis_perjalanan' => fake()->randomElement(['Dalam Kota', 'Luar Kota', 'Luar Provinsi']),
-            'alat_angkut' => fake()->randomElement(['Kendaraan Dinas', 'Pesawat', 'Kereta Api']),
-            'kode_mak' => fake()->numerify('5###.###.###'),
-            'ppk' => fake()->numerify('##################'),
-            'nama_ppk' => fake()->name(),
-            'nip_ppk' => fake()->numerify('##################'),
+            'spd_id' => Spd::factory(),
             'rincian_biaya' => [
                 [
-                    'biaya_transport' => fake()->randomElement([150000, 300000, 500000]),
-                    'penginapan' => fake()->randomElement([30, 100]),
-                    'hotel_ril' => fake()->randomElement([350000, 500000, 750000]),
-                ]
+                    'item' => 'Biaya Transportasi',
+                    'transport' => fake()->numberBetween(100000, 1000000),
+                    'penginapan' => 0,
+                    'hotel_ril' => 0,
+                ],
+                [
+                    'item' => 'Penginapan',
+                    'transport' => 0,
+                    'penginapan' => fake()->numberBetween(300000, 1000000),
+                    'hotel_ril' => fake()->numberBetween(200000, 800000),
+                ],
             ],
             'status' => 'draft',
             'pembuat_id' => User::factory(),

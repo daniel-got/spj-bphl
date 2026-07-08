@@ -22,7 +22,8 @@ return new class extends Migration
                 'tgl_berangkat',
                 'tgl_kembali',
                 'lama_kegiatan',
-                'kode_mak'
+                'kode_mak',
+                'jenis_perjalanan', // Tambahan kolom yang harus dihapus karena ada di SPT
             ]);
         });
 
@@ -44,7 +45,7 @@ return new class extends Migration
                 'kode_mak',
                 'ppk',
                 'nama_ppk',
-                'nip_ppk'
+                'nip_ppk',
             ]);
         });
     }

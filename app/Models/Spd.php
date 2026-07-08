@@ -101,4 +101,12 @@ class Spd extends Model
     {
         return $this->belongsTo(Spt::class, 'spt_id');
     }
+
+    /**
+     * Hubungan ke model User (Pembuat).
+     */
+    public function pembuat(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'pembuat_id');
+    }
 }

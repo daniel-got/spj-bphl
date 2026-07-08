@@ -94,11 +94,11 @@ class SptService
     }
 
     /**
-     * Get an SPT by ID.
+     * Get an SPT by ID with relations.
      */
     public function getSptById(string $id)
     {
-        return Spt::findOrFail($id);
+        return Spt::with(['spds.rincian'])->findOrFail($id);
     }
 
     /**

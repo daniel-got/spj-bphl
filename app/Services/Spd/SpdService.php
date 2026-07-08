@@ -81,11 +81,11 @@ class SpdService
     }
 
     /**
-     * Get an SPD by ID.
+     * Get an SPD by ID with relations.
      */
     public function getSpdById(string $id)
     {
-        return Spd::findOrFail($id);
+        return Spd::with(['spt', 'pembuat'])->findOrFail($id);
     }
 
     /**
