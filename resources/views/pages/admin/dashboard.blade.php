@@ -102,6 +102,7 @@
                                                 $roleColor = match ($user->role) {
                                                     'admin' => 'purple',
                                                     'verifikator' => 'blue',
+                                                    'pembuat_spt' => 'green',
                                                     'kepala_balai',
                                                     'kepala_tu',
                                                     'kepala_seksi_pephphl',
