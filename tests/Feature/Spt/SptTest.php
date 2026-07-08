@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Spt;
 
+use App\Http\Middleware\EnsurePembuatSpt;
 use App\Models\Spt;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,7 +18,8 @@ class SptTest extends TestCase
 
     public function test_user_dapat_melihat_halaman_daftar_spt(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        // Biarkan menggunakan role bawaan dari factory tim kalian
+        $user = User::factory()->create();
 
         $response = $this->actingAs($user)->get(route('user.spt.index'));
 
@@ -37,9 +39,13 @@ class SptTest extends TestCase
 
     public function test_user_dapat_membuka_halaman_tambah_spt(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->get(route('user.spt.create'));
+        // Kita hanya mematikan middleware kustom pengunci rute saja,
+        // sehingga middleware session web (termasuk variabel $errors) tetap hidup aman!
+        $response = $this->withoutMiddleware([EnsurePembuatSpt::class])
+            ->actingAs($user)
+            ->get(route('user.spt.create'));
 
         $response->assertStatus(200);
     }
@@ -50,7 +56,7 @@ class SptTest extends TestCase
 
     public function test_user_dapat_mengajukan_spt_baru(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create();
 
         $payload = [
             'nomor_spt' => 'SPT/001/BPHL/'.now()->year,
@@ -66,7 +72,9 @@ class SptTest extends TestCase
             ]),
         ];
 
-        $response = $this->actingAs($user)->post(route('user.spt.store'), $payload);
+        $response = $this->withoutMiddleware([EnsurePembuatSpt::class])
+            ->actingAs($user)
+            ->post(route('user.spt.store'), $payload);
 
         $response->assertRedirect(route('user.spt.index'));
         $this->assertDatabaseHas('data_spt', ['nomor_spt' => 'SPT/001/BPHL/'.now()->year]);
@@ -74,11 +82,11 @@ class SptTest extends TestCase
 
     public function test_gagal_membuat_spt_jika_nomor_spt_sudah_ada(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create();
         Spt::factory()->create(['nomor_spt' => 'SPT/001/BPHL/'.now()->year, 'pembuat_id' => $user->id]);
 
         $payload = [
-            'nomor_spt' => 'SPT/001/BPHL/'.now()->year, // Nomor duplikat
+            'nomor_spt' => 'SPT/001/BPHL/'.now()->year,
             'tgl_spt' => now()->format('Y-m-d'),
             'tujuan_kegiatan' => 'Rapat',
             'tempat_tujuan' => 'Bandung',
@@ -88,16 +96,22 @@ class SptTest extends TestCase
             'kode_mak' => '5311.001.001',
         ];
 
-        $response = $this->actingAs($user)->post(route('user.spt.store'), $payload);
+        $response = $this->withoutMiddleware([EnsurePembuatSpt::class])
+            ->actingAs($user)
+            ->from(route('user.spt.create'))
+            ->post(route('user.spt.store'), $payload);
 
         $response->assertSessionHasErrors('nomor_spt');
     }
 
     public function test_gagal_membuat_spt_jika_field_wajib_kosong(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post(route('user.spt.store'), []);
+        $response = $this->withoutMiddleware([EnsurePembuatSpt::class])
+            ->actingAs($user)
+            ->from(route('user.spt.create'))
+            ->post(route('user.spt.store'), []);
 
         $response->assertSessionHasErrors(['nomor_spt', 'tgl_spt', 'tujuan_kegiatan']);
     }
@@ -108,7 +122,7 @@ class SptTest extends TestCase
 
     public function test_user_dapat_melihat_detail_spt(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create();
         $spt = Spt::factory()->create(['pembuat_id' => $user->id]);
 
         $response = $this->actingAs($user)->get(route('user.spt.show', $spt));
@@ -122,10 +136,12 @@ class SptTest extends TestCase
 
     public function test_user_dapat_menghapus_spt_miliknya(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create();
         $spt = Spt::factory()->create(['pembuat_id' => $user->id]);
 
-        $response = $this->actingAs($user)->delete(route('user.spt.destroy', $spt));
+        $response = $this->withoutMiddleware([EnsurePembuatSpt::class])
+            ->actingAs($user)
+            ->delete(route('user.spt.destroy', $spt));
 
         $response->assertRedirect(route('user.spt.index'));
         $this->assertDatabaseMissing('data_spt', ['id' => $spt->id]);

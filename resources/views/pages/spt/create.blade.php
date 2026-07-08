@@ -129,7 +129,7 @@
                         <div id="pegawai-list" class="space-y-4">
                             <div class="pegawai-item border border-border-custom rounded-lg p-4 bg-background/50">
                                 <div class="flex items-end gap-2">
-                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 grow">
+                                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 grow">
                                         <div class="flex flex-col">
                                             <label class="text-xs font-medium text-text-main mb-1">Nama Pegawai</label>
                                             <select required class="pegawai-select w-full">
@@ -143,6 +143,13 @@
                                                         {{ $pegawai->nama_pegawai }}
                                                     </option>
                                                 @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <label class="text-xs font-medium text-text-main mb-1">Peran SPT</label>
+                                            <select required class="pegawai-peran w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background border-border-custom focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                                <option value="Anggota">Anggota</option>
+                                                <option value="Penanggung Jawab">Penanggung Jawab</option>
                                             </select>
                                         </div>
                                         <div class="flex flex-col">
@@ -426,15 +433,20 @@
                 let selectOptionsHTML = '<option value="">Pilih Pegawai</option>';
                 masterOptions.forEach(opt => {
                     selectOptionsHTML += `<option value="${opt.id}">${opt.text}</option>`;
-                });
-
-                newItem.innerHTML = `
+                });                newItem.innerHTML = `
                     <div class="flex items-end gap-2">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 grow">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 grow">
                             <div class="flex flex-col">
                                 <label class="text-xs font-medium text-text-main mb-1">Nama Pegawai</label>
                                 <select required class="pegawai-select w-full">
                                     ${selectOptionsHTML}
+                                </select>
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-xs font-medium text-text-main mb-1">Peran SPT</label>
+                                <select required class="pegawai-peran w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background border-border-custom focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                    <option value="Anggota">Anggota</option>
+                                    <option value="Penanggung Jawab">Penanggung Jawab</option>
                                 </select>
                             </div>
                             <div class="flex flex-col">
@@ -460,19 +472,20 @@
                 updateRemoveButtons();
                 syncAllDropdowns();
             });
-
+ 
             // Menjalankan inisialisasi awal saat halaman dibuka
             container.querySelectorAll('.pegawai-item').forEach(initPegawaiRow);
             updateRemoveButtons();
             syncAllDropdowns();
-
+ 
             // Interseptor form submit untuk membundel data pegawai ke input JSON hidden
             form.addEventListener('submit', function(e) {
                 const items = container.querySelectorAll('.pegawai-item');
                 const pegawaiData = [];
-
+ 
                 items.forEach((item) => {
                     const select = item.querySelector('.pegawai-select');
+                    const peranSelect = item.querySelector('.pegawai-peran');
                     if (select && select.value) {
                         const dataPegawai = cacheOptions[select.value];
                         if (dataPegawai) {
@@ -482,6 +495,7 @@
                                 nip: dataPegawai.nip,
                                 pangkat: dataPegawai.pangkat,
                                 jabatan: dataPegawai.jabatan,
+                                peran: peranSelect ? peranSelect.value : 'Anggota',
                             });
                         }
                     }

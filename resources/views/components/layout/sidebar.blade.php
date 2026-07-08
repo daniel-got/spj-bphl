@@ -44,6 +44,11 @@
         @endforeach
     </nav>
 
+    {{-- Before Footer Slot (opsional, misal accordion menu) --}}
+    @isset($beforeFooter)
+        {{ $beforeFooter }}
+    @endisset
+
     {{-- Footer Slot (opsional, misal info user) --}}
     @isset($footer)
         <div class="p-4 border-t border-border-custom">
