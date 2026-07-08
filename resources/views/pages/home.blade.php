@@ -1,32 +1,7 @@
 <x-layout.app title="Beranda - SPJ BPHL 4">
 
-    <style>
-        /* Memastikan background kabut hutan mengunci penuh ke seluruh layar secara statis */
-        .main-portal-bg {
-            background-image: url('https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=1920&auto=format&fit=crop') !important;
-            background-attachment: fixed !important;
-            background-position: center !important;
-            background-size: cover !important;
-        }
-
-        /* Lapisan putih tipis transparan global agar teks tetap terbaca tajam */
-        .light-overlay {
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.82)) !important;
-        }
-
-        /* Memastikan transisi perpindahan scroll berjalan mulus */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Menghapus background solid bawaan layout jika ada */
-        section, footer {
-            background-color: transparent !important;
-        }
-    </style>
-
-    <div class="main-portal-bg min-h-screen flex flex-col relative">
-        <div class="absolute inset-0 light-overlay pointer-events-none z-0"></div>
+    <div class="portal-bg min-h-screen flex flex-col relative">
+        <div class="absolute inset-0 portal-overlay pointer-events-none z-0"></div>
 
         <div class="relative z-10 flex flex-col min-h-screen">
             
@@ -36,57 +11,48 @@
 
             <section id="hero-section" class="flex-grow flex items-center justify-center pt-16 pb-12 md:pt-24 md:pb-16">
                 <div class="max-w-6xl mx-auto px-6 w-full text-center flex flex-col items-center justify-center">
-                    
-                    <h1 class="font-doc-title text-4xl md:text-5xl font-extrabold tracking-tight text-emerald-950 mb-6 drop-shadow-sm">
+
+                    <h1 class="font-doc-title text-4xl md:text-5xl font-extrabold tracking-tight text-black mb-6 drop-shadow-sm">
                         SPJ Perjalanan Dinas
                     </h1>
 
-                    <p class="text-sm md:text-base text-emerald-900/80 font-medium leading-relaxed max-w-3xl mb-10">
-                        Portal resmi Balai Pengelolaan Hutan Lestari (BPHL) Wilayah IV Jambi untuk pengelolaan 
+                    <p class="text-sm md:text-base text-gray-600 font-medium leading-relaxed max-w-3xl mb-12">
+                        Portal resmi Balai Pengelolaan Hutan Lestari (BPHL) Wilayah IV Jambi untuk pengelolaan
                         administrasi Surat Perintah Tugas (SPT), Surat Perjalanan Dinas (SPD), dan Rincian Biaya secara terintegrasi.
                     </p>
 
-                    <div class="mb-12">
-                        <a href="#ringkasan"
-                            class="inline-flex items-center justify-center border-2 border-emerald-800 text-emerald-800 hover:bg-emerald-800 hover:text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-xl transition-all duration-200 shadow-sm">
-                            Lihat Ringkasan Personil
-                        </a>
-                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 w-full">
+                        <x-dashboard.stat-card
+                            title="Total Pegawai"
+                            :value="$totalPegawai"
+                            description="Personil BPHL IV"
+                            icon="users"
+                            color="blue"
+                        />
 
-                    <div id="ringkasan" class="w-full pt-4 scroll-mt-24">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-                            
-                            @php
-                                $ringkasan = [
-                                    ['label' => 'TOTAL PEGAWAI', 'desc' => 'Personil BPHL IV', 'value' => $totalPegawai, 'borderColor' => 'border-blue-200/80', 'badgeColor' => 'bg-blue-50/80 text-blue-600'],
-                                    ['label' => 'GOLONGAN IV', 'desc' => 'Total Pegawai Golongan IV', 'value' => $totalPegawaiIV, 'borderColor' => 'border-emerald-200/80', 'badgeColor' => 'bg-emerald-50/80 text-emerald-600'],
-                                    ['label' => 'GOLONGAN III', 'desc' => 'Total Pegawai Golongan III', 'value' => $totalPegawaiIII, 'borderColor' => 'border-amber-200/80', 'badgeColor' => 'bg-amber-50/80 text-amber-600'],
-                                    ['label' => 'GOLONGAN II', 'desc' => 'Total Pegawai Golongan II', 'value' => $totalPegawaiII, 'borderColor' => 'border-rose-200/80', 'badgeColor' => 'bg-rose-50/80 text-rose-600'],
-                                ];
-                            @endphp
+                        <x-dashboard.stat-card
+                            title="Golongan IV"
+                            :value="$totalPegawaiIV"
+                            description="Total Pegawai Golongan IV"
+                            icon="users"
+                            color="green"
+                        />
 
-                            @foreach ($ringkasan as $item)
-                                <div class="bg-white/90 backdrop-blur-sm border {{ $item['borderColor'] }} rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between text-left h-40">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-950/70">{{ $item['label'] }}</h3>
-                                            <p class="text-[10px] text-gray-400 font-medium mt-0.5">{{ $item['desc'] }}</p>
-                                        </div>
-                                        <div class="p-1.5 rounded-lg {{ $item['badgeColor'] }}">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div class="mt-2">
-                                        <span class="text-3xl font-black text-emerald-950 tracking-tight">
-                                            {{ $item['value'] }}
-                                        </span>
-                                    </div>
-                                </div>
-                            @endforeach
+                        <x-dashboard.stat-card
+                            title="Golongan III"
+                            :value="$totalPegawaiIII"
+                            description="Total Pegawai Golongan III"
+                            icon="users"
+                            color="yellow"
+                        />
 
-                        </div>
+                        <x-dashboard.stat-card
+                            title="Golongan II"
+                            :value="$totalPegawaiII"
+                            description="Total Pegawai Golongan II"
+                            icon="users"
+                            color="red"
+                        />
                     </div>
 
                 </div>

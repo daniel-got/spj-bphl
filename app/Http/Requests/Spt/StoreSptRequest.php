@@ -24,6 +24,11 @@ class StoreSptRequest extends FormRequest
             'status' => 'nullable|string|in:draft,diajukan,direvisi,disetujui,ditolak',
             'tgl_spt' => 'required|date',
             'pegawai_ditugaskan' => 'required|string',
+
+            // Tambahan validasi untuk Penanggung Jawab dan Anggota (Instruksi Rifka No. 2)
+            'penanggung_jawab' => 'nullable|string',
+            'anggota' => 'nullable|string',
+
             'tujuan_kegiatan' => 'required|string',
             'tempat_tujuan' => 'required|string|max:255',
             'tgl_berangkat' => 'required|date',

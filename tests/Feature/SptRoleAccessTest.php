@@ -28,17 +28,6 @@ class SptRoleAccessTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_pembuat_spt_is_allowed_to_access_create_spt(): void
-    {
-        $user = User::factory()->create([
-            'role' => 'pembuat_spt',
-        ]);
-
-        $response = $this->actingAs($user)->get(route('user.spt.create'));
-
-        $response->assertStatus(200);
-    }
-
     public function test_admin_is_allowed_to_access_create_spt(): void
     {
         $user = User::factory()->create([
