@@ -26,11 +26,11 @@ class UpdateSptRequest extends FormRequest
             'nomor_spt' => 'required|string|unique:data_spt,nomor_spt,'.$sptId,
             'status' => 'nullable|string|in:draft,diajukan,direvisi,disetujui,ditolak',
             'tgl_spt' => 'required|date',
-            'pegawai_ditugaskan' => 'required|string',
-
-            // Tambahan validasi untuk Penanggung Jawab dan Anggota (Instruksi Rifka No. 2)
-            'penanggung_jawab' => 'nullable|string',
-            'anggota' => 'nullable|string',
+            'pegawai_ditugaskan' => 'required|array|min:1',
+            'pegawai_ditugaskan.*.pegawai_id' => 'required|exists:data_pegawai,id',
+            'pegawai_ditugaskan.*.nama' => 'required|string',
+            'pegawai_ditugaskan.*.nip' => 'required|string',
+            'pegawai_ditugaskan.*.peran' => 'required|string|in:Penanggung Jawab,Anggota',
 
             'tujuan_kegiatan' => 'required|string',
             'tempat_tujuan' => 'required|string|max:255',

@@ -2,6 +2,7 @@
 
 namespace App\Services\Spt;
 
+use App\Helpers\SptHelper;
 use App\Models\Pegawai;
 use App\Models\Spt;
 use Illuminate\Support\Facades\DB;
@@ -85,7 +86,7 @@ class SptService
 
         if ($pegawaiId) {
             $query->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                  ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
         } else {
             // Jika user tidak punya data pegawai (harusnya tidak terjadi), sembunyikan semua SPT
             $query->whereRaw('1 = 0');
@@ -107,21 +108,26 @@ class SptService
     {
         return DB::transaction(function () use ($data, $authId) {
             $data['pembuat_id'] = $authId;
-            $data['status'] = $data['status'] ?? 'draft';
+            // Status default ke diajukan (menunggu verifikasi TU) sesuai brainstorming
+            $data['status'] = $data['status'] ?? Spt::STATUS_WAITING_TU;
 
-            // Mengantisipasi jika input dari form dikirim dalam bentuk array, bukan string JSON
-            $pegawaiData = $data['pegawai_ditugaskan'] ?? '[]';
-            if (is_array($pegawaiData)) {
-                $pegawaiData = json_encode($pegawaiData);
+            // Mengantisipasi jika input dari form dikirim dalam bentuk array
+            $pegawaiData = $data['pegawai_ditugaskan'] ?? [];
+            if (is_string($pegawaiData)) {
+                $pegawaiData = json_decode($pegawaiData, true) ?? [];
             }
 
             // Ekstrak peran Penanggung Jawab & Anggota untuk kolom flat database
-            $processed = $this->extractRolesFromPegawaiJson($pegawaiData);
+            $processed = SptHelper::extractRoles($pegawaiData);
             $data['penanggung_jawab'] = $processed['penanggung_jawab'];
             $data['anggota'] = $processed['anggota'];
-            $data['pegawai_ditugaskan'] = json_decode($pegawaiData, true);
+            $data['pegawai_ditugaskan'] = $pegawaiData;
 
-            return Spt::create($data);
+            $spt = Spt::create($data);
+
+            session()->flash('success', 'SPT berhasil dibuat dan menunggu verifikasi Kepala TU.');
+
+            return $spt;
         });
     }
 
@@ -132,16 +138,21 @@ class SptService
     {
         return DB::transaction(function () use ($spt, $data) {
             // Mengantisipasi jika input dari form dikirim dalam bentuk array
-            $pegawaiData = $data['pegawai_ditugaskan'] ?? '[]';
-            if (is_array($pegawaiData)) {
-                $pegawaiData = json_encode($pegawaiData);
+            $pegawaiData = $data['pegawai_ditugaskan'] ?? [];
+            if (is_string($pegawaiData)) {
+                $pegawaiData = json_decode($pegawaiData, true) ?? [];
             }
 
             // Ekstrak peran Penanggung Jawab & Anggota
-            $processed = $this->extractRolesFromPegawaiJson($pegawaiData);
+            $processed = SptHelper::extractRoles($pegawaiData);
             $data['penanggung_jawab'] = $processed['penanggung_jawab'];
             $data['anggota'] = $processed['anggota'];
-            $data['pegawai_ditugaskan'] = json_decode($pegawaiData, true);
+            $data['pegawai_ditugaskan'] = $pegawaiData;
+
+            // Jika status berubah menjadi disetujui, beri notifikasi khusus
+            if (isset($data['status']) && $data['status'] === Spt::STATUS_APPROVED && $spt->status !== Spt::STATUS_APPROVED) {
+                session()->flash('success', 'SPT telah disetujui. Pegawai yang ditugaskan akan menerima notifikasi.');
+            }
 
             $spt->update($data);
 
@@ -157,34 +168,9 @@ class SptService
         return DB::transaction(function () use ($spt) {
             $spt->delete();
 
+            session()->flash('success', 'SPT berhasil dihapus.');
+
             return true;
         });
-    }
-
-    /**
-     * Helper untuk memisahkan nama penanggung jawab dan anggota dari string JSON front-end.
-     */
-    private function extractRolesFromPegawaiJson(string $jsonString): array
-    {
-        $pegawaiList = json_decode($jsonString, true) ?? [];
-        $pjNames = [];
-        $anggotaNames = [];
-
-        foreach ($pegawaiList as $pegawai) {
-            // Mengantisipasi perbedaan penamaan field ('nama' atau 'nama_pegawai') dari payload test
-            $nama = $pegawai['nama_pegawai'] ?? $pegawai['nama'] ?? '';
-            $peran = $pegawai['peran'] ?? 'Anggota';
-
-            if ($peran === 'Penanggung Jawab') {
-                $pjNames[] = $nama;
-            } else {
-                $anggotaNames[] = $nama;
-            }
-        }
-
-        return [
-            'penanggung_jawab' => implode(', ', $pjNames) ?: null,
-            'anggota' => implode(', ', $anggotaNames) ?: null,
-        ];
     }
 }

@@ -5,7 +5,9 @@ namespace App\Services\Rincian;
 use App\Models\Pegawai;
 use App\Models\Rincian;
 use App\Models\Spd;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class RincianService
 {
@@ -94,12 +96,23 @@ class RincianService
     public function createRincian(array $data, int $authId)
     {
         return DB::transaction(function () use ($data, $authId) {
-            return Rincian::create([
+            // Jika ada file lampiran
+            $lampiranPath = null;
+            if (isset($data['lampiran']) && $data['lampiran'] instanceof UploadedFile) {
+                $lampiranPath = $data['lampiran']->store('lampiran_spj', 'public');
+            }
+
+            $rincian = Rincian::create([
                 'spd_id' => $data['spd_id'],
                 'rincian_biaya' => $data['rincian_biaya'] ?? [],
-                'status' => 'draft',
+                'status' => Rincian::STATUS_DRAFT,
                 'pembuat_id' => $authId,
+                'lampiran' => $lampiranPath,
             ]);
+
+            session()->flash('success', 'Rincian biaya berhasil disimpan sebagai Draft.');
+
+            return $rincian;
         });
     }
 
@@ -109,10 +122,28 @@ class RincianService
     public function updateRincian(Rincian $rincian, array $data)
     {
         return DB::transaction(function () use ($rincian, $data) {
-            $rincian->update([
+            $updateData = [
                 'rincian_biaya' => $data['rincian_biaya'] ?? $rincian->rincian_biaya,
                 'status' => $data['status'] ?? $rincian->status,
-            ]);
+            ];
+
+            // Update lampiran jika ada file baru
+            if (isset($data['lampiran']) && $data['lampiran'] instanceof UploadedFile) {
+                // Hapus lampiran lama jika ada
+                if ($rincian->lampiran) {
+                    Storage::disk('public')->delete($rincian->lampiran);
+                }
+                $updateData['lampiran'] = $data['lampiran']->store('lampiran_spj', 'public');
+            }
+
+            // Jika status berubah menjadi diajukan, beri notifikasi khusus untuk verifikator
+            if (isset($data['status']) && $data['status'] === Rincian::STATUS_SUBMITTED && $rincian->status !== Rincian::STATUS_SUBMITTED) {
+                session()->flash('success', 'Bundel SPJ telah diajukan ke Verifikator.');
+            } else {
+                session()->flash('success', 'Rincian biaya berhasil diperbarui.');
+            }
+
+            $rincian->update($updateData);
 
             return $rincian;
         });
@@ -124,7 +155,14 @@ class RincianService
     public function deleteRincian(Rincian $rincian)
     {
         return DB::transaction(function () use ($rincian) {
+            // Hapus lampiran jika ada
+            if ($rincian->lampiran) {
+                Storage::disk('public')->delete($rincian->lampiran);
+            }
+
             $rincian->delete();
+
+            session()->flash('success', 'Rincian biaya berhasil dihapus.');
 
             return true;
         });

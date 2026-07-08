@@ -95,8 +95,14 @@ class SpdService
     {
         return DB::transaction(function () use ($data) {
             $data['pembuat_id'] = $data['pembuat_id'] ?? auth()->id();
+            // Default status SPD adalah draft
+            $data['status'] = $data['status'] ?? 'draft';
 
-            return Spd::create($data);
+            $spd = Spd::create($data);
+
+            session()->flash('success', 'SPD berhasil dibuat sebagai Draft.');
+
+            return $spd;
         });
     }
 
@@ -107,6 +113,8 @@ class SpdService
     {
         return DB::transaction(function () use ($spd, $data) {
             $spd->update($data);
+
+            session()->flash('success', 'SPD berhasil diperbarui.');
 
             return $spd;
         });
@@ -119,6 +127,8 @@ class SpdService
     {
         return DB::transaction(function () use ($spd) {
             $spd->delete();
+
+            session()->flash('success', 'SPD berhasil dihapus.');
 
             return true;
         });
