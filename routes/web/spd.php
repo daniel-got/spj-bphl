@@ -3,7 +3,7 @@
 use App\Http\Controllers\Spd\SpdController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'role:user'])
+Route::middleware(['auth'])
     ->prefix('user')
     ->name('user.')
     ->group(function () {
