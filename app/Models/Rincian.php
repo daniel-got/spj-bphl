@@ -30,10 +30,7 @@ class Rincian extends Model
         'ppk',                  // PPK
         'nama_ppk',             // Nama PPK
         'nip_ppk',              // NIP PPK
-        'biaya_transport',      // Biaya Transport
-        'penginapan',           // Penginapan (%)
-        'hotel_ril',            // Hotel Ril
-        'detail_transportasi',  // Menyimpan komponen detail transportasi dinamis
+        'rincian_biaya',        // Rincian Biaya (JSON)
         'status',
         'pembuat_id',
         'verifikator_id',

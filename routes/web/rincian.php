@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Rincian\RincianController;
 
-Route::middleware(['auth', 'role:user'])
+Route::middleware(['auth'])
     ->prefix('user')
     ->name('user.')
     ->group(function () {
