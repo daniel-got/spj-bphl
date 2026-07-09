@@ -1,43 +1,25 @@
 {{--
-    Dashboard Admin — resources/views/pages/admin/dashboard.blade.php
+    Dashboard Pegawai — resources/views/pages/user/dashboard.blade.php
 
     Data yang diterima dari DashboardController (via DashboardService):
     - $stats           : array of stat cards
-    - $recentUsers     : Collection<User> with pegawai relation
+    - $recentSpt       : Collection<Spt>
     - $documentSummary : array of ['status' => ..., 'jumlah' => ...]
-
-    Komponen yang digunakan sesuai developing_view.md:
-    - <x-layout.app>
-    - <x-layout.sidebar>
-    - <x-layout.page-header>
-    - <x-layout.breadcrumb>
-    - <x-dashboard.stat-card>
-    - <x-layout.card>
-    - <x-data.badge>
-    - <x-data.empty-state>
-    - <x-utility.avatar>
-    - <x-feedback.alert>
 --}}
 
-<x-layout.app title="Dashboard Admin — SPJ BPHL">
+<x-layout.app title="Dashboard Pegawai — SPJ BPHL">
 
-    {{-- =====================================================================
-         SIDEBAR — Menu khusus admin
-    ====================================================================== --}}
     <div class="flex min-h-screen bg-background">
         <x-layout.sidebar />
 
-        {{-- ================================================================
-             MAIN CONTENT AREA
-        ================================================================= --}}
         <main class="flex-1 p-6 space-y-6 overflow-auto">
 
             {{-- Breadcrumb --}}
             <x-layout.breadcrumb :items="[['label' => 'Pegawai'], ['label' => 'Dashboard']]" />
 
             {{-- Page Header --}}
-            <x-layout.page-header title="Dashboard Administrator"
-                description="Ringkasan sistem dan aktivitas terkini SPJ BPHL Wilayah IV Jambi" />
+            <x-layout.page-header title="Dashboard Pegawai"
+                description="Selamat datang kembali! Berikut ringkasan tugas dan perjalanan dinas Anda." />
 
             {{-- Flash message dari session --}}
             @if (session('success'))
@@ -56,7 +38,7 @@
                  STAT CARDS — 4 kartu ringkasan di bagian atas
                  Data dikirim oleh DashboardService::getStatCards()
             ============================================================ --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 @foreach ($stats as $stat)
                     <x-dashboard.stat-card :title="$stat['title']" :value="$stat['value']" :description="$stat['description']" :icon="$stat['icon']"
                         :color="$stat['color']" />
@@ -64,55 +46,39 @@
             </div>
 
             {{-- ===========================================================
-                 ROW 2 — Pengguna Terbaru & Ringkasan Dokumen
+                 ROW 2 — SPT Terbaru & Ringkasan Status
             ============================================================ --}}
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                {{-- Pengguna Terbaru (lebar 2/3) --}}
+                {{-- SPT Terbaru (lebar 2/3) --}}
                 <div class="lg:col-span-2">
-                    <x-layout.card title="Pengguna Terbaru" subtitle="5 akun yang baru ditambahkan ke sistem">
+                    <x-layout.card title="SPT Terbaru" subtitle="5 surat perintah tugas terakhir Anda">
 
-                        @if ($recentUsers->isEmpty())
-                            <x-data.empty-state title="Belum ada pengguna"
-                                description="Belum ada akun yang dibuat di sistem ini." />
+                        @if ($recentSpt->isEmpty())
+                            <x-data.empty-state title="Belum ada SPT"
+                                description="Anda belum memiliki riwayat SPT di sistem." />
                         @else
                             <div class="divide-y divide-border-custom -mx-6 -mb-6">
-                                @foreach ($recentUsers as $user)
+                                @foreach ($recentSpt as $spt)
                                     <div
-                                        class="flex items-center justify-between px-6 py-3 hover:bg-background transition-colors">
+                                        class="flex items-center justify-between px-6 py-4 hover:bg-background transition-colors">
                                         <div class="flex items-center gap-3 min-w-0">
-                                            {{-- Avatar dengan inisial otomatis dari komponen --}}
-                                            <x-utility.avatar :name="$user->name" size="sm" />
+                                            <div class="p-2 bg-primary/10 rounded-lg">
+                                                <x-utility.icon name="document-text" class="w-5 h-5 text-primary" />
+                                            </div>
                                             <div class="min-w-0">
-                                                <p class="text-sm font-medium text-text-main truncate">
-                                                    {{ $user->name }}
-                                                </p>
+                                                <a href="{{ route('user.spt.show', $spt->id) }}" class="text-sm font-medium text-text-main hover:text-primary truncate block">
+                                                    {{ $spt->nomor_spt ?? 'Belum ada nomor' }}
+                                                </a>
                                                 <p class="text-xs text-muted truncate">
-                                                    {{ $user->pegawai?->nip ?? $user->email }}
+                                                    {{ $spt->tujuan_kegiatan }}
                                                 </p>
                                             </div>
                                         </div>
-                                        <div class="flex items-center gap-3 flex-shrink-0">
-                                            {{--
-                                                Badge Role — mapping ke warna palette
-                                                Hindari warna arbitrary, gunakan nilai color yang
-                                                didukung komponen <x-data.badge>
-                                            --}}
-                                            @php
-                                                $roleColor = match ($user->role) {
-                                                    'admin' => 'purple',
-                                                    'verifikator' => 'blue',
-                                                    'kepala_balai',
-                                                    'kepala_tu',
-                                                    'kepala_seksi_pephphl',
-                                                    'kepala_seksi_ppphphl'
-                                                        => 'yellow',
-                                                    default => 'gray',
-                                                };
-                                            @endphp
-                                            <x-data.badge :label="$user->roleLabel()" :color="$roleColor" />
+                                        <div class="flex items-center gap-4 flex-shrink-0">
+                                            <x-data.status-badge :status="$spt->status" />
                                             <span class="text-xs text-muted hidden sm:block whitespace-nowrap">
-                                                {{ $user->created_at->diffForHumans() }}
+                                                {{ $spt->created_at->diffForHumans() }}
                                             </span>
                                         </div>
                                     </div>
@@ -125,7 +91,7 @@
 
                 {{-- Ringkasan Dokumen SPT per Status (lebar 1/3) --}}
                 <div class="lg:col-span-1">
-                    <x-layout.card title="Status Dokumen" subtitle="Ringkasan SPT per status">
+                    <x-layout.card title="Status SPT" subtitle="Ringkasan status seluruh SPT Anda">
 
                         @if (empty($documentSummary))
                             <x-data.empty-state title="Belum ada dokumen" description="Belum ada SPT yang dibuat." />

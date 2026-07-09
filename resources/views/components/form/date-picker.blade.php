@@ -8,6 +8,21 @@
     'hint'     => null,
 ])
 
+@php
+    // Normalisasi nilai ke format Y-m-d agar terbaca oleh <input type="date">.
+    // Nilai bisa berupa Carbon (mis. dari accessor/relasi SPT) atau string.
+    $dateValue = old($name, $value);
+    if ($dateValue instanceof \DateTimeInterface) {
+        $dateValue = $dateValue->format('Y-m-d');
+    } elseif (! empty($dateValue)) {
+        try {
+            $dateValue = \Illuminate\Support\Carbon::parse($dateValue)->format('Y-m-d');
+        } catch (\Throwable $e) {
+            // Biarkan nilai apa adanya jika tidak dapat di-parse.
+        }
+    }
+@endphp
+
 <div {{ $attributes->only('class')->merge(['class' => 'flex flex-col gap-1']) }}>
     @if($label)
         <label for="{{ $name }}" class="text-sm font-medium text-text-main">
@@ -20,7 +35,7 @@
         id="{{ $name }}"
         name="{{ $name }}"
         type="date"
-        value="{{ old($name, $value) }}"
+        value="{{ $dateValue }}"
         {{ $required  ? 'required'  : '' }}
         {{ $disabled  ? 'disabled'  : '' }}
         {{ $attributes->except(['class', 'name', 'type', 'value', 'required', 'disabled']) }}

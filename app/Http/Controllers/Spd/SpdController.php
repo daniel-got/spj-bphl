@@ -34,9 +34,10 @@ class SpdController extends Controller
      */
     public function create()
     {
-        $pegawais = Pegawai::orderBy('nama_pegawai', 'asc')->get();
+        // SPD dibuat per akun: identitas pegawai otomatis dari akun yang login.
+        $myPegawai = Pegawai::where('user_id', auth()->id())->first();
 
-        return view('pages.spd.create', compact('pegawais'));
+        return view('pages.spd.create', compact('myPegawai'));
     }
 
     /**
@@ -64,9 +65,10 @@ class SpdController extends Controller
      */
     public function edit(Spd $spd)
     {
-        $pegawais = Pegawai::orderBy('nama_pegawai', 'asc')->get();
+        // Identitas pegawai pada SPD tetap mengikuti akun pemilik (tidak dapat diubah).
+        $spd->load('pegawai');
 
-        return view('pages.spd.edit', compact('spd', 'pegawais'));
+        return view('pages.spd.edit', compact('spd'));
     }
 
     /**

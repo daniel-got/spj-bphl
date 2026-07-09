@@ -18,6 +18,7 @@ class Spd extends Model
         'nomor_spd',           // Nomor SPD
         'tgl_spd',             // Tgl SPD
         'nip_pegawai',         // NIP Pegawai
+        'jenis_perjalanan',    // Jenis perjalanan dinas (Dalam Kota/Luar Kota)
         'berangkat_dari',      // Berangkat dari
         'alat_angkut',         // Alat Angkut
         'ppk',                 // PPK
@@ -85,6 +86,38 @@ class Spd extends Model
     }
 
     /**
+     * Nama pegawai diambil dari data_pegawai berdasarkan nip_pegawai.
+     */
+    public function getPegawaiDitugaskanAttribute()
+    {
+        return $this->pegawai?->nama_pegawai;
+    }
+
+    /**
+     * Pangkat/Golongan pegawai diambil dari data_pegawai berdasarkan nip_pegawai.
+     */
+    public function getPangkatPegawaiAttribute()
+    {
+        $pegawai = $this->pegawai;
+
+        if (! $pegawai) {
+            return null;
+        }
+
+        $parts = array_filter([$pegawai->pangkat, $pegawai->golongan]);
+
+        return $parts ? implode(' / ', $parts) : null;
+    }
+
+    /**
+     * Jabatan pegawai diambil dari data_pegawai berdasarkan nip_pegawai.
+     */
+    public function getJabatanPegawaiAttribute()
+    {
+        return $this->pegawai?->jabatan;
+    }
+
+    /**
      * The "booted" method of the model.
      *
      * @return void
@@ -95,11 +128,29 @@ class Spd extends Model
     }
 
     /**
+     * Hubungan ke model Rincian (One-to-One).
+     */
+    public function rincian()
+    {
+        return $this->hasOne(Rincian::class, 'spd_id');
+    }
+
+    /**
      * Hubungan ke model SPT.
      */
     public function spt(): BelongsTo
     {
         return $this->belongsTo(Spt::class, 'spt_id');
+    }
+
+    /**
+     * Hubungan ke data pegawai berdasarkan NIP.
+     * SPD hanya menyimpan nip_pegawai; identitas (nama, pangkat, jabatan)
+     * selalu dibaca dari data_pegawai agar tetap konsisten.
+     */
+    public function pegawai(): BelongsTo
+    {
+        return $this->belongsTo(Pegawai::class, 'nip_pegawai', 'nip');
     }
 
     /**

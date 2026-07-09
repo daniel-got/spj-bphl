@@ -5,15 +5,34 @@
         || request()->routeIs('user.spt.edit');
 @endphp
 
-<aside class="bg-surface border-r border-border-custom flex flex-col min-h-screen w-64 transition-all duration-300">
+<aside class="bg-surface border-r border-border-custom flex flex-col sticky top-0 h-screen w-64 transition-all duration-300">
 
     {{-- Logo / Brand --}}
     <div class="h-16 flex items-center px-4 border-b border-border-custom">
         <img class="h-8 w-auto" src="{{ asset('nav-banner.png') }}" alt="BPHL 4 Jambi">
     </div>
 
+    @auth
+    <div class="px-4 py-4 border-b border-border-custom bg-surface/50">
+        <div class="flex items-center gap-3">
+            <x-utility.avatar :name="Auth::user()->name ?? 'User'" size="md" />
+            <div class="min-w-0 flex-1">
+                <p class="text-sm font-bold text-text-main truncate">
+                    {{ Auth::user()?->pegawai?->nama_pegawai ?? Auth::user()->name ?? 'User' }}
+                </p>
+                @if (Auth::user()?->pegawai?->nip)
+                    <p class="text-[11px] font-medium text-muted truncate mt-0.5">NIP. {{ Auth::user()->pegawai->nip }}</p>
+                @endif
+                <p class="text-[11px] text-primary truncate mt-0.5 font-medium">
+                    {{ Auth::user()?->pegawai?->jabatan ?? Auth::user()?->roleLabel() ?? 'Pegawai' }}
+                </p>
+            </div>
+        </div>
+    </div>
+    @endauth
+
     {{-- Navigation Items --}}
-    <nav class="flex-1 py-4 space-y-1 px-2" aria-label="Sidebar Navigation">
+    <nav class="flex-1 py-4 space-y-1 px-2 overflow-y-auto" aria-label="Sidebar Navigation">
 
         {{-- Dashboard --}}
         <a href="#" {{-- href="{{ route('user.dashboard') }}" --}}

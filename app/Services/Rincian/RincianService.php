@@ -57,7 +57,7 @@ class RincianService
             $query->where('status', $filters['status']);
         }
 
-        return $query->with(['spd.spt'])->latest()->paginate($perPage);
+        return $query->with(['spd.spt', 'spd.pegawai'])->latest()->paginate($perPage);
     }
 
     /**
@@ -93,7 +93,7 @@ class RincianService
      */
     public function getRincianById(string $id)
     {
-        return Rincian::with(['spd.spt', 'pembuat', 'verifikator'])->findOrFail($id);
+        return Rincian::with(['spd.spt', 'spd.pegawai', 'pembuat', 'verifikator'])->findOrFail($id);
     }
 
     /**
@@ -192,7 +192,7 @@ class RincianService
 
     public function getSpdAjax($id)
     {
-        $spd = Spd::with('spt')->find($id);
+        $spd = Spd::with(['spt', 'pegawai'])->find($id);
 
         if (! $spd) {
             return [];
@@ -200,8 +200,9 @@ class RincianService
 
         return [
             'nomor_spd' => $spd->nomor_spd,
-            'tgl_spd' => $spd->tgl_spd,
-            'pegawai_ditugaskan' => $spd->spt?->pegawai_ditugaskan,
+            'tgl_spd' => $spd->tgl_spd?->format('Y-m-d'),
+            // SPD dibuat per akun: pegawai yang ditugaskan adalah satu orang (nama dari data_pegawai via nip).
+            'pegawai_ditugaskan' => $spd->pegawai_ditugaskan,
             'nip_pegawai' => $spd->nip_pegawai,
             'tujuan_kegiatan' => $spd->tujuan_kegiatan,
             'berangkat_dari' => $spd->berangkat_dari,

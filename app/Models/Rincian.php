@@ -26,9 +26,13 @@ class Rincian extends Model
     ];
 
     const STATUS_DRAFT = 'draft';
+
     const STATUS_SUBMITTED = 'diajukan'; // Diajukan ke Verifikator
+
     const STATUS_REVISED = 'direvisi';
+
     const STATUS_APPROVED = 'disetujui';
+
     const STATUS_REJECTED = 'ditolak';
 
     protected $casts = [
@@ -70,11 +74,8 @@ class Rincian extends Model
 
     public function getPegawaiDitugaskanAttribute()
     {
-        // Jika data_spd memiliki kolom nama_pegawai atau semacamnya
-        // Dalam model Spd, tidak terlihat kolom nama_pegawai eksplisit,
-        // mungkin ada di pejabat_ditugaskan atau relasi lain.
-        // Berdasarkan Spd.php, nip_pegawai ada.
-        return $this->spd?->nama_pegawai ?? $this->spd?->pejabat_ditugaskan['nama'] ?? '-';
+        // Nama pegawai diambil dari SPD (accessor SPD membacanya dari data_pegawai via nip_pegawai).
+        return $this->spd?->pegawai_ditugaskan ?? '-';
     }
 
     public function getTujuanKegiatanAttribute()
@@ -84,7 +85,8 @@ class Rincian extends Model
 
     public function getTempatTujuanAttribute()
     {
-        return $this->spd?->tempat_tujuan;
+        $tt = $this->spd?->tempat_tujuan;
+        return is_array($tt) ? implode(', ', $tt) : $tt;
     }
 
     public function getLamaKegiatanAttribute()
@@ -94,8 +96,43 @@ class Rincian extends Model
 
     public function getJenisPerjalananAttribute()
     {
-        // Misalkan diambil dari tempat tujuan atau kolom di SPD
-        return $this->spd?->spt?->tempat_tujuan ? 'Dinas' : '-';
+        return $this->spd?->jenis_perjalanan ?? '-';
+    }
+
+    public function getTglSpdAttribute()
+    {
+        return $this->spd?->tgl_spd?->format('Y-m-d');
+    }
+
+    public function getBerangkatDariAttribute()
+    {
+        return $this->spd?->berangkat_dari;
+    }
+
+    public function getAlatAngkutAttribute()
+    {
+        $aa = $this->spd?->alat_angkut;
+        return is_array($aa) ? implode(', ', $aa) : $aa;
+    }
+
+    public function getKodeMakAttribute()
+    {
+        return $this->spd?->kode_mak;
+    }
+
+    public function getPpkAttribute()
+    {
+        return $this->spd?->ppk;
+    }
+
+    public function getNamaPpkAttribute()
+    {
+        return $this->spd?->nama_ppk;
+    }
+
+    public function getNipPpkAttribute()
+    {
+        return $this->spd?->nip_ppk;
     }
 
     // -------------------------------------------------------------------------
@@ -104,6 +141,6 @@ class Rincian extends Model
 
     public function scope(Builder $query): Builder
     {
-        return $query->where('role', UserRole::ADMIN->value);
+        return $query;
     }
 }

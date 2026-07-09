@@ -62,71 +62,59 @@
 
                     {{-- Pegawai yang Ditugaskan --}}
                     <div class="border-t border-border-custom pt-6">
-                        <h3 class="text-sm font-bold text-text-main mb-4">Pegawai yang Ditugaskan</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            @php
-                                $pegawaiOptions = [];
-                                foreach ($pegawais as $pegawai) {
-                                    $pegawaiOptions[$pegawai->nama_pegawai] = $pegawai->nama_pegawai;
-                                }
-                            @endphp
-                            <x-form.select name="pegawai_ditugaskan" label="Nama Pegawai" :options="$pegawaiOptions"
-                                :selected="old('pegawai_ditugaskan')" :required="true" :error="$errors->first('pegawai_ditugaskan')" placeholder="Pilih Pegawai" />
-                            <x-form.input name="nip_pegawai" label="NIP" placeholder="NIP" :value="old('nip_pegawai')"
-                                :required="true" :error="$errors->first('nip_pegawai')" />
-                            <x-form.input name="pangkat_pegawai" label="Pangkat/Golongan" placeholder="Pangkat/Golongan"
-                                :value="old('pangkat_pegawai')" :error="$errors->first('pangkat_pegawai')" />
-                            <x-form.input name="jabatan_pegawai" label="Jabatan" placeholder="Jabatan"
-                                :value="old('jabatan_pegawai')" :error="$errors->first('jabatan_pegawai')" />
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-bold text-text-main">Pegawai yang Ditugaskan</h3>
+                            <div id="spt-info-badge" class="hidden">
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    Data dari SPT
+                                </span>
+                            </div>
                         </div>
+
+                        <div id="assigned-pegawai-list" class="hidden mb-6 bg-background/50 border border-border-custom rounded-lg overflow-hidden">
+                            <table class="min-w-full divide-y divide-border-custom">
+                                <thead class="bg-surface">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-semibold text-muted uppercase">Nama</th>
+                                        <th class="px-4 py-2 text-left text-xs font-semibold text-muted uppercase">NIP</th>
+                                        <th class="px-4 py-2 text-left text-xs font-semibold text-muted uppercase">Peran</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="assigned-pegawai-body" class="divide-y divide-border-custom">
+                                    <!-- Diisi via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        @if ($myPegawai)
+                            {{-- SPD dibuat per akun: identitas pegawai otomatis dari akun yang login --}}
+                            <input type="hidden" name="nip_pegawai" value="{{ $myPegawai->nip }}">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <x-form.input name="nama_pegawai_display" label="Nama Pegawai"
+                                    :value="$myPegawai->nama_pegawai" :disabled="true" />
+                                <x-form.input name="nip_display" label="NIP"
+                                    :value="$myPegawai->nip" :disabled="true" />
+                                <x-form.input name="pangkat_display" label="Pangkat/Golongan"
+                                    :value="trim(($myPegawai->pangkat ?? '').' / '.($myPegawai->golongan ?? ''), ' /')" :disabled="true" />
+                                <x-form.input name="jabatan_display" label="Jabatan"
+                                    :value="$myPegawai->jabatan" :disabled="true" />
+                            </div>
+                            <p class="text-[10px] text-muted mt-2">* SPD dibuat untuk akun Anda sendiri. Identitas terisi otomatis dan tidak dapat diubah.</p>
+                        @else
+                            <div class="rounded-lg border border-danger/40 bg-danger/5 px-4 py-3">
+                                <p class="text-sm font-medium text-danger">Akun Anda belum tertaut dengan data pegawai.</p>
+                                <p class="text-xs text-muted mt-1">SPD tidak dapat dibuat sampai akun Anda dihubungkan dengan data pegawai. Silakan hubungi admin.</p>
+                            </div>
+                        @endif
                     </div>
 
-                    {{-- Tujuan & Tempat --}}
+                    {{-- Tujuan & Tempat (otomatis dari SPT yang dipilih, tidak dapat diubah) --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-border-custom pt-6">
-                        <x-form.textarea name="tujuan_kegiatan" label="Tujuan Kegiatan"
-                            placeholder="Tuliskan tujuan kegiatan perjalanan dinas..." :rows="3"
-                            :value="old('tujuan_kegiatan')" :required="true" :error="$errors->first('tujuan_kegiatan')" />
+                        <x-form.textarea name="tujuan_kegiatan" label="Tujuan Kegiatan" :rows="3"
+                            hint="Isi tujuan kegiatan."  :required="true" :error="$errors->first('tujuan_kegitan')"/>
 
-                        <div class="flex flex-col">
-                            <label class="text-sm font-medium text-text-main mb-2">
-                                Tempat Tujuan <span class="text-danger">*</span>
-                            </label>
-
-                            @php
-                                $destinations = old('tempat_tujuan');
-                                if (!$destinations || !is_array($destinations)) {
-                                    $destinations = [''];
-                                }
-                            @endphp
-
-                            <div id="destinations-list" class="space-y-3">
-                                @foreach ($destinations as $index => $destination)
-                                    <div class="flex items-center gap-2 destination-item">
-                                        <div class="grow">
-                                            <input type="text" name="tempat_tujuan[]" placeholder="Contoh: Jakarta"
-                                                value="{{ $destination }}" required
-                                                class="w-full px-3 py-2 text-sm border rounded-md shadow-sm placeholder-muted bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom" />
-                                        </div>
-                                        @if (count($destinations) > 1 || $index > 0)
-                                            <button type="button"
-                                                class="remove-destination-btn text-danger hover:text-red-700 transition duration-150 p-2">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
-
-
-                            @if ($errors->has('tempat_tujuan'))
-                                <p class="text-xs text-danger mt-1">{{ $errors->first('tempat_tujuan') }}</p>
-                            @endif
-                        </div>
+                        <x-form.input name="tempat_tujuan" label="Tempat Tujuan" :value="old('tempat_tujuan')"
+                            :disabled="true" hint="Terisi otomatis dari SPT yang dipilih."  />
                     </div>
 
                     {{-- Tanggal & Lama --}}
@@ -269,41 +257,10 @@
 
     <x-layout.footer />
 
-    <script id="pegawai-data" type="application/json">
-        @json($pegawais)
-    </script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const container = document.getElementById('alatangkuts-list');
             const addBtn = document.getElementById('add-alatangkut-btn');
-
-            // --- Select2 for Pegawai ---
-            $('#pegawai_ditugaskan').select2({
-                placeholder: 'Pilih Pegawai',
-                allowClear: true
-            });
-
-            // --- Auto Fill Pegawai Data ---
-            const selectPegawai = document.getElementById('pegawai_ditugaskan');
-            const nipInput = document.getElementById('nip_pegawai');
-            const pangkatInput = document.getElementById('pangkat_pegawai');
-            const jabatanInput = document.getElementById('jabatan_pegawai');
-            const pegawaiData = JSON.parse(document.getElementById('pegawai-data').textContent);
-
-            $('#pegawai_ditugaskan').on('change', function() {
-                const selectedName = this.value;
-                const employee = pegawaiData.find(p => p.nama_pegawai === selectedName);
-                if (employee) {
-                    nipInput.value = employee.nip || '';
-                    pangkatInput.value = employee.pangkat || '';
-                    jabatanInput.value = employee.jabatan || '';
-                } else {
-                    nipInput.value = '';
-                    pangkatInput.value = '';
-                    jabatanInput.value = '';
-                }
-            });
 
             // --- Select2 for Referensi SPT ---
             $('#spt_id').select2({
@@ -355,70 +312,40 @@
                             }
 
                             if (data.tempat_tujuan) {
-                                const destinationsList = document.getElementById(
-                                    'destinations-list');
-                                destinationsList.innerHTML = '';
-
-                                const places = data.tempat_tujuan.split(',').map(p => p.trim())
-                                    .filter(p => p !== '');
-                                if (places.length > 0) {
-                                    places.forEach(place => {
-                                        const newItem = document.createElement('div');
-                                        newItem.className =
-                                            'flex items-center gap-2 destination-item';
-                                        newItem.innerHTML = `
-                                            <div class="grow">
-                                                <input
-                                                    type="text"
-                                                    name="tempat_tujuan[]"
-                                                    placeholder="Contoh: Jakarta"
-                                                    value="${place}"
-                                                    required
-                                                    class="w-full px-3 py-2 text-sm border rounded-md shadow-sm placeholder-muted bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom"
-                                                />
-                                            </div>
-                                        `;
-                                        destinationsList.appendChild(newItem);
-                                    });
-                                } else {
-                                    const newItem = document.createElement('div');
-                                    newItem.className =
-                                        'flex items-center gap-2 destination-item';
-                                    newItem.innerHTML = `
-                                        <div class="grow">
-                                            <input
-                                                type="text"
-                                                name="tempat_tujuan[]"
-                                                placeholder="Contoh: Jakarta"
-                                                required
-                                                class="w-full px-3 py-2 text-sm border rounded-md shadow-sm placeholder-muted bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom"
-                                            />
-                                        </div>
-                                    `;
-                                    destinationsList.appendChild(newItem);
+                                const tempatTujuanInput = document.getElementById('tempat_tujuan');
+                                if (tempatTujuanInput) {
+                                    tempatTujuanInput.value = data.tempat_tujuan;
                                 }
                             }
 
+                            // Tampilkan daftar pegawai dari SPT sebagai informasi (read-only).
+                            // Identitas pelaksana SPD tetap mengikuti akun yang login.
                             if (data.pegawai_list && data.pegawai_list.length > 0) {
-                                const firstPegawai = data.pegawai_list[0];
-                                const name = firstPegawai.nama_pegawai;
+                                const badge = document.getElementById('spt-info-badge');
+                                const listContainer = document.getElementById('assigned-pegawai-list');
+                                const tableBody = document.getElementById('assigned-pegawai-body');
 
-                                const selectPeg = $('#pegawai_ditugaskan');
-                                if (selectPeg.length) {
-                                    let optionExists = false;
-                                    selectPeg.find('option').each(function() {
-                                        if (this.value === name) {
-                                            optionExists = true;
-                                            return false;
-                                        }
-                                    });
-                                    if (!optionExists) {
-                                        const newOpt = new Option(name, name, true, true);
-                                        selectPeg.append(newOpt).trigger('change');
-                                    } else {
-                                        selectPeg.val(name).trigger('change');
-                                    }
-                                }
+                                badge.classList.remove('hidden');
+                                listContainer.classList.remove('hidden');
+                                tableBody.innerHTML = '';
+
+                                data.pegawai_list.forEach(function(p) {
+                                    const row = `
+                                        <tr class="hover:bg-background/80 transition-colors">
+                                            <td class="px-4 py-2 text-xs text-text-main font-medium">${p.nama_pegawai}</td>
+                                            <td class="px-4 py-2 text-xs text-muted">${p.nip}</td>
+                                            <td class="px-4 py-2 text-xs">
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${p.peran === 'Penanggung Jawab' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}">
+                                                    ${p.peran}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `;
+                                    tableBody.insertAdjacentHTML('beforeend', row);
+                                });
+                            } else {
+                                document.getElementById('spt-info-badge').classList.add('hidden');
+                                document.getElementById('assigned-pegawai-list').classList.add('hidden');
                             }
                         }
                     });

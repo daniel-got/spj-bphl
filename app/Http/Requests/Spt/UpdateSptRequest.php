@@ -42,6 +42,8 @@ class UpdateSptRequest extends FormRequest
             'pegawai_ditugaskan.*.pegawai_id' => 'required|exists:data_pegawai,id',
             'pegawai_ditugaskan.*.nama_pegawai' => 'required|string',
             'pegawai_ditugaskan.*.nip' => 'required|string',
+            'pegawai_ditugaskan.*.pangkat' => 'required|string',
+            'pegawai_ditugaskan.*.jabatan' => 'required|string',
             'pegawai_ditugaskan.*.peran' => 'required|string|in:Penanggung Jawab,Anggota',
 
             'tujuan_kegiatan' => 'required|string',

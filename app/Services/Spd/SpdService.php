@@ -30,7 +30,7 @@ class SpdService
      */
     public function getAllLatest(array $filters = [], int $perPage = 10)
     {
-        $query = Spd::query();
+        $query = Spd::query()->with('pegawai');
         $this->applyRoleFilter($query);
 
         if (! empty($filters['search'])) {
@@ -85,7 +85,7 @@ class SpdService
      */
     public function getSpdById(string $id)
     {
-        return Spd::with(['spt', 'pembuat'])->findOrFail($id);
+        return Spd::with(['spt', 'pembuat', 'pegawai'])->findOrFail($id);
     }
 
     /**
@@ -94,9 +94,36 @@ class SpdService
     public function createSpd(array $data)
     {
         return DB::transaction(function () use ($data) {
+            $user = auth()->user();
+
+            // Validasi keamanan: Pastikan SPT yang dipilih boleh diakses oleh user
+            if ($user && in_array($user->role, ['user', 'pembuat_spt'])) {
+                $pegawai = Pegawai::where('user_id', $user->id)->first();
+                $nip = $pegawai?->nip;
+
+                $isValidSpt = Spt::where('id', $data['spt_id'])
+                    ->where(function ($q) use ($user, $nip) {
+                        $q->where('pembuat_id', $user->id);
+                        if ($nip) {
+                            $q->orWhere('pegawai_ditugaskan', 'like', '%'.$nip.'%');
+                        }
+                    })->exists();
+
+                if (! $isValidSpt) {
+                    throw new \Exception('Anda tidak memiliki akses untuk membuat SPD dari SPT ini.');
+                }
+            }
+
             $data['pembuat_id'] = $data['pembuat_id'] ?? auth()->id();
             // Default status SPD adalah draft
             $data['status'] = $data['status'] ?? 'draft';
+
+            // SPD dibuat per akun: identitas pegawai selalu diambil dari akun yang login,
+            // tidak boleh memilih/menginput pegawai lain dari form.
+            $myPegawai = Pegawai::where('user_id', auth()->id())->first();
+            if ($myPegawai) {
+                $data['nip_pegawai'] = $myPegawai->nip;
+            }
 
             $spd = Spd::create($data);
 
@@ -136,13 +163,32 @@ class SpdService
 
     /**
      * Search SPT for autocomplete/Select2.
+     * Hanya menampilkan SPT yang ditugaskan kepada user atau dibuat oleh user.
      */
     public function searchSpt(?string $search): array
     {
-        return Spt::query()
+        $user = auth()->user();
+        $query = Spt::query();
+
+        // Terapkan filter berdasarkan role/penugasan
+        if ($user && in_array($user->role, ['user', 'pembuat_spt'])) {
+            $pegawai = Pegawai::where('user_id', $user->id)->first();
+            $nip = $pegawai?->nip;
+
+            $query->where(function ($q) use ($user, $nip) {
+                $q->where('pembuat_id', $user->id);
+                if ($nip) {
+                    $q->orWhere('pegawai_ditugaskan', 'like', '%'.$nip.'%');
+                }
+            });
+        }
+
+        return $query
             ->when($search, function ($query) use ($search) {
-                $query->where('nomor_spt', 'like', "%{$search}%")
-                    ->orWhere('tujuan_kegiatan', 'like', "%{$search}%");
+                $query->where(function ($q) use ($search) {
+                    $q->where('nomor_spt', 'like', "%{$search}%")
+                        ->orWhere('tujuan_kegiatan', 'like', "%{$search}%");
+                });
             })
             ->limit(15)
             ->get()
@@ -158,7 +204,23 @@ class SpdService
      */
     public function getSptAjax(string $id): array
     {
-        $spt = Spt::findOrFail($id);
+        $user = auth()->user();
+        $query = Spt::query();
+
+        // Keamanan: Pastikan user hanya bisa mengambil detail SPT yang boleh mereka akses
+        if ($user && in_array($user->role, ['user', 'pembuat_spt'])) {
+            $pegawai = Pegawai::where('user_id', $user->id)->first();
+            $nip = $pegawai?->nip;
+
+            $query->where(function ($q) use ($user, $nip) {
+                $q->where('pembuat_id', $user->id);
+                if ($nip) {
+                    $q->orWhere('pegawai_ditugaskan', 'like', '%'.$nip.'%');
+                }
+            });
+        }
+
+        $spt = $query->findOrFail($id);
 
         return [
             'id' => $spt->id,

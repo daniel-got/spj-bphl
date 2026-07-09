@@ -21,8 +21,8 @@ class UpdateRincianRequest extends FormRequest
     {
         return [
             'rincian_biaya' => 'required|array|min:1',
-            'rincian_biaya.*.item' => 'required|string',
-            'rincian_biaya.*.transport' => 'required|numeric|min:0',
+            // Kunci mengikuti skema form & tampilan: biaya_transport, penginapan (%), hotel_ril.
+            'rincian_biaya.*.biaya_transport' => 'required|numeric|min:0',
             'rincian_biaya.*.penginapan' => 'required|numeric|min:0',
             'rincian_biaya.*.hotel_ril' => 'required|numeric|min:0',
             'status' => 'nullable|in:draft,diajukan,direvisi,disetujui,ditolak',

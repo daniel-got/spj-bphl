@@ -69,7 +69,7 @@ class SptTest extends TestCase
             'lama_kegiatan' => 3,
             'kode_mak' => '5311.001.001',
             'pegawai_ditugaskan' => [
-                ['pegawai_id' => 1, 'nama_pegawai' => 'Budi Santoso', 'nip' => '198501012010011001', 'peran' => 'Penanggung Jawab'],
+                ['pegawai_id' => 1, 'nama_pegawai' => 'Budi Santoso', 'nip' => '198501012010011001', 'pangkat' => 'Penata / IIIc', 'jabatan' => 'Analis Data', 'peran' => 'Penanggung Jawab'],
             ],
         ];
 
@@ -149,5 +149,53 @@ class SptTest extends TestCase
 
         $response->assertRedirect(route('user.spt.index'));
         $this->assertDatabaseMissing('data_spt', ['id' => $spt->id]);
+    }
+    public function test_user_dapat_mengajukan_spt_baru_dengan_banyak_pegawai(): void
+    {
+        $user = User::factory()->create();
+
+        Pegawai::factory()->create(['id' => 1, 'nama_pegawai' => 'Budi Santoso', 'nip' => '198501012010011001', 'pangkat' => 'Penata', 'jabatan' => 'Analis']);
+        Pegawai::factory()->create(['id' => 2, 'nama_pegawai' => 'Ani Wijaya', 'nip' => '199002022015012002', 'pangkat' => 'Pengatur', 'jabatan' => 'Administrasi']);
+
+        $payload = [
+            'nomor_spt' => 'SPT/MULTI/001/'.now()->year,
+            'tgl_spt' => now()->format('Y-m-d'),
+            'tujuan_kegiatan' => 'Tujuan Multi Pegawai',
+            'tempat_tujuan' => 'Jakarta',
+            'tgl_berangkat' => now()->addDays(1)->format('Y-m-d'),
+            'tgl_kembali' => now()->addDays(3)->format('Y-m-d'),
+            'lama_kegiatan' => 3,
+            'kode_mak' => 'MAK-001',
+            'pegawai_ditugaskan' => [
+                [
+                    'pegawai_id' => 1,
+                    'nama_pegawai' => 'Budi Santoso',
+                    'nip' => '198501012010011001',
+                    'pangkat' => 'Penata',
+                    'jabatan' => 'Analis',
+                    'peran' => 'Penanggung Jawab',
+                ],
+                [
+                    'pegawai_id' => 2,
+                    'nama_pegawai' => 'Ani Wijaya',
+                    'nip' => '199002022015012002',
+                    'pangkat' => 'Pengatur',
+                    'jabatan' => 'Administrasi',
+                    'peran' => 'Anggota',
+                ],
+            ],
+        ];
+
+        $response = $this->withoutMiddleware([EnsurePembuatSpt::class])
+            ->actingAs($user)
+            ->post(route('user.spt.store'), $payload);
+
+        $response->assertRedirect(route('user.spt.index'));
+
+        $spt = Spt::where('nomor_spt', 'SPT/MULTI/001/'.now()->year)->first();
+        $this->assertNotNull($spt);
+        $this->assertCount(2, $spt->pegawai_ditugaskan);
+        $this->assertEquals('Budi Santoso', $spt->penanggung_jawab);
+        $this->assertEquals('Ani Wijaya', $spt->anggota);
     }
 }

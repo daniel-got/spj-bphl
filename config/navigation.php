@@ -28,103 +28,103 @@ return [
         // --- GRUP: UTAMA ---
         [
             'header' => 'Utama',
-            'roles' => ['admin', 'pembuat_spt', 'user', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+            'roles' => ['admin', 'pembuat_spt', 'user', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
             'label' => 'Dashboard',
             'url' => '/admin/dashboard',
             'icon' => 'home',
-            'roles' => ['admin']
+            'roles' => ['admin'],
         ],
         [
             'label' => 'Dashboard',
             'url' => '/user/pembuat-spt',
             'icon' => 'home',
-            'roles' => ['pembuat_spt']
+            'roles' => ['pembuat_spt'],
         ],
         [
             'label' => 'Dashboard Statistik',
             'url' => '/user/spt', // Nanti arahkan ke dashboard statistik pimpinan
             'icon' => 'chart-bar',
-            'roles' => ['kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+            'roles' => ['kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
             'label' => 'Dashboard',
-            'url' => '/user/spt',
+            'url' => '/user/dashboard',
             'icon' => 'home',
-            'roles' => ['user', 'verifikator']
+            'roles' => ['user', 'verifikator'],
         ],
 
         // --- GRUP: TUGAS SAYA (Semua Aktor) ---
         [
             'header' => 'Tugas Saya',
-            'roles' => ['admin', 'pembuat_spt', 'user', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+            'roles' => ['admin', 'pembuat_spt', 'user', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
             'label' => 'SPT Saya',
             'url' => '/user/spt',
             'icon' => 'document-text',
-            'roles' => ['admin', 'user', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+            'roles' => ['admin', 'user', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
             'label' => 'SPD Saya',
             'url' => '/user/spd',
             'icon' => 'clipboard',
-            'roles' => ['admin', 'user', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+            'roles' => ['admin', 'user', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
             'label' => 'Rincian Saya',
             'url' => '/user/rincian',
             'icon' => 'calculator',
-            'roles' => ['admin', 'user', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+            'roles' => ['admin', 'user', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
 
         // --- GRUP: OPERASIONAL (Input & Verifikasi) ---
         [
             'header' => 'Operasional',
-            'roles' => ['admin', 'pembuat_spt', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+            'roles' => ['admin', 'pembuat_spt', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
             'label' => 'Kelola SPT Pegawai',
             'url' => '/user/spt/kelola',
             'icon' => 'pencil-square',
-            'roles' => ['admin', 'pembuat_spt']
+            'roles' => ['admin', 'pembuat_spt'],
         ],
         [
             'label' => 'Verifikasi SPT',
             'url' => '/verifikasi/spt',
             'icon' => 'check-badge',
-            'roles' => ['kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+            'roles' => ['kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
             'label' => 'Verifikasi SPJ',
             'url' => '/verifikasi/spj',
             'icon' => 'shield-check',
-            'roles' => ['verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+            'roles' => ['verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
 
         // --- GRUP: ADMINISTRATOR ---
         [
             'header' => 'Administrasi',
-            'roles' => ['admin']
+            'roles' => ['admin'],
         ],
         [
             'label' => 'Kelola Pegawai',
             'url' => '/admin/kelolaPegawai',
             'icon' => 'users',
-            'roles' => ['admin']
+            'roles' => ['admin'],
         ],
         [
             'label' => 'Master Tarif',
             'url' => '/admin/tarif',
             'icon' => 'currency-dollar',
-            'roles' => ['admin']
+            'roles' => ['admin'],
         ],
         [
             'label' => 'Kelola PPK',
             'url' => '/admin/ppk',
             'icon' => 'identification',
-            'roles' => ['admin']
+            'roles' => ['admin'],
         ],
     ],
 

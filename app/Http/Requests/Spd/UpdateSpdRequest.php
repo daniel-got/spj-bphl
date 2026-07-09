@@ -28,6 +28,10 @@ class UpdateSpdRequest extends FormRequest
             'alasan' => 'nullable|string',
             'tgl_spd' => 'required|date',
             'nip_pegawai' => 'required|string|max:50',
+            // Catatan: tujuan_kegiatan, tempat_tujuan, tgl_berangkat, tgl_kembali,
+            // lama_kegiatan, dan kode_mak TIDAK divalidasi/disimpan di SPD lagi.
+            // Field-field tersebut diturunkan dari SPT terkait (lihat accessor di App\Models\Spd).
+            'jenis_perjalanan' => 'required|string|in:Dalam Kota,Luar Kota',
             'berangkat_dari' => 'required|string|max:255',
             'alat_angkut' => 'required|array|min:1',
             'alat_angkut.*' => 'required|string|max:255',

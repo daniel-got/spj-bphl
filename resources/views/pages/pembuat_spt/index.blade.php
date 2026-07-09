@@ -27,42 +27,6 @@
                         </x-slot:actions>
                     </x-layout.page-header>
 
-                    {{-- Stats Section --}}
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <x-dashboard.stat-card
-                            title="SPT Dibuat"
-                            value="{{ $counts['dibuat'] ?? 0 }}"
-                            description="Total SPT yang Anda buat"
-                            icon="document-text"
-                            color="blue"
-                            href="{{ route('pembuat_spt.index') }}"
-                        />
-                        <x-dashboard.stat-card
-                            title="Disetujui"
-                            value="{{ $counts['disetujui'] ?? 0 }}"
-                            description="SPT telah disetujui"
-                            icon="check-circle"
-                            color="green"
-                            href="{{ route('pembuat_spt.index', ['status' => 'disetujui']) }}"
-                        />
-                        <x-dashboard.stat-card
-                            title="Ditolak"
-                            value="{{ $counts['ditolak'] ?? 0 }}"
-                            description="SPT ditolak"
-                            icon="x-circle"
-                            color="red"
-                            href="{{ route('pembuat_spt.index', ['status' => 'ditolak']) }}"
-                        />
-                        <x-dashboard.stat-card
-                            title="Selesai"
-                            value="{{ $counts['selesai'] ?? 0 }}"
-                            description="Rincian biaya sudah dilengkapi"
-                            icon="check-badge"
-                            color="primary"
-                            href="{{ route('pembuat_spt.index', ['status' => 'selesai']) }}"
-                        />
-                    </div>
-
                     {{-- Tabel Riwayat SPT --}}
                     <div class="mb-8">
                         @php
@@ -157,30 +121,28 @@
                                     $tglBerangkat = $spt->tgl_berangkat ? \Carbon\Carbon::parse($spt->tgl_berangkat)->format('d/m/Y') : '-';
                                     $tglKembali   = $spt->tgl_kembali   ? \Carbon\Carbon::parse($spt->tgl_kembali)->format('d/m/Y')   : '-';
 
-                                    // Pegawai ditugaskan
+                                    // Menampilkan penanggung jawab saja sesuai permintaan issue
+                                    $namaPegawai = $spt->penanggung_jawab ?? '-';
+                                    $nipPegawai = '-';
+                                    $pangkatPegawai = '-';
+                                    $jabatanPegawai = '-';
+
+                                    // Ambil detail penanggung jawab dari JSON jika ada untuk melengkapi NIP dll
                                     $pegawaiData = $spt->pegawai_ditugaskan;
                                     if (is_string($pegawaiData)) {
                                         $pegawaiData = json_decode($pegawaiData, true);
                                     }
 
-                                    $namaPegawaiList = $nipList = $pangkatList = $jabatanList = [];
-
                                     if (is_array($pegawaiData)) {
                                         foreach ($pegawaiData as $pegawai) {
-                                            if (is_array($pegawai)) {
-                                                $peranStr = !empty($pegawai['peran']) ? ' (' . $pegawai['peran'] . ')' : '';
-                                                $namaPegawaiList[] = ($pegawai['nama_pegawai'] ?? '-') . $peranStr;
-                                                $nipList[]         = $pegawai['nip']     ?? '-';
-                                                $pangkatList[]     = $pegawai['pangkat'] ?? '-';
-                                                $jabatanList[]     = $pegawai['jabatan'] ?? '-';
+                                            if (is_array($pegawai) && ($pegawai['peran'] ?? '') === 'Penanggung Jawab') {
+                                                $nipPegawai = $pegawai['nip'] ?? '-';
+                                                $pangkatPegawai = $pegawai['pangkat'] ?? '-';
+                                                $jabatanPegawai = $pegawai['jabatan'] ?? '-';
+                                                break;
                                             }
                                         }
                                     }
-
-                                    $namaPegawai   = !empty($namaPegawaiList) ? implode(', ', $namaPegawaiList) : '-';
-                                    $nipPegawai    = !empty($nipList)         ? implode(', ', $nipList)         : '-';
-                                    $pangkatPegawai = !empty($pangkatList)    ? implode(', ', $pangkatList)     : '-';
-                                    $jabatanPegawai = !empty($jabatanList)    ? implode(', ', $jabatanList)     : '-';
 
                                     // Nomor SPT link
                                     $nomorSptLink = '<a href="' . route('user.spt.show', $spt->id) . '" class="text-primary hover:underline font-semibold" title="Lihat Rincian">' . e($spt->nomor_spt ?? '') . '</a>';

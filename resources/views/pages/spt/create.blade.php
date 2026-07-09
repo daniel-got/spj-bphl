@@ -148,8 +148,8 @@
                                         <div class="flex flex-col">
                                             <label class="text-xs font-medium text-text-main mb-1">Peran SPT</label>
                                             <select required class="pegawai-peran w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background border-border-custom focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
-                                                <option value="Anggota">Anggota</option>
                                                 <option value="Penanggung Jawab">Penanggung Jawab</option>
+                                                <option value="Anggota">Anggota</option>
                                             </select>
                                         </div>
                                         <div class="flex flex-col">
@@ -445,8 +445,8 @@
                             <div class="flex flex-col">
                                 <label class="text-xs font-medium text-text-main mb-1">Peran SPT</label>
                                 <select required class="pegawai-peran w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background border-border-custom focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
-                                    <option value="Anggota">Anggota</option>
                                     <option value="Penanggung Jawab">Penanggung Jawab</option>
+                                    <option value="Anggota">Anggota</option>
                                 </select>
                             </div>
                             <div class="flex flex-col">
@@ -472,29 +472,33 @@
                 updateRemoveButtons();
                 syncAllDropdowns();
             });
- 
+
             // Menjalankan inisialisasi awal saat halaman dibuka
             container.querySelectorAll('.pegawai-item').forEach(initPegawaiRow);
             updateRemoveButtons();
             syncAllDropdowns();
- 
+
             // Interseptor form submit untuk membundel data pegawai ke input JSON hidden
             form.addEventListener('submit', function(e) {
                 const items = container.querySelectorAll('.pegawai-item');
                 const pegawaiData = [];
- 
+
                 items.forEach((item) => {
                     const select = item.querySelector('.pegawai-select');
                     const peranSelect = item.querySelector('.pegawai-peran');
+                    const nipInput = item.querySelector('.pegawai-nip');
+                    const pangkatInput = item.querySelector('.pegawai-pangkat');
+                    const jabatanInput = item.querySelector('.pegawai-jabatan');
+
                     if (select && select.value) {
                         const dataPegawai = cacheOptions[select.value];
                         if (dataPegawai) {
                             pegawaiData.push({
                                 pegawai_id: select.value,
                                 nama_pegawai: dataPegawai.text,
-                                nip: dataPegawai.nip,
-                                pangkat: dataPegawai.pangkat,
-                                jabatan: dataPegawai.jabatan,
+                                nip: nipInput ? nipInput.value : dataPegawai.nip,
+                                pangkat: pangkatInput ? pangkatInput.value : dataPegawai.pangkat,
+                                jabatan: jabatanInput ? jabatanInput.value : dataPegawai.jabatan,
                                 peran: peranSelect ? peranSelect.value : 'Anggota',
                             });
                         }

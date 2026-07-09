@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Spd;
 
+use App\Models\Pegawai;
 use App\Models\Spd;
 use App\Models\Spt;
 use App\Models\User;
@@ -52,12 +53,13 @@ class SpdTest extends TestCase
     public function test_user_dapat_membuat_spd_baru(): void
     {
         $user = User::factory()->create(['role' => 'user']);
-        $spt = Spt::factory()->create();
+        $spt = Spt::factory()->create(['pembuat_id' => $user->id]);
 
         $payload = [
             'nomor_spd' => 'SPD/001/BPHL/'.now()->year,
             'tgl_spd' => now()->format('Y-m-d'),
             'nip_pegawai' => '198501012010011001',
+            'jenis_perjalanan' => 'Luar Kota',
             'berangkat_dari' => 'Samarinda',
             'alat_angkut' => ['Kendaraan Dinas'],
             'ppk' => 'Pejabat Pembuat Komitmen 1',
@@ -72,10 +74,83 @@ class SpdTest extends TestCase
         $this->assertDatabaseHas('data_spd', ['nomor_spd' => 'SPD/001/BPHL/'.now()->year]);
     }
 
+    public function test_nip_pegawai_dipaksa_dari_akun_yang_login(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $pegawai = Pegawai::factory()->create(['user_id' => $user->id]);
+        $spt = Spt::factory()->create(['pembuat_id' => $user->id]);
+
+        $payload = [
+            'nomor_spd' => 'SPD/010/BPHL/'.now()->year,
+            'tgl_spd' => now()->format('Y-m-d'),
+            // Sengaja mengirim NIP orang lain — harus diabaikan & ditimpa NIP akun.
+            'nip_pegawai' => '000000000000000000',
+            'jenis_perjalanan' => 'Luar Kota',
+            'berangkat_dari' => 'Samarinda',
+            'alat_angkut' => ['Kendaraan Dinas'],
+            'ppk' => 'Pejabat Pembuat Komitmen 1',
+            'nama_ppk' => 'Kepala Balai',
+            'nip_ppk' => '197001012000011001',
+            'spt_id' => $spt->id,
+        ];
+
+        $this->actingAs($user)->post(route('user.spd.store'), $payload);
+
+        $this->assertDatabaseHas('data_spd', [
+            'nomor_spd' => 'SPD/010/BPHL/'.now()->year,
+            'nip_pegawai' => $pegawai->nip,
+        ]);
+    }
+
+    public function test_riwayat_spd_menampilkan_identitas_pegawai(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $pegawai = Pegawai::factory()->create(['user_id' => $user->id]);
+        $spd = Spd::factory()->create([
+            'pembuat_id' => $user->id,
+            'nip_pegawai' => $pegawai->nip,
+        ]);
+
+        // Accessor membaca identitas dari data_pegawai berdasarkan nip_pegawai.
+        $this->assertSame($pegawai->nama_pegawai, $spd->pegawai_ditugaskan);
+        $this->assertSame($pegawai->jabatan, $spd->jabatan_pegawai);
+        $this->assertNotNull($spd->pangkat_pegawai);
+
+        $this->actingAs($user)
+            ->get(route('user.spd.show', $spd))
+            ->assertStatus(200)
+            ->assertSee($pegawai->nama_pegawai);
+    }
+
+    public function test_user_gagal_membuat_spd_untuk_spt_orang_lain(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $otherUser = User::factory()->create(['role' => 'user']);
+        $spt = Spt::factory()->create(['pembuat_id' => $otherUser->id]);
+
+        $payload = [
+            'nomor_spd' => 'SPD/001/BPHL/'.now()->year,
+            'tgl_spd' => now()->format('Y-m-d'),
+            'nip_pegawai' => '198501012010011001',
+            'jenis_perjalanan' => 'Luar Kota',
+            'berangkat_dari' => 'Samarinda',
+            'alat_angkut' => ['Kendaraan Dinas'],
+            'ppk' => 'Pejabat Pembuat Komitmen 1',
+            'nama_ppk' => 'Kepala Balai',
+            'nip_ppk' => '197001012000011001',
+            'spt_id' => $spt->id,
+        ];
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Anda tidak memiliki akses untuk membuat SPD dari SPT ini.');
+
+        $this->actingAs($user)->withoutExceptionHandling()->post(route('user.spd.store'), $payload);
+    }
+
     public function test_gagal_membuat_spd_jika_nomor_spd_duplikat(): void
     {
         $user = User::factory()->create(['role' => 'user']);
-        $spt = Spt::factory()->create();
+        $spt = Spt::factory()->create(['pembuat_id' => $user->id]);
         Spd::factory()->create(['nomor_spd' => 'SPD/001/BPHL/'.now()->year, 'pembuat_id' => $user->id, 'spt_id' => $spt->id]);
 
         $response = $this->actingAs($user)->post(route('user.spd.store'), [
@@ -115,6 +190,26 @@ class SpdTest extends TestCase
     // UPDATE - Edit SPD
     // -------------------------------------------------------------------------
 
+    public function test_halaman_edit_spd_menampilkan_tanggal_dari_spt(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $spt = Spt::factory()->create([
+            'pembuat_id' => $user->id,
+            'tgl_berangkat' => '2026-08-10',
+            'tgl_kembali' => '2026-08-15',
+        ]);
+        $spd = Spd::factory()->create(['pembuat_id' => $user->id, 'spt_id' => $spt->id]);
+
+        $response = $this->actingAs($user)->get(route('user.spd.edit', $spd));
+
+        $response->assertStatus(200);
+        // Tanggal (turunan dari SPT) harus tampil dalam format Y-m-d agar terbaca input type=date.
+        $response->assertSee('value="2026-08-10"', false);
+        $response->assertSee('value="2026-08-15"', false);
+        // spt_id harus ikut dikirim agar update tidak gagal validasi (required).
+        $response->assertSee('name="spt_id" value="'.$spt->id.'"', false);
+    }
+
     public function test_user_dapat_mengedit_spd(): void
     {
         $user = User::factory()->create(['role' => 'user']);
@@ -129,6 +224,7 @@ class SpdTest extends TestCase
             'nomor_spd' => $spd->nomor_spd,
             'tgl_spd' => $spd->tgl_spd->format('Y-m-d'),
             'nip_pegawai' => $spd->nip_pegawai,
+            'jenis_perjalanan' => 'Dalam Kota',
             'berangkat_dari' => 'Berangkat Diperbarui',
             'alat_angkut' => ['Kendaraan Dinas'],
             'ppk' => 'Pejabat Pembuat Komitmen 1',

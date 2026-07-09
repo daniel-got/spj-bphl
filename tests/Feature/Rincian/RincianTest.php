@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Rincian;
 
+use App\Models\Pegawai;
 use App\Models\Rincian;
 use App\Models\Spd;
 use App\Models\User;
@@ -30,6 +31,25 @@ class RincianTest extends TestCase
         $response = $this->get(route('user.rincian.index'));
 
         $response->assertRedirect(route('login'));
+    }
+
+    public function test_ajax_spd_mengembalikan_nama_pegawai_dan_tanggal_terformat(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $pegawai = Pegawai::factory()->create(['user_id' => $user->id]);
+        $spd = Spd::factory()->create([
+            'pembuat_id' => $user->id,
+            'nip_pegawai' => $pegawai->nip,
+            'tgl_spd' => '2026-07-13',
+        ]);
+
+        $response = $this->actingAs($user)->getJson(route('user.rincian.spd.ajax', $spd->id));
+
+        $response->assertStatus(200);
+        // Bukan array objek ([object Object]) — harus nama pegawai tunggal.
+        $response->assertJsonPath('pegawai_ditugaskan', $pegawai->nama_pegawai);
+        // Tanggal harus terformat Y-m-d, bukan ISO string.
+        $response->assertJsonPath('tgl_spd', '2026-07-13');
     }
 
     // -------------------------------------------------------------------------
@@ -98,15 +118,13 @@ class RincianTest extends TestCase
             'spd_id' => $spd->id,
             'rincian_biaya' => [
                 [
-                    'item' => 'Baris 1',
-                    'transport' => 150000,
-                    'penginapan' => 0,
+                    'biaya_transport' => 150000,
+                    'penginapan' => 100,
                     'hotel_ril' => 500000,
                 ],
                 [
-                    'item' => 'Baris 2',
-                    'transport' => 200000,
-                    'penginapan' => 500000,
+                    'biaya_transport' => 200000,
+                    'penginapan' => 30,
                     'hotel_ril' => 700000,
                 ],
             ],
@@ -119,8 +137,8 @@ class RincianTest extends TestCase
 
         $rincian = Rincian::where('spd_id', $spd->id)->first();
         $this->assertCount(2, $rincian->rincian_biaya);
-        $this->assertEquals(150000, $rincian->rincian_biaya[0]['transport']);
-        $this->assertEquals(200000, $rincian->rincian_biaya[1]['transport']);
+        $this->assertEquals(150000, $rincian->rincian_biaya[0]['biaya_transport']);
+        $this->assertEquals(200000, $rincian->rincian_biaya[1]['biaya_transport']);
     }
 
     public function test_gagal_membuat_rincian_tanpa_spd_id(): void
@@ -175,15 +193,13 @@ class RincianTest extends TestCase
         $response = $this->actingAs($user)->put(route('user.rincian.update', $rincian), [
             'rincian_biaya' => [
                 [
-                    'item' => 'Edit 1',
-                    'transport' => 250000,
-                    'penginapan' => 500000,
+                    'biaya_transport' => 250000,
+                    'penginapan' => 100,
                     'hotel_ril' => 750000,
                 ],
                 [
-                    'item' => 'Edit 2',
-                    'transport' => 50000,
-                    'penginapan' => 0,
+                    'biaya_transport' => 50000,
+                    'penginapan' => 30,
                     'hotel_ril' => 0,
                 ],
             ],
@@ -193,8 +209,8 @@ class RincianTest extends TestCase
 
         $rincian->refresh();
         $this->assertCount(2, $rincian->rincian_biaya);
-        $this->assertEquals(250000, $rincian->rincian_biaya[0]['transport']);
-        $this->assertEquals(50000, $rincian->rincian_biaya[1]['transport']);
+        $this->assertEquals(250000, $rincian->rincian_biaya[0]['biaya_transport']);
+        $this->assertEquals(50000, $rincian->rincian_biaya[1]['biaya_transport']);
     }
 
     // -------------------------------------------------------------------------

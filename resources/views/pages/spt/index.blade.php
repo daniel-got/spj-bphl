@@ -29,20 +29,6 @@
                         @endif
                     </x-layout.page-header>
 
-                    {{-- Stats Section --}}
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <x-dashboard.stat-card title="Total SPT" value="{{ $counts['all'] ?? 0 }}" description="Total data semua SPT"
-                            icon="document-text" color="blue" href="{{ route('user.spt.index') }}" />
-                        <x-dashboard.stat-card title="Disetujui" value="{{ $counts['disetujui'] ?? 0 }}"
-                            description="Total SPT disetujui" icon="check-circle" color="green"
-                            href="{{ route('user.spt.index', ['status' => 'disetujui']) }}" />
-                        <x-dashboard.stat-card title="Direvisi" value="{{ $counts['direvisi'] ?? 0 }}"
-                            description="Total SPT perlu direvisi" icon="exclamation-circle" color="yellow"
-                            href="{{ route('user.spt.index', ['status' => 'direvisi']) }}" />
-                        <x-dashboard.stat-card title="Ditolak" value="{{ $counts['ditolak'] ?? 0 }}" description="Total SPT ditolak"
-                            icon="x-circle" color="red" href="{{ route('user.spt.index', ['status' => 'ditolak']) }}" />
-                    </div>
-
                     {{-- Tabel Riwayat SPT --}}
                     <div class="mb-8">
                         @php
@@ -140,36 +126,28 @@
                                     $tglBerangkat = $spt->tgl_berangkat ? \Carbon\Carbon::parse($spt->tgl_berangkat)->format('d/m/Y') : '-';
                                     $tglKembali = $spt->tgl_kembali ? \Carbon\Carbon::parse($spt->tgl_kembali)->format('d/m/Y') : '-';
 
-                                    // Ambil snapshot data pegawai dari kolom JSON 'pegawai_ditugaskan'.
-                                    // Kolom ini berisi ARRAY DAFTAR pegawai (bisa lebih dari satu orang),
-                                    // masing-masing item punya key 'nama_pegawai', 'nip', 'pangkat', 'jabatan'
-                                    // (bukan key 'nama' seperti sebelumnya).
+                                    // Menampilkan penanggung jawab saja sesuai permintaan issue
+                                    $namaPegawai = $spt->penanggung_jawab ?? '-';
+                                    $nipPegawai = '-';
+                                    $pangkatPegawai = '-';
+                                    $jabatanPegawai = '-';
+
+                                    // Ambil detail penanggung jawab dari JSON jika ada untuk melengkapi NIP dll
                                     $pegawaiData = $spt->pegawai_ditugaskan;
                                     if (is_string($pegawaiData)) {
                                         $pegawaiData = json_decode($pegawaiData, true);
                                     }
 
-                                    $namaPegawaiList = [];
-                                    $nipList = [];
-                                    $pangkatList = [];
-                                    $jabatanList = [];
-
                                     if (is_array($pegawaiData)) {
                                         foreach ($pegawaiData as $pegawai) {
-                                            if (is_array($pegawai)) {
-                                                $peranStr = !empty($pegawai['peran']) ? ' (' . $pegawai['peran'] . ')' : '';
-                                                $namaPegawaiList[] = ($pegawai['nama_pegawai'] ?? '-') . $peranStr;
-                                                $nipList[] = $pegawai['nip'] ?? '-';
-                                                $pangkatList[] = $pegawai['pangkat'] ?? '-';
-                                                $jabatanList[] = $pegawai['jabatan'] ?? '-';
+                                            if (is_array($pegawai) && ($pegawai['peran'] ?? '') === 'Penanggung Jawab') {
+                                                $nipPegawai = $pegawai['nip'] ?? '-';
+                                                $pangkatPegawai = $pegawai['pangkat'] ?? '-';
+                                                $jabatanPegawai = $pegawai['jabatan'] ?? '-';
+                                                break;
                                             }
                                         }
                                     }
-
-                                    $namaPegawai = !empty($namaPegawaiList) ? implode(', ', $namaPegawaiList) : '-';
-                                    $nipPegawai = !empty($nipList) ? implode(', ', $nipList) : '-';
-                                    $pangkatPegawai = !empty($pangkatList) ? implode(', ', $pangkatList) : '-';
-                                    $jabatanPegawai = !empty($jabatanList) ? implode(', ', $jabatanList) : '-';
 
                                     // Link Detail pada Nomor SPT
                                     $nomorSptLink = '<a href="' . route('user.spt.show', $spt->id) . '" class="text-primary hover:underline font-semibold" title="Lihat Rincian">' . e($spt->nomor_spt ?? '') . '</a>';

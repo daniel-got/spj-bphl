@@ -25,6 +25,7 @@ class SpdFactory extends Factory
             'nomor_spd' => 'SPD/'.fake()->unique()->numerify('###').'/BPHL/'.now()->year,
             'tgl_spd' => fake()->date(),
             'nip_pegawai' => fake()->numerify('##################'),
+            'jenis_perjalanan' => fake()->randomElement(['Dalam Kota', 'Luar Kota']),
             'berangkat_dari' => fake()->city(),
             'alat_angkut' => [fake()->randomElement(['Kendaraan Dinas', 'Pesawat', 'Kereta Api'])],
             'ppk' => fake()->randomElement(['Pejabat Pembuat Komitmen 1', 'Pejabat Pembuat Komitmen 2']),

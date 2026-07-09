@@ -40,6 +40,9 @@
                 @csrf
                 @method('PUT')
 
+                {{-- SPT induk tidak dapat diubah saat edit, nilainya dipertahankan. --}}
+                <input type="hidden" name="spt_id" value="{{ $spd->spt_id }}">
+
                 <div class="bg-surface border border-border-custom rounded-xl shadow-sm p-6 space-y-6">
 
                     {{-- Nomor & Tanggal --}}
@@ -50,25 +53,21 @@
                             :error="$errors->first('tgl_spd')" />
                     </div>
 
-                    {{-- Pegawai yang Ditugaskan --}}
+                    {{-- Pegawai yang Ditugaskan (identitas mengikuti akun pemilik SPD, tidak dapat diubah) --}}
                     <div class="border-t border-border-custom pt-6">
                         <h3 class="text-sm font-bold text-text-main mb-4">Pegawai yang Ditugaskan</h3>
+                        <input type="hidden" name="nip_pegawai" value="{{ $spd->nip_pegawai }}">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            @php
-                                $pegawaiOptions = [];
-                                foreach ($pegawais as $pegawai) {
-                                    $pegawaiOptions[$pegawai->nama_pegawai] = $pegawai->nama_pegawai;
-                                }
-                            @endphp
-                            <x-form.select name="pegawai_ditugaskan" label="Nama Pegawai" :options="$pegawaiOptions"
-                                :selected="old('pegawai_ditugaskan', $spd->pegawai_ditugaskan)" :required="true" :error="$errors->first('pegawai_ditugaskan')" placeholder="Pilih Pegawai" />
-                            <x-form.input name="nip_pegawai" label="NIP" placeholder="NIP" :value="old('nip_pegawai', $spd->nip_pegawai)"
-                                :required="true" :error="$errors->first('nip_pegawai')" />
-                            <x-form.input name="pangkat_pegawai" label="Pangkat/Golongan" placeholder="Pangkat/Golongan"
-                                :value="old('pangkat_pegawai', $spd->pangkat_pegawai)" :error="$errors->first('pangkat_pegawai')" />
-                            <x-form.input name="jabatan_pegawai" label="Jabatan" placeholder="Jabatan"
-                                :value="old('jabatan_pegawai', $spd->jabatan_pegawai)" :error="$errors->first('jabatan_pegawai')" />
+                            <x-form.input name="nama_pegawai_display" label="Nama Pegawai"
+                                :value="$spd->pegawai_ditugaskan" :disabled="true" />
+                            <x-form.input name="nip_display" label="NIP"
+                                :value="$spd->nip_pegawai" :disabled="true" />
+                            <x-form.input name="pangkat_display" label="Pangkat/Golongan"
+                                :value="$spd->pangkat_pegawai ?? '-'" :disabled="true" />
+                            <x-form.input name="jabatan_display" label="Jabatan"
+                                :value="$spd->jabatan_pegawai ?? '-'" :disabled="true" />
                         </div>
+                        <p class="text-[10px] text-muted mt-2">* Identitas pelaksana terisi otomatis dari akun pemilik SPD dan tidak dapat diubah.</p>
                     </div>
 
                     {{-- Tujuan & Tempat --}}
@@ -190,7 +189,7 @@
                                     'Transportasi Online' => 'Transportasi Online',
                                     'Travel' => 'Travel',
                                 ];
-                                
+
                                 $alatangkuts = old('alat_angkut');
                                 if (!$alatangkuts) {
                                     $alatangkuts = $spd->alat_angkut;
@@ -207,7 +206,7 @@
                                     $alatangkuts = [''];
                                 }
                             @endphp
-                        
+
                             <div id="alatangkuts-list" class="space-y-3">
                                 @foreach ($alatangkuts as $index => $val)
                                     <div class="flex items-center gap-2 alatangkut-item">
@@ -240,7 +239,7 @@
                             @if ($errors->has('alat_angkut'))
                                 <p class="text-xs text-danger mt-1">{{ $errors->first('alat_angkut') }}</p>
                             @endif
-                        
+
                             <div class="mt-2">
                                 <button type="button" id="add-alatangkut-btn"
                                     class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover transition duration-150">
@@ -291,38 +290,8 @@
 
     <x-layout.footer />
 
-    <script id="pegawai-data" type="application/json">
-        @json($pegawais)
-    </script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- Select2 for Pegawai ---
-            $('#pegawai_ditugaskan').select2({
-                placeholder: 'Pilih Pegawai',
-                allowClear: true
-            });
-
-            // --- Auto Fill Pegawai Data ---
-            const nipInput = document.getElementById('nip_pegawai');
-            const pangkatInput = document.getElementById('pangkat_pegawai');
-            const jabatanInput = document.getElementById('jabatan_pegawai');
-            const pegawaiData = JSON.parse(document.getElementById('pegawai-data').textContent);
-
-            $('#pegawai_ditugaskan').on('change', function() {
-                const selectedName = this.value;
-                const employee = pegawaiData.find(p => p.nama_pegawai === selectedName);
-                if (employee) {
-                    nipInput.value = employee.nip || '';
-                    pangkatInput.value = employee.pangkat || '';
-                    jabatanInput.value = employee.jabatan || '';
-                } else {
-                    nipInput.value = '';
-                    pangkatInput.value = '';
-                    jabatanInput.value = '';
-                }
-            });
-
             // --- Destinations Dynamic List ---
             const destContainer = document.getElementById('destinations-list');
             const destAddBtn = document.getElementById('add-destination-btn');
@@ -419,7 +388,7 @@
             transportAddBtn.addEventListener('click', function() {
                 const newItem = document.createElement('div');
                 newItem.className = 'flex items-center gap-2 alatangkut-item';
-                
+
                 let optionsHtml = '<option value="" disabled selected>Pilih Alat Angkut</option>';
                 const options = {
                     'Angkutan Umum': 'Angkutan Umum (Angkot)',
@@ -446,7 +415,7 @@
                     'Transportasi Online': 'Transportasi Online',
                     'Travel': 'Travel'
                 };
-                
+
                 for (const [val, label] of Object.entries(options)) {
                     optionsHtml += `<option value="${val}">${label}</option>`;
                 }
@@ -460,7 +429,7 @@
                     </div>
                 `;
                 transportContainer.appendChild(newItem);
-                
+
                 // Initialize Select2 on the dynamically created select element with tags: true
                 $(newItem).find('select').select2({
                     placeholder: 'Pilih Alat Angkut',
@@ -490,14 +459,14 @@
                 if (startVal && endVal) {
                     const startDate = new Date(startVal);
                     const endDate = new Date(endVal);
-                    
+
                     // Reset hours to avoid timezone/DST differences
                     startDate.setHours(0, 0, 0, 0);
                     endDate.setHours(0, 0, 0, 0);
 
                     const timeDiff = endDate.getTime() - startDate.getTime();
                     const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
-                    
+
                     lamaKegiatanInput.value = dayDiff > 0 ? dayDiff : '';
                 } else {
                     lamaKegiatanInput.value = '';

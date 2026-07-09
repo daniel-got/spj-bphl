@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
@@ -27,8 +27,7 @@ class LoginController extends Controller
             }
 
             if ($user->isVerifikator()) {
-                // Untuk sementara ke user.spt.index sampai dashboard verifikator dibuat
-                return redirect()->intended(route('user.spt.index'));
+                return redirect()->intended(route('user.dashboard'));
             }
 
             if ($user->isPembuatSpt()) {
@@ -36,12 +35,11 @@ class LoginController extends Controller
             }
 
             if ($user->isPegawai()) {
-                return redirect()->intended(route('user.spd.index'));
+                return redirect()->intended(route('user.dashboard'));
             }
 
             if ($user->isMonitoring()) {
-                // Dashboard monitoring biasanya sama dengan dashboard umum/SPT
-                return redirect()->intended(route('user.spt.index'));
+                return redirect()->intended(route('user.dashboard'));
             }
 
             // Default: arahkan ke dashboard umum (akan dibuat nanti per role)
