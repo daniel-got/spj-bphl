@@ -111,11 +111,8 @@ class SptService
             // Status default ke diajukan (menunggu verifikasi TU) sesuai brainstorming
             $data['status'] = $data['status'] ?? Spt::STATUS_WAITING_TU;
 
-            // Mengantisipasi jika input dari form dikirim dalam bentuk array
+            // Mengantisipasi jika input dari form dikirim dalam bentuk array (sudah di-handle Request)
             $pegawaiData = $data['pegawai_ditugaskan'] ?? [];
-            if (is_string($pegawaiData)) {
-                $pegawaiData = json_decode($pegawaiData, true) ?? [];
-            }
 
             // Ekstrak peran Penanggung Jawab & Anggota untuk kolom flat database
             $processed = SptHelper::extractRoles($pegawaiData);
@@ -137,11 +134,8 @@ class SptService
     public function updateSpt(Spt $spt, array $data)
     {
         return DB::transaction(function () use ($spt, $data) {
-            // Mengantisipasi jika input dari form dikirim dalam bentuk array
+            // Mengantisipasi jika input dari form dikirim dalam bentuk array (sudah di-handle Request)
             $pegawaiData = $data['pegawai_ditugaskan'] ?? [];
-            if (is_string($pegawaiData)) {
-                $pegawaiData = json_decode($pegawaiData, true) ?? [];
-            }
 
             // Ekstrak peran Penanggung Jawab & Anggota
             $processed = SptHelper::extractRoles($pegawaiData);

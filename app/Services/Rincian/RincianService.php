@@ -38,10 +38,14 @@ class RincianService
         if (! empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('nomor_spd', 'like', '%'.$search.'%')
-                    ->orWhere('pegawai_ditugaskan', 'like', '%'.$search.'%')
-                    ->orWhere('tujuan_kegiatan', 'like', '%'.$search.'%')
-                    ->orWhere('tempat_tujuan', 'like', '%'.$search.'%');
+                $q->whereHas('spd', function ($sq) use ($search) {
+                    $sq->where('nomor_spd', 'like', '%'.$search.'%')
+                        ->orWhere('nip_pegawai', 'like', '%'.$search.'%');
+                })
+                    ->orWhereHas('spd.spt', function ($stq) use ($search) {
+                        $stq->where('tujuan_kegiatan', 'like', '%'.$search.'%')
+                            ->orWhere('tempat_tujuan', 'like', '%'.$search.'%');
+                    });
             });
         }
 
@@ -53,7 +57,7 @@ class RincianService
             $query->where('status', $filters['status']);
         }
 
-        return $query->latest()->paginate($perPage);
+        return $query->with(['spd.spt'])->latest()->paginate($perPage);
     }
 
     /**
@@ -77,7 +81,9 @@ class RincianService
             $q->where('pembuat_id', $user->id);
 
             if ($pegawaiNip) {
-                $q->orWhere('nip_pegawai', $pegawaiNip);
+                $q->orWhereHas('spd', function ($query) use ($pegawaiNip) {
+                    $query->where('nip_pegawai', $pegawaiNip);
+                });
             }
         });
     }

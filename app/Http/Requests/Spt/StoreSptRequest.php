@@ -15,6 +15,18 @@ class StoreSptRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (is_string($this->pegawai_ditugaskan)) {
+            $this->merge([
+                'pegawai_ditugaskan' => json_decode($this->pegawai_ditugaskan, true),
+            ]);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array
@@ -25,7 +37,7 @@ class StoreSptRequest extends FormRequest
             'tgl_spt' => 'required|date',
             'pegawai_ditugaskan' => 'required|array|min:1',
             'pegawai_ditugaskan.*.pegawai_id' => 'required|exists:data_pegawai,id',
-            'pegawai_ditugaskan.*.nama' => 'required|string',
+            'pegawai_ditugaskan.*.nama_pegawai' => 'required|string',
             'pegawai_ditugaskan.*.nip' => 'required|string',
             'pegawai_ditugaskan.*.peran' => 'required|string|in:Penanggung Jawab,Anggota',
 

@@ -1,7 +1,7 @@
 <x-layout.app title="Kelola Pegawai">
     <div id="kelola-pegawai-root" class="flex">
 
-        <x-layout.admin-sidebar />
+        <x-layout.sidebar />
 
         <main class="flex-1 p-6 bg-background min-h-screen">
             <x-layout.breadcrumb :items="[['label' => 'Admin'], ['label' => 'Kelola Pegawai']]" />
@@ -183,13 +183,13 @@
                         \App\Enums\Pangkat::values(),
                         array_map(fn($p) => \App\Enums\Pangkat::from($p)->label(), \App\Enums\Pangkat::values()),
                     )" :selected="old('pangkat')" />
-                    
+
                     <x-form.select name="golongan" label="Golongan (Opsional)" :options="array_combine(
                         \App\Enums\Golongan::values(),
                         array_map(fn($g) => \App\Enums\Golongan::from($g)->label(), \App\Enums\Golongan::values()),
                     )" :selected="old('golongan')" />
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <x-form.input name="jabatan" label="Jabatan (Opsional)" placeholder="Contoh: Staf Pelaksana"
                         :value="old('jabatan')" />
@@ -282,7 +282,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="flex flex-col gap-1">
                         <label class="text-sm font-medium text-text-main">Jabatan</label>

@@ -25,8 +25,18 @@ class CheckRole
             return redirect()->route('login');
         }
 
+        $user = auth()->user();
+
+        // Admin bypass - Admin selalu boleh akses semua route yang dijaga middleware ini
+        if ($user->isAdmin()) {
+            return $next($request);
+        }
+
         // Pastikan role user ada di dalam array $roles yang diizinkan
-        if (!in_array(auth()->user()->role, $roles)) {
+        // Gunakan ->value jika role adalah Enum
+        $roleValue = is_object($user->role) && method_exists($user->role, 'value') ? $user->role->value : $user->role;
+
+        if (!in_array($roleValue, $roles)) {
             abort(403, 'Akses Ditolak. Halaman ini butuh hak akses khusus.');
         }
 

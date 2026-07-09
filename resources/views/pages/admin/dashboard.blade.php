@@ -25,7 +25,7 @@
          SIDEBAR — Menu khusus admin
     ====================================================================== --}}
     <div class="flex min-h-screen bg-background">
-        <x-layout.admin-sidebar />
+        <x-layout.sidebar />
 
         {{-- ================================================================
              MAIN CONTENT AREA

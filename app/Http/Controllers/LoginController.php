@@ -26,9 +26,22 @@ class LoginController extends Controller
                 return redirect()->intended(route('admin.dashboard'));
             }
 
+            if ($user->isVerifikator()) {
+                // Untuk sementara ke user.spt.index sampai dashboard verifikator dibuat
+                return redirect()->intended(route('user.spt.index'));
+            }
+
+            if ($user->isPembuatSpt()) {
+                return redirect()->intended(route('pembuat_spt.index'));
+            }
 
             if ($user->isPegawai()) {
                 return redirect()->intended(route('user.spd.index'));
+            }
+
+            if ($user->isMonitoring()) {
+                // Dashboard monitoring biasanya sama dengan dashboard umum/SPT
+                return redirect()->intended(route('user.spt.index'));
             }
 
             // Default: arahkan ke dashboard umum (akan dibuat nanti per role)

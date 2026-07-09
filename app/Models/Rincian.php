@@ -55,6 +55,50 @@ class Rincian extends Model
     }
 
     // -------------------------------------------------------------------------
+    // Accessors untuk kolom virtual dari relasi SPD
+    // -------------------------------------------------------------------------
+
+    public function getNomorSpdAttribute()
+    {
+        return $this->spd?->nomor_spd;
+    }
+
+    public function getNipPegawaiAttribute()
+    {
+        return $this->spd?->nip_pegawai;
+    }
+
+    public function getPegawaiDitugaskanAttribute()
+    {
+        // Jika data_spd memiliki kolom nama_pegawai atau semacamnya
+        // Dalam model Spd, tidak terlihat kolom nama_pegawai eksplisit,
+        // mungkin ada di pejabat_ditugaskan atau relasi lain.
+        // Berdasarkan Spd.php, nip_pegawai ada.
+        return $this->spd?->nama_pegawai ?? $this->spd?->pejabat_ditugaskan['nama'] ?? '-';
+    }
+
+    public function getTujuanKegiatanAttribute()
+    {
+        return $this->spd?->tujuan_kegiatan;
+    }
+
+    public function getTempatTujuanAttribute()
+    {
+        return $this->spd?->tempat_tujuan;
+    }
+
+    public function getLamaKegiatanAttribute()
+    {
+        return $this->spd?->lama_kegiatan;
+    }
+
+    public function getJenisPerjalananAttribute()
+    {
+        // Misalkan diambil dari tempat tujuan atau kolom di SPD
+        return $this->spd?->spt?->tempat_tujuan ? 'Dinas' : '-';
+    }
+
+    // -------------------------------------------------------------------------
     // Scopes
     // -------------------------------------------------------------------------
 

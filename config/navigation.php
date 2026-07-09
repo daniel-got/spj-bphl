@@ -25,12 +25,107 @@ return [
     | - active  : ditentukan secara dinamis di komponen (bukan di sini)
     */
     'sidebar' => [
-        ['label' => 'Dashboard',  'url' => '/dashboard',  'icon' => 'home'],
-        ['label' => 'Pegawai',    'url' => '/pegawai',    'icon' => 'users'],
-        ['label' => 'Daftar SPT', 'url' => '/user/spt',        'icon' => 'document-text'],
-        ['label' => 'Daftar SPD', 'url' => '/user/spd',   'icon' => 'clipboard'],
-        ['label' => 'Laporan',    'url' => '/laporan',    'icon' => 'chart-bar'],
-        ['label' => 'Pengaturan', 'url' => '/pengaturan', 'icon' => 'cog'],
+        // --- GRUP: UTAMA ---
+        [
+            'header' => 'Utama',
+            'roles' => ['admin', 'pembuat_spt', 'user', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+        ],
+        [
+            'label' => 'Dashboard',
+            'url' => '/admin/dashboard',
+            'icon' => 'home',
+            'roles' => ['admin']
+        ],
+        [
+            'label' => 'Dashboard',
+            'url' => '/user/pembuat-spt',
+            'icon' => 'home',
+            'roles' => ['pembuat_spt']
+        ],
+        [
+            'label' => 'Dashboard Statistik',
+            'url' => '/user/spt', // Nanti arahkan ke dashboard statistik pimpinan
+            'icon' => 'chart-bar',
+            'roles' => ['kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+        ],
+        [
+            'label' => 'Dashboard',
+            'url' => '/user/spt',
+            'icon' => 'home',
+            'roles' => ['user', 'verifikator']
+        ],
+
+        // --- GRUP: TUGAS SAYA (Semua Aktor) ---
+        [
+            'header' => 'Tugas Saya',
+            'roles' => ['admin', 'pembuat_spt', 'user', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+        ],
+        [
+            'label' => 'SPT Saya',
+            'url' => '/user/spt',
+            'icon' => 'document-text',
+            'roles' => ['admin', 'user', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+        ],
+        [
+            'label' => 'SPD Saya',
+            'url' => '/user/spd',
+            'icon' => 'clipboard',
+            'roles' => ['admin', 'user', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+        ],
+        [
+            'label' => 'Rincian Saya',
+            'url' => '/user/rincian',
+            'icon' => 'calculator',
+            'roles' => ['admin', 'user', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+        ],
+
+        // --- GRUP: OPERASIONAL (Input & Verifikasi) ---
+        [
+            'header' => 'Operasional',
+            'roles' => ['admin', 'pembuat_spt', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+        ],
+        [
+            'label' => 'Kelola SPT Pegawai',
+            'url' => '/user/spt/kelola',
+            'icon' => 'pencil-square',
+            'roles' => ['admin', 'pembuat_spt']
+        ],
+        [
+            'label' => 'Verifikasi SPT',
+            'url' => '/verifikasi/spt',
+            'icon' => 'check-badge',
+            'roles' => ['kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+        ],
+        [
+            'label' => 'Verifikasi SPJ',
+            'url' => '/verifikasi/spj',
+            'icon' => 'shield-check',
+            'roles' => ['verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl']
+        ],
+
+        // --- GRUP: ADMINISTRATOR ---
+        [
+            'header' => 'Administrasi',
+            'roles' => ['admin']
+        ],
+        [
+            'label' => 'Kelola Pegawai',
+            'url' => '/admin/kelolaPegawai',
+            'icon' => 'users',
+            'roles' => ['admin']
+        ],
+        [
+            'label' => 'Master Tarif',
+            'url' => '/admin/tarif',
+            'icon' => 'currency-dollar',
+            'roles' => ['admin']
+        ],
+        [
+            'label' => 'Kelola PPK',
+            'url' => '/admin/ppk',
+            'icon' => 'identification',
+            'roles' => ['admin']
+        ],
     ],
 
     /*

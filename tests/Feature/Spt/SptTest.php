@@ -69,7 +69,7 @@ class SptTest extends TestCase
             'lama_kegiatan' => 3,
             'kode_mak' => '5311.001.001',
             'pegawai_ditugaskan' => [
-                ['pegawai_id' => 1, 'nama' => 'Budi Santoso', 'nip' => '198501012010011001', 'peran' => 'Penanggung Jawab'],
+                ['pegawai_id' => 1, 'nama_pegawai' => 'Budi Santoso', 'nip' => '198501012010011001', 'peran' => 'Penanggung Jawab'],
             ],
         ];
 

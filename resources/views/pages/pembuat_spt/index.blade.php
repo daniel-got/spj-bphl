@@ -1,7 +1,7 @@
 <x-layout.app title="Pembuat SPT - SPJ BPHL 4">
 
     <div class="flex flex-1 w-full">
-        <x-layout.user-sidebar />
+        <x-layout.sidebar />
 
         <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
             <main class="grow flex flex-col px-6 py-10">

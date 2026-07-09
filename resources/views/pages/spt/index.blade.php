@@ -1,8 +1,8 @@
 <x-layout.app title="Data SPT - SPJ BPHL 4">
 
     <div class="flex flex-1 w-full">
-        <x-layout.user-sidebar />
-        
+        <x-layout.sidebar />
+
         <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
             <main class="grow flex flex-col px-6 py-10">
 
@@ -48,7 +48,7 @@
                         @php
                             $isStatusDetailView = in_array(request('status'), ['disetujui', 'ditolak', 'direvisi']);
                         @endphp
-                        
+
                         <x-layout.card>
                             @if ($isStatusDetailView)
                                 <x-slot:header>
@@ -105,7 +105,7 @@
                             {{-- Pengaturan Header dan Isi Baris Tabel Berdasarkan Struktur Data SPT --}}
                             @php
                                 $headers = [
-                                    'No', 'Nomor SPT', 'Tgl SPT', 'Nama Pegawai', 'NIP', 'Pangkat/Golongan', 'Jabatan', 
+                                    'No', 'Nomor SPT', 'Tgl SPT', 'Nama Pegawai', 'NIP', 'Pangkat/Golongan', 'Jabatan',
                                     'Tujuan Kegiatan', 'Tempat Tujuan', 'Tgl. Berangkat', 'Tgl. Kembali', 'Lama (Hari)', 'Kode MAK', 'Aksi'
                                 ];
 
@@ -173,7 +173,7 @@
 
                                     // Link Detail pada Nomor SPT
                                     $nomorSptLink = '<a href="' . route('user.spt.show', $spt->id) . '" class="text-primary hover:underline font-semibold" title="Lihat Rincian">' . e($spt->nomor_spt ?? '') . '</a>';
-                                    
+
                                     // Edit hanya untuk admin — pembuat_spt punya tombol Edit di dashboard-nya sendiri
                                     $hasAccess = Auth::user()->role === 'admin';
                                     $editLink = $hasAccess

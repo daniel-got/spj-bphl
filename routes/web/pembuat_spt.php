@@ -7,4 +7,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'pembuat_spt'])->group(function () {
     Route::get('user/pembuat-spt', [DashboardController::class, 'index'])
         ->name('pembuat_spt.index');
+
+    // Kelola SPT Pegawai (Operasional)
+    Route::get('user/spt/kelola', function () {
+        return view('pages.spt.kelola');
+    })->name('user.spt.kelola');
 });

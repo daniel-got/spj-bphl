@@ -31,4 +31,14 @@ Route::middleware(['auth', 'role:admin'])
         Route::delete('/kelolaPegawai/{pegawai}', [KelolaPegawaiController::class, 'destroy'])->name('kelolaPegawai.destroy');
         Route::post('/kelolaPegawai/import', [KelolaPegawaiController::class, 'import'])->name('kelolaPegawai.import');
         Route::post('/kelolaPegawai/validate-import', [KelolaPegawaiController::class, 'validateImport'])->name('kelolaPegawai.validateImport');
+
+        // Master Tarif
+        Route::get('/tarif', function () {
+            return view('pages.admin.tarif');
+        })->name('tarif');
+
+        // Kelola PPK
+        Route::get('/ppk', function () {
+            return view('pages.admin.ppk');
+        })->name('ppk');
     });
