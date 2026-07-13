@@ -121,10 +121,9 @@
                                         :selected="request('per_page', 10)" onchange="this.form.submit()" />
                                 </div>
                                 <div class="flex gap-2">
-                                    <button type="submit"
-                                        class="bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-5 py-2 rounded-md transition-colors duration-150 cursor-pointer border border-transparent w-full justify-center text-center h-[38px]">
-                                        Filter
-                                    </button>
+                                        <x-action.button-primary type="submit" class="w-full justify-center text-center h-[38px]">
+                                            Filter
+                                        </x-action.button-primary>
                                 </div>
                             </div>
                         </form>
@@ -154,21 +153,26 @@
 
                                 $nomorSpdLink = '<a href="' . route('user.rincian.show', $rincian->id) . '" class="text-primary hover:underline font-semibold" title="Lihat Rincian">' . e($rincian->nomor_spd ?? '') . '</a>';
 
-                                $aksiButtons = '
-                                <div class="flex items-center gap-2">
-                                    <a href="' . route('user.rincian.print', $rincian->id) . '" target="_blank" class="inline-flex items-center justify-center bg-gray-50 hover:bg-gray-200 text-gray-700 text-xs font-semibold p-1.5 rounded transition-colors duration-150 border border-gray-200/50" title="Cetak"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg></a>
-                                    <a href="' . route('user.rincian.show', $rincian->id) . '" class="inline-flex items-center bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors duration-150 border border-blue-200/50" title="Detail">Detail</a>
-                                    <a href="' . route('user.rincian.edit', $rincian->id) . '" class="inline-flex items-center bg-yellow-50 hover:bg-yellow-600 text-yellow-700 hover:text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors duration-150 border border-yellow-200/50" title="Edit">Edit</a>
-                                </div>';
+                                $actions = [
+                                    'print' => route('user.rincian.print', $rincian->id),
+                                    'detail' => route('user.rincian.show', $rincian->id),
+                                ];
+                                
+                                if (in_array($rincian->status, [\App\Models\Rincian::STATUS_DRAFT, \App\Models\Rincian::STATUS_REVISED]) && auth()->user()->can('update', $rincian)) {
+                                    $actions['edit'] = route('user.rincian.edit', $rincian->id);
+                                    $actions['delete'] = route('user.rincian.destroy', $rincian->id);
+                                }
 
                                 return [
-                                    ($rincians->firstItem() ?? 1) + $index,
-                                    $nomorSpdLink,
-                                    $tglDiajukan,
-                                    $tglDiperiksa,
-                                    $catatan,
-                                    $verifikator,
-                                    $aksiButtons,
+                                    'cells' => [
+                                        ($rincians->firstItem() ?? 1) + $index,
+                                        $nomorSpdLink,
+                                        $tglDiajukan,
+                                        $tglDiperiksa,
+                                        $catatan,
+                                        $verifikator,
+                                    ],
+                                    'actions' => $actions
                                 ];
                             });
                         } else {
@@ -200,26 +204,31 @@
                                 $config = $statusMap[$rincian->status] ?? ['label' => ucfirst($rincian->status ?? 'Unknown'), 'class' => 'bg-gray-100 text-gray-800'];
                                 $badgeHtml = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ' . $config['class'] . '">' . $config['label'] . '</span>';
 
-                                $aksiButtons = '
-                                <div class="flex items-center gap-2">
-                                    <a href="' . route('user.rincian.print', $rincian->id) . '" target="_blank" class="inline-flex items-center justify-center bg-gray-50 hover:bg-gray-200 text-gray-700 text-xs font-semibold p-1.5 rounded transition-colors duration-150 border border-gray-200/50" title="Cetak"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg></a>
-                                    <a href="' . route('user.rincian.show', $rincian->id) . '" class="inline-flex items-center bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors duration-150 border border-blue-200/50" title="Detail">Detail</a>
-                                    <a href="' . route('user.rincian.edit', $rincian->id) . '" class="inline-flex items-center bg-yellow-50 hover:bg-yellow-600 text-yellow-700 hover:text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors duration-150 border border-yellow-200/50" title="Edit">Edit</a>
-                                </div>';
+                                $actions = [
+                                    'print' => route('user.rincian.print', $rincian->id),
+                                    'detail' => route('user.rincian.show', $rincian->id),
+                                ];
+                                
+                                if (in_array($rincian->status, [\App\Models\Rincian::STATUS_DRAFT, \App\Models\Rincian::STATUS_REVISED]) && auth()->user()->can('update', $rincian)) {
+                                    $actions['edit'] = route('user.rincian.edit', $rincian->id);
+                                    $actions['delete'] = route('user.rincian.destroy', $rincian->id);
+                                }
 
                                 return [
-                                    ($rincians->firstItem() ?? 1) + $index,
-                                    $nomorSpdLink,
-                                    e($rincian->pegawai_ditugaskan ?? ''),
-                                    e($rincian->nip_pegawai ?? ''),
-                                    '<div class="max-w-xs whitespace-normal line-clamp-2" title="' . e($rincian->tujuan_kegiatan ?? '') . '">' . e($rincian->tujuan_kegiatan ?? '') . '</div>',
-                                    '<div class="max-w-xs whitespace-normal line-clamp-2">' . e($rincian->tempat_tujuan ?? '') . '</div>',
-                                    e($rincian->lama_kegiatan ?? '') . ' Hari',
-                                    e($rincian->jenis_perjalanan ?? ''),
-                                    'Rp ' . number_format($rincian->biaya_transport ?? 0, 0, ',', '.'),
-                                    'Rp ' . number_format($rincian->hotel_ril ?? 0, 0, ',', '.'),
-                                    $badgeHtml,
-                                    $aksiButtons,
+                                    'cells' => [
+                                        ($rincians->firstItem() ?? 1) + $index,
+                                        $nomorSpdLink,
+                                        e($rincian->pegawai_ditugaskan ?? ''),
+                                        e($rincian->nip_pegawai ?? ''),
+                                        '<div class="max-w-xs whitespace-normal line-clamp-2" title="' . e($rincian->tujuan_kegiatan ?? '') . '">' . e($rincian->tujuan_kegiatan ?? '') . '</div>',
+                                        '<div class="max-w-xs whitespace-normal line-clamp-2">' . e($rincian->tempat_tujuan ?? '') . '</div>',
+                                        e($rincian->lama_kegiatan ?? '') . ' Hari',
+                                        e($rincian->jenis_perjalanan ?? ''),
+                                        'Rp ' . number_format($rincian->biaya_transport ?? 0, 0, ',', '.'),
+                                        'Rp ' . number_format($rincian->hotel_ril ?? 0, 0, ',', '.'),
+                                        $badgeHtml,
+                                    ],
+                                    'actions' => $actions
                                 ];
                             });
                         }

@@ -25,14 +25,20 @@ class Spt extends Model
         'kode_mak',            // Kode MAK
         'pembuat_id',          // ID user yang membuat SPT (kolom NOT NULL, wajib ada di fillable)
         'status',              // Status SPT (draft/disetujui/direvisi/ditolak)
+        'verifikator_id',
+        'catatan_verifikator',
         'penanggung_jawab',
         'anggota',
     ];
 
     const STATUS_DRAFT = 'draft';
+
     const STATUS_WAITING_TU = 'diajukan'; // Menunggu verifikasi TU
+
     const STATUS_REVISED = 'direvisi';
+
     const STATUS_APPROVED = 'disetujui';
+
     const STATUS_REJECTED = 'ditolak';
 
     // Konversi otomatis data JSON dari PostgreSQL menjadi array PHP

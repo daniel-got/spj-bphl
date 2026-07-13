@@ -87,11 +87,23 @@
                         <x-utility.icon name="chart-bar" class="w-4 h-4 shrink-0" />
                         <span>Dashboard SPT</span>
                     </a>
+                    <a href="{{ route('user.spt.kelola') }}"
+                        class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
+                            {{ request()->routeIs('user.spt.kelola') ? 'bg-primary/10 text-primary font-semibold' : 'text-muted hover:bg-primary-light hover:text-primary' }}">
+                        <x-utility.icon name="table-cells" class="w-4 h-4 shrink-0" />
+                        <span>Kelola SPT Pegawai</span>
+                    </a>
                     <a href="{{ route('user.spt.create') }}"
                         class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
                             {{ request()->routeIs('user.spt.create') ? 'bg-primary/10 text-primary font-semibold' : 'text-muted hover:bg-primary-light hover:text-primary' }}">
                         <x-utility.icon name="plus-circle" class="w-4 h-4 shrink-0" />
                         <span>Buat SPT Baru</span>
+                    </a>
+                    <a href="{{ route('pembuat_spt.spj_selesai.index') }}"
+                        class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
+                            {{ request()->routeIs('pembuat_spt.spj_selesai.*') ? 'bg-primary/10 text-primary font-semibold' : 'text-muted hover:bg-primary-light hover:text-primary' }}">
+                        <x-utility.icon name="check-badge" class="w-4 h-4 shrink-0" />
+                        <span>Proses SPJ Selesai</span>
                     </a>
                 </div>
             </div>

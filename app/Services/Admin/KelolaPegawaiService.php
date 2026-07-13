@@ -2,14 +2,17 @@
 
 namespace App\Services\Admin;
 
+use App\Enums\Golongan;
+use App\Enums\Pangkat;
+use App\Enums\UserRole;
 use App\Models\Pegawai;
 use App\Models\User;
+use Exception;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Http\UploadedFile;
-use Exception;
 
 class KelolaPegawaiService
 {
@@ -74,7 +77,7 @@ class KelolaPegawaiService
             $user->email = $data['email'];
             $user->role = $data['role'];
 
-            if (!empty($data['password'])) {
+            if (! empty($data['password'])) {
                 $user->password = Hash::make($data['password']);
             }
 
@@ -114,7 +117,7 @@ class KelolaPegawaiService
 
         if ($header !== $expectedHeader) {
             fclose($handle);
-            throw new Exception("Format kolom CSV tidak sesuai. Gunakan template yang disediakan.");
+            throw new Exception('Format kolom CSV tidak sesuai. Gunakan template yang disediakan.');
         }
 
         $berhasil = 0;
@@ -136,6 +139,7 @@ class KelolaPegawaiService
                     $errors[] = "Baris $rowNum: Jumlah kolom tidak sesuai.";
                     $gagal++;
                     $rowNum++;
+
                     continue;
                 }
 
@@ -149,32 +153,36 @@ class KelolaPegawaiService
                     $errors[] = "Baris $rowNum: NIP ({$data['nip']}) atau Email ({$data['email']}) sudah terdaftar.";
                     $gagal++;
                     $rowNum++;
+
                     continue;
                 }
 
                 // Cek role valid
-                $validRoles = \App\Enums\UserRole::values();
-                if (!in_array($data['role'], $validRoles)) {
+                $validRoles = UserRole::values();
+                if (! in_array($data['role'], $validRoles)) {
                     $errors[] = "Baris $rowNum: Role '{$data['role']}' tidak valid.";
                     $gagal++;
                     $rowNum++;
+
                     continue;
                 }
 
                 // Cek pangkat dan golongan valid
-                $validPangkat = \App\Enums\Pangkat::values();
-                if (!empty($data['pangkat']) && !in_array($data['pangkat'], $validPangkat)) {
+                $validPangkat = Pangkat::values();
+                if (! empty($data['pangkat']) && ! in_array($data['pangkat'], $validPangkat)) {
                     $errors[] = "Baris $rowNum: Pangkat '{$data['pangkat']}' tidak valid.";
                     $gagal++;
                     $rowNum++;
+
                     continue;
                 }
 
-                $validGolongan = \App\Enums\Golongan::values();
-                if (!empty($data['golongan']) && !in_array($data['golongan'], $validGolongan)) {
+                $validGolongan = Golongan::values();
+                if (! empty($data['golongan']) && ! in_array($data['golongan'], $validGolongan)) {
                     $errors[] = "Baris $rowNum: Golongan '{$data['golongan']}' tidak valid.";
                     $gagal++;
                     $rowNum++;
+
                     continue;
                 }
 
@@ -202,10 +210,10 @@ class KelolaPegawaiService
             }
 
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             fclose($handle);
-            throw new Exception("Gagal memproses baris $rowNum: " . $e->getMessage());
+            throw new Exception("Gagal memproses baris $rowNum: ".$e->getMessage());
         }
 
         fclose($handle);
@@ -231,6 +239,7 @@ class KelolaPegawaiService
 
         if ($header !== $expectedHeader) {
             fclose($handle);
+
             return [
                 'valid' => false,
                 'berhasil' => 0,
@@ -246,8 +255,8 @@ class KelolaPegawaiService
         $errors = [];
         $preview = [];
         $rowNum = 2;
-        $validRoles = \App\Enums\UserRole::values();
-        
+        $validRoles = UserRole::values();
+
         $seenNips = [];
         $seenEmails = [];
 
@@ -260,6 +269,7 @@ class KelolaPegawaiService
                 $errors[] = "Baris $rowNum: Jumlah kolom tidak sesuai.";
                 $gagal++;
                 $rowNum++;
+
                 continue;
             }
 
@@ -267,37 +277,37 @@ class KelolaPegawaiService
             $rowErrors = [];
 
             if (Pegawai::where('nip', $data['nip'])->exists() || in_array($data['nip'], $seenNips)) {
-                $rowErrors[] = "NIP sudah terdaftar.";
+                $rowErrors[] = 'NIP sudah terdaftar.';
             }
             if (User::where('email', $data['email'])->exists() || in_array($data['email'], $seenEmails)) {
-                $rowErrors[] = "Email sudah digunakan.";
+                $rowErrors[] = 'Email sudah digunakan.';
             }
-            if (!in_array($data['role'], $validRoles)) {
-                $rowErrors[] = "Role tidak valid.";
+            if (! in_array($data['role'], $validRoles)) {
+                $rowErrors[] = 'Role tidak valid.';
             }
-            if (!empty($data['pangkat']) && !in_array($data['pangkat'], \App\Enums\Pangkat::values())) {
-                $rowErrors[] = "Pangkat tidak valid.";
+            if (! empty($data['pangkat']) && ! in_array($data['pangkat'], Pangkat::values())) {
+                $rowErrors[] = 'Pangkat tidak valid.';
             }
-            if (!empty($data['golongan']) && !in_array($data['golongan'], \App\Enums\Golongan::values())) {
-                $rowErrors[] = "Golongan tidak valid.";
+            if (! empty($data['golongan']) && ! in_array($data['golongan'], Golongan::values())) {
+                $rowErrors[] = 'Golongan tidak valid.';
             }
             if (empty($data['nama_pegawai'])) {
-                $rowErrors[] = "Nama kosong.";
+                $rowErrors[] = 'Nama kosong.';
             }
 
-            if (!empty($rowErrors)) {
-                $errors[] = "Baris $rowNum diabaikan: " . implode(' ', $rowErrors);
+            if (! empty($rowErrors)) {
+                $errors[] = "Baris $rowNum diabaikan: ".implode(' ', $rowErrors);
                 $gagal++;
             } else {
                 $seenNips[] = $data['nip'];
                 $seenEmails[] = $data['email'];
                 $berhasil++;
-                
+
                 // Preview hanya 5 baris pertama yang valid
                 if (count($preview) < 5) {
                     $preview[] = [
                         'nama' => $data['nama_pegawai'],
-                        'nip'  => $data['nip'],
+                        'nip' => $data['nip'],
                         'role' => $data['role'],
                     ];
                 }
@@ -312,17 +322,17 @@ class KelolaPegawaiService
         $token = null;
         if ($berhasil > 0) {
             $token = Str::random(40);
-            $file->storeAs('tmp/csv-import', $token . '.csv', 'local');
+            $file->storeAs('tmp/csv-import', $token.'.csv', 'local');
         }
 
         return [
             // Selama ada yang berhasil, kita anggap file valid untuk diimport (mengabaikan yang gagal)
-            'valid'    => $berhasil > 0,
+            'valid' => $berhasil > 0,
             'berhasil' => $berhasil,
-            'gagal'    => $gagal,
-            'errors'   => $errors,
-            'token'    => $token,
-            'preview'  => $preview,
+            'gagal' => $gagal,
+            'errors' => $errors,
+            'token' => $token,
+            'preview' => $preview,
         ];
     }
 
@@ -332,9 +342,9 @@ class KelolaPegawaiService
     public function importFromToken(string $token): array
     {
         // Pada Laravel versi terbaru, disk 'local' default menunjuk ke storage/app/private
-        $path = storage_path('app/private/tmp/csv-import/' . $token . '.csv');
+        $path = storage_path('app/private/tmp/csv-import/'.$token.'.csv');
 
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             throw new Exception('Token tidak valid atau sudah kadaluarsa. Silakan upload ulang.');
         }
 

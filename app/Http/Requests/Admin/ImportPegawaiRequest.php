@@ -18,7 +18,7 @@ class ImportPegawaiRequest extends FormRequest
             'import_token' => ['nullable', 'string'],
         ];
     }
-    
+
     public function messages(): array
     {
         return [

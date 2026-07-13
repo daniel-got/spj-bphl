@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Contracts\View\View;
-use App\Models\User;
 use App\Models\Pegawai;
+use App\Models\User;
+use Illuminate\Contracts\View\View;
 
 class LandingPageController extends Controller
 {

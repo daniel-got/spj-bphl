@@ -45,14 +45,14 @@ class Pegawai extends Model
      */
     public function scopeSearch($query, ?string $keyword)
     {
-        if (!$keyword) {
+        if (! $keyword) {
             return $query;
         }
 
         return $query->where(function ($q) use ($keyword) {
             $q->where('nama_pegawai', 'like', "%{$keyword}%")
-              ->orWhere('nip', 'like', "%{$keyword}%")
-              ->orWhere('sub_seksi', 'like', "%{$keyword}%");
+                ->orWhere('nip', 'like', "%{$keyword}%")
+                ->orWhere('sub_seksi', 'like', "%{$keyword}%");
         });
     }
 }

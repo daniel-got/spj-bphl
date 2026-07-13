@@ -235,17 +235,17 @@ class RincianTest extends TestCase
     public function test_user_dapat_melihat_rincian_yang_ditugaskan_kepadanya_melalui_nip(): void
     {
         $user = User::factory()->create(['role' => 'user']);
-        $pegawai = \App\Models\Pegawai::factory()->create(['user_id' => $user->id]);
+        $pegawai = Pegawai::factory()->create(['user_id' => $user->id]);
 
         // Rincian dibuat oleh orang lain (admin), tapi ditugaskan ke user ini (NIP sama di SPD)
         $admin = User::factory()->create(['role' => 'admin']);
         $spd = Spd::factory()->create([
             'nip_pegawai' => $pegawai->nip,
-            'pembuat_id' => $admin->id
+            'pembuat_id' => $admin->id,
         ]);
         $rincian = Rincian::factory()->create([
             'spd_id' => $spd->id,
-            'pembuat_id' => $admin->id
+            'pembuat_id' => $admin->id,
         ]);
 
         $response = $this->actingAs($user)->get(route('user.rincian.index'));

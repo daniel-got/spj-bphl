@@ -12,6 +12,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('user/spt/{spt}/edit', [SptController::class, 'edit'])->name('user.spt.edit');
         Route::put('user/spt/{spt}', [SptController::class, 'update'])->name('user.spt.update');
         Route::delete('user/spt/{spt}', [SptController::class, 'destroy'])->name('user.spt.destroy');
+        Route::post('user/spt/{spt}/submit', [SptController::class, 'submit'])->name('user.spt.submit');
     });
 
     // Semua user yang sudah login bisa melihat daftar (index) dan detail (show) SPT

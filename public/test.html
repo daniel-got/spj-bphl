@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <button onclick="test(1, 'http', {&quot;provinsi&quot;:&quot;Jawa Barat&quot;})">Test 1 (Double quotes attr)</button>
+    <button onclick='test(2, "http", {"provinsi":"Jawa Barat"})'>Test 2 (Single quotes attr)</button>
+    <script>
+        function test(id, url, data) {
+            console.log(id, url, data.provinsi);
+            alert(data.provinsi);
+        }
+    </script>
+</body>
+</html>

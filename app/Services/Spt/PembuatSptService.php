@@ -44,12 +44,17 @@ class PembuatSptService
         $pegawai = Pegawai::where('user_id', $userId)->first();
         $pegawaiId = $pegawai?->id;
 
-        $baseQuery = Spt::where('pembuat_id', $userId);
-
-        if ($pegawaiId) {
-            $baseQuery->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id":"'.$pegawaiId.'"%')
-                ->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id":'.$pegawaiId.'%');
-        }
+        $baseQuery = Spt::where(function ($q) use ($userId, $pegawaiId) {
+            $q->where('pembuat_id', $userId);
+            if ($pegawaiId) {
+                $q->orWhere(function ($subQ) use ($pegawaiId) {
+                    $subQ->where(function ($jsonQ) use ($pegawaiId) {
+                        $jsonQ->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
+                            ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                    })->whereIn('status', ['disetujui', 'selesai']);
+                });
+            }
+        });
 
         $sptIds = (clone $baseQuery)->pluck('id');
 
@@ -71,12 +76,17 @@ class PembuatSptService
         $pegawai = Pegawai::where('user_id', $userId)->first();
         $pegawaiId = $pegawai?->id;
 
-        $query = Spt::where('pembuat_id', $userId);
-
-        if ($pegawaiId) {
-            $query->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id":"'.$pegawaiId.'"%')
-                ->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id":'.$pegawaiId.'%');
-        }
+        $query = Spt::where(function ($q) use ($userId, $pegawaiId) {
+            $q->where('pembuat_id', $userId);
+            if ($pegawaiId) {
+                $q->orWhere(function ($subQ) use ($pegawaiId) {
+                    $subQ->where(function ($jsonQ) use ($pegawaiId) {
+                        $jsonQ->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
+                            ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                    })->whereIn('status', ['disetujui', 'selesai']);
+                });
+            }
+        });
 
         if (! empty($filters['search'])) {
             $search = $filters['search'];

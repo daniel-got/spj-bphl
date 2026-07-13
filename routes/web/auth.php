@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
+use Illuminate\Support\Facades\Route;
 
 // ========================================
 // PUBLIC AUTH ROUTES

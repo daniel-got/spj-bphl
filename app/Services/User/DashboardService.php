@@ -103,10 +103,15 @@ class DashboardService
 
     private function getRecentSpt(int $userId, ?string $nip)
     {
-        return Spt::where('pembuat_id', $userId)
-            ->when($nip, function ($q) use ($nip) {
-                return $q->orWhere('pegawai_ditugaskan', 'like', '%'.$nip.'%');
-            })
+        return Spt::where(function ($query) use ($userId, $nip) {
+            $query->where('pembuat_id', $userId);
+            if ($nip) {
+                $query->orWhere(function ($subQ) use ($nip) {
+                    $subQ->where('pegawai_ditugaskan', 'like', '%'.$nip.'%')
+                        ->whereIn('status', [Spt::STATUS_APPROVED, 'selesai']);
+                });
+            }
+        })
             ->latest()
             ->limit(5)
             ->get();
@@ -121,9 +126,9 @@ class DashboardService
             $summary[] = [
                 'status' => $status,
                 'jumlah' => Spt::where('status', $status)
-                    ->where(function ($query) use ($userId, $nip) {
+                    ->where(function ($query) use ($userId, $nip, $status) {
                         $query->where('pembuat_id', $userId);
-                        if ($nip) {
+                        if ($nip && in_array($status, [Spt::STATUS_APPROVED, 'selesai'])) {
                             $query->orWhere('pegawai_ditugaskan', 'like', '%'.$nip.'%');
                         }
                     })->count(),

@@ -25,8 +25,6 @@ class Spd extends Model
         'nama_ppk',            // Nama PPK
         'nip_ppk',             // NIP PPK
         'pejabat_ditugaskan',  // Kolom tambahan untuk pejabat dinamis
-        'status',              // Status SPD
-        'alasan',              // Alasan revisi/penolakan
         'spt_id',              // Referensi SPT
         'pembuat_id',          // Pembuat SPD
     ];

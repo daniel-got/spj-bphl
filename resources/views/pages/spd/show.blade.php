@@ -22,7 +22,34 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <x-data.status-badge status="{{ $spd->status ?? 'draft' }}" class="text-xs px-3 py-1" />
+                    @can('update', $spd)
+                        @if(!$spd->rincian || in_array($spd->rincian->status, [\App\Models\Rincian::STATUS_DRAFT, \App\Models\Rincian::STATUS_REVISED]))
+                            <a href="{{ route('user.spd.edit', $spd->id) }}"
+                                class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors duration-150">
+                                Edit SPD
+                            </a>
+                            <x-feedback.confirm-dialog
+                                id="confirm-hapus-{{ $spd->id }}"
+                                title="Hapus SPD?"
+                                message="Data SPD yang dihapus tidak dapat dikembalikan."
+                                confirm-label="Ya, Hapus"
+                                cancel-label="Batal"
+                                action="{{ route('user.spd.destroy', $spd->id) }}"
+                                method="DELETE"
+                            />
+                            <x-action.button
+                                onclick="openModal('confirm-hapus-{{ $spd->id }}')"
+                                class="bg-danger hover:bg-red-700 text-white px-4 py-2 text-xs font-semibold rounded-lg transition-colors duration-150"
+                            >
+                                Hapus SPD
+                            </x-action.button>
+                        @endif
+                    @endcan
+                    @if($spd->rincian)
+                        <x-data.status-badge status="{{ $spd->rincian->status }}" class="text-xs px-3 py-1" />
+                    @else
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Menunggu Rincian</span>
+                    @endif
                 </div>
             </div>
 
@@ -31,30 +58,28 @@
                 {{-- Status & Validasi Card --}}
                 <x-layout.card title="Status & Validasi Pertanggungjawaban">
                     <div class="overflow-x-auto mt-4">
-                        <table class="min-w-full divide-y divide-border-custom text-sm">
-                            <thead class="bg-background text-muted uppercase text-[10px] font-bold tracking-wider">
-                                <tr>
-                                    <th class="px-4 py-3 text-left w-1/4">Status SPD</th>
-                                    <th class="px-4 py-3 text-left">Detail Alasan / Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-border-custom bg-surface">
-                                <tr>
-                                    <td class="px-4 py-4">
-                                        <x-data.status-badge status="{{ $spd->status ?? 'draft' }}" />
-                                    </td>
-                                    <td class="px-4 py-4 text-text-main">
-                                        @if($spd->status === 'disetujui')
-                                            <span class="text-xs text-muted italic">Tidak membutuhkan catatan alasan tambahan (Disetujui penuh oleh PPK).</span>
-                                        @elseif(in_array($spd->status, ['direvisi', 'ditolak']) && !empty($spd->alasan))
-                                            <span class="font-bold text-xs text-text-main bg-background border border-border-custom px-3 py-2 rounded-lg block max-w-2xl leading-relaxed">{{ $spd->alasan }}</span>
-                                        @else
-                                            <span class="text-xs text-muted italic">Belum ada rincian catatan status.</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        @php
+                            $statusBadge = $spd->rincian 
+                                ? '<x-data.status-badge status="' . $spd->rincian->status . '" />'
+                                : '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Menunggu Rincian</span>';
+
+                            $keterangan = '';
+                            if ($spd->rincian && $spd->rincian->status === 'disetujui') {
+                                $keterangan = '<span class="text-xs text-muted italic">Tidak membutuhkan catatan alasan tambahan (Disetujui penuh oleh Verifikator).</span>';
+                            } elseif ($spd->rincian && in_array($spd->rincian->status, ['direvisi', 'ditolak']) && !empty($spd->rincian->catatan_verifikator)) {
+                                $keterangan = '<span class="font-bold text-xs text-text-main bg-background border border-border-custom px-3 py-2 rounded-lg block max-w-2xl leading-relaxed">' . e($spd->rincian->catatan_verifikator) . '</span>';
+                            } else {
+                                $keterangan = '<span class="text-xs text-muted italic">Belum ada rincian catatan status.</span>';
+                            }
+
+                            $headers = ['Status Pertanggungjawaban', 'Detail Alasan / Keterangan'];
+                            $rows = [
+                                [
+                                    'cells' => [$statusBadge, $keterangan]
+                                ]
+                            ];
+                        @endphp
+                        <x-data.table :headers="$headers" :rows="$rows" :striped="false" />
                     </div>
                 </x-layout.card>
 

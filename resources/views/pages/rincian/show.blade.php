@@ -21,8 +21,36 @@
                         <p class="text-xs text-muted mt-0.5">Detail informasi Rincian Biaya Perjalanan Dinas</p>
                     </div>
                 </div>
-                </div>
                 <div class="flex items-center gap-3">
+                    @can('update', $rincian)
+                        @if(in_array($rincian->status, [\App\Models\Rincian::STATUS_DRAFT, \App\Models\Rincian::STATUS_REVISED]))
+                            <a href="{{ route('user.rincian.edit', $rincian->id) }}"
+                                class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors duration-150">
+                                Edit SPJ
+                            </a>
+                            <form action="{{ route('user.rincian.submit', $rincian->id) }}" method="POST" class="inline-block">
+                                @csrf
+                                <x-action.button-primary type="submit" onclick="return confirm('Apakah Anda yakin ingin mengajukan SPJ ini untuk diverifikasi?')">
+                                    Ajukan SPJ
+                                </x-action.button-primary>
+                            </form>
+                            <x-feedback.confirm-dialog
+                                id="confirm-hapus-{{ $rincian->id }}"
+                                title="Hapus Rincian SPJ?"
+                                message="Data Rincian SPJ yang dihapus tidak dapat dikembalikan."
+                                confirm-label="Ya, Hapus"
+                                cancel-label="Batal"
+                                action="{{ route('user.rincian.destroy', $rincian->id) }}"
+                                method="DELETE"
+                            />
+                            <x-action.button
+                                onclick="openModal('confirm-hapus-{{ $rincian->id }}')"
+                                class="bg-danger hover:bg-red-700 text-white px-4 py-2 text-xs font-semibold rounded-lg transition-colors duration-150"
+                            >
+                                Hapus SPJ
+                            </x-action.button>
+                        @endif
+                    @endcan
                     <a href="{{ route('user.rincian.print', $rincian->id) }}" target="_blank"
                        class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-150 shadow-sm"
                        title="Cetak Rincian">
@@ -38,30 +66,26 @@
                 {{-- Status & Validasi Card --}}
                 <x-layout.card title="Status & Validasi">
                     <div class="overflow-x-auto mt-4">
-                        <table class="min-w-full divide-y divide-border-custom text-sm">
-                            <thead class="bg-background text-muted uppercase text-[10px] font-bold tracking-wider">
-                                <tr>
-                                    <th class="px-4 py-3 text-left w-1/4">Status Rincian</th>
-                                    <th class="px-4 py-3 text-left">Detail Alasan / Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-border-custom bg-surface">
-                                <tr>
-                                    <td class="px-4 py-4">
-                                        <x-data.status-badge status="{{ $rincian->status ?? 'draft' }}" />
-                                    </td>
-                                    <td class="px-4 py-4 text-text-main">
-                                        @if($rincian->status === 'disetujui')
-                                            <span class="text-xs text-muted italic">Tidak membutuhkan catatan alasan tambahan (Disetujui penuh oleh PPK).</span>
-                                        @elseif(in_array($rincian->status, ['direvisi', 'ditolak']) && !empty($rincian->catatan_verifikator))
-                                            <span class="font-bold text-xs text-text-main bg-background border border-border-custom px-3 py-2 rounded-lg block max-w-2xl leading-relaxed">{{ $rincian->catatan_verifikator }}</span>
-                                        @else
-                                            <span class="text-xs text-muted italic">Belum ada rincian catatan status.</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        @php
+                            $statusBadge = '<x-data.status-badge status="' . ($rincian->status ?? 'draft') . '" />';
+
+                            $keterangan = '';
+                            if ($rincian->status === 'disetujui') {
+                                $keterangan = '<span class="text-xs text-muted italic">Tidak membutuhkan catatan alasan tambahan (Disetujui penuh oleh PPK).</span>';
+                            } elseif (in_array($rincian->status, ['direvisi', 'ditolak']) && !empty($rincian->catatan_verifikator)) {
+                                $keterangan = '<span class="font-bold text-xs text-text-main bg-background border border-border-custom px-3 py-2 rounded-lg block max-w-2xl leading-relaxed">' . e($rincian->catatan_verifikator) . '</span>';
+                            } else {
+                                $keterangan = '<span class="text-xs text-muted italic">Belum ada rincian catatan status.</span>';
+                            }
+
+                            $headersStatus = ['Status Rincian', 'Detail Alasan / Keterangan'];
+                            $rowsStatus = [
+                                [
+                                    'cells' => [$statusBadge, $keterangan]
+                                ]
+                            ];
+                        @endphp
+                        <x-data.table :headers="$headersStatus" :rows="$rowsStatus" :striped="false" />
                     </div>
                 </x-layout.card>
 
@@ -118,32 +142,28 @@
                     @endphp
                     @if (!empty($rincianBiaya))
                         <div class="overflow-x-auto mt-4">
-                            <table class="min-w-full divide-y divide-border-custom text-sm">
-                                <thead class="bg-background text-muted uppercase text-[10px] font-bold tracking-wider">
-                                    <tr>
-                                        <th class="px-4 py-3 text-left w-12">#</th>
-                                        <th class="px-4 py-3 text-left">Biaya Transport</th>
-                                        <th class="px-4 py-3 text-left">Penginapan (%)</th>
-                                        <th class="px-4 py-3 text-right">Biaya Hotel / Penginapan</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-border-custom bg-surface">
-                                    @foreach ($rincianBiaya as $i => $baris)
-                                        <tr>
-                                            <td class="px-4 py-3 text-muted font-medium">{{ $i + 1 }}</td>
-                                            <td class="px-4 py-3 text-text-main">
-                                                Rp {{ number_format($baris['biaya_transport'] ?? 0, 0, ',', '.') }}
-                                            </td>
-                                            <td class="px-4 py-3 text-text-main">
-                                                {{ $baris['penginapan'] ?? '-' }}%
-                                            </td>
-                                            <td class="px-4 py-3 text-text-main text-right">
-                                                Rp {{ number_format($baris['hotel_ril'] ?? 0, 0, ',', '.') }}
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                            @php
+                                $headersBiaya = [
+                                    '#', 
+                                    'Biaya Transport', 
+                                    'Penginapan (%)', 
+                                    ['label' => 'Biaya Hotel / Penginapan', 'class' => 'text-right']
+                                ];
+                                
+                                $rowsBiaya = [];
+                                foreach ($rincianBiaya as $i => $baris) {
+                                    $rowsBiaya[] = [
+                                        'cells' => [
+                                            '<span class="text-muted font-medium">' . ($i + 1) . '</span>',
+                                            'Rp ' . number_format($baris['biaya_transport'] ?? 0, 0, ',', '.'),
+                                            ($baris['penginapan'] ?? '-') . '%',
+                                            '<div class="text-right">Rp ' . number_format($baris['hotel_ril'] ?? 0, 0, ',', '.') . '</div>'
+                                        ]
+                                    ];
+                                }
+                            @endphp
+                            
+                            <x-data.table :headers="$headersBiaya" :rows="$rowsBiaya" :striped="false" />
                         </div>
                     @else
                         <p class="text-sm text-muted mt-4 italic">Belum ada data rincian biaya.</p>

@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<body>
+<button onclick="openEditModalHandler(1, &#039;http&#039;, {&quot;id&quot;: 1})">Test Button</button>
+<script>
+function openEditModalHandler(id, url, data) {
+    console.log(id, url, data);
+    document.body.innerHTML += "<p>Success: " + id + " " + url + " " + JSON.stringify(data) + "</p>";
+}
+</script>
+</body>
+</html>

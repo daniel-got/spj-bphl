@@ -37,6 +37,7 @@ class SptService
 
         return [
             'all' => (clone $query)->count(),
+            'diajukan' => (clone $query)->where('status', 'diajukan')->count(),
             'disetujui' => (clone $query)->where('status', 'disetujui')->count(),
             'direvisi' => (clone $query)->where('status', 'direvisi')->count(),
             'ditolak' => (clone $query)->where('status', 'ditolak')->count(),
@@ -76,8 +77,8 @@ class SptService
     {
         $user = auth()->user();
 
-        // Jika user adalah admin atau role monitoring/verifikator, mereka bisa melihat semua (return tanpa filter)
-        if (! $user || ! in_array($user->role, ['user', 'pembuat_spt'])) {
+        // Jika user adalah admin atau role monitoring, mereka bisa melihat semua (return tanpa filter)
+        if (! $user || $user->isAdmin() || $user->isMonitoring()) {
             return;
         }
 
@@ -85,11 +86,18 @@ class SptService
         $pegawaiId = (int) Pegawai::where('user_id', $user->id)->value('id');
 
         if ($pegawaiId) {
-            $query->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+            $query->where(function ($q) use ($user, $pegawaiId) {
+                $q->where('pembuat_id', $user->id)
+                    ->orWhere(function ($subQ) use ($pegawaiId) {
+                        $subQ->where(function ($jsonQ) use ($pegawaiId) {
+                            $jsonQ->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
+                                ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                        })->whereIn('status', ['disetujui', 'selesai']);
+                    });
+            });
         } else {
-            // Jika user tidak punya data pegawai (harusnya tidak terjadi), sembunyikan semua SPT
-            $query->whereRaw('1 = 0');
+            // Jika user tidak punya data pegawai, setidaknya mereka bisa lihat yang mereka buat
+            $query->where('pembuat_id', $user->id);
         }
     }
 
@@ -108,8 +116,8 @@ class SptService
     {
         return DB::transaction(function () use ($data, $authId) {
             $data['pembuat_id'] = $authId;
-            // Status default ke diajukan (menunggu verifikasi TU) sesuai brainstorming
-            $data['status'] = $data['status'] ?? Spt::STATUS_WAITING_TU;
+            // Status default ke draft
+            $data['status'] = $data['status'] ?? Spt::STATUS_DRAFT;
 
             // Mengantisipasi jika input dari form dikirim dalam bentuk array (sudah di-handle Request)
             $pegawaiData = $data['pegawai_ditugaskan'] ?? [];
@@ -122,7 +130,7 @@ class SptService
 
             $spt = Spt::create($data);
 
-            session()->flash('success', 'SPT berhasil dibuat dan menunggu verifikasi Kepala TU.');
+            session()->flash('success', 'SPT berhasil dibuat dan disimpan sebagai Draft.');
 
             return $spt;
         });
@@ -165,6 +173,31 @@ class SptService
             session()->flash('success', 'SPT berhasil dihapus.');
 
             return true;
+        });
+    }
+
+    /**
+     * Memproses verifikasi SPT (Approve/Reject/Revise) oleh TU/Pimpinan.
+     */
+    public function verifySpt(Spt $spt, string $status, ?string $catatan, int $verifikatorId)
+    {
+        return DB::transaction(function () use ($spt, $status, $catatan, $verifikatorId) {
+            $spt->update([
+                'status' => $status,
+                'catatan_verifikator' => $catatan,
+                'verifikator_id' => $verifikatorId,
+            ]);
+
+            $message = match ($status) {
+                Spt::STATUS_APPROVED => 'SPT berhasil disetujui.',
+                Spt::STATUS_REVISED => 'SPT dikembalikan untuk direvisi.',
+                Spt::STATUS_REJECTED => 'SPT telah ditolak.',
+                default => 'Status SPT berhasil diperbarui.',
+            };
+
+            session()->flash('success', $message);
+
+            return $spt;
         });
     }
 }

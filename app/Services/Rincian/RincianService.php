@@ -21,6 +21,7 @@ class RincianService
 
         return [
             'all' => (clone $query)->count(),
+            'diajukan' => (clone $query)->where('status', 'diajukan')->count(),
             'disetujui' => (clone $query)->where('status', 'disetujui')->count(),
             'direvisi' => (clone $query)->where('status', 'direvisi')->count(),
             'ditolak' => (clone $query)->where('status', 'ditolak')->count(),
@@ -69,8 +70,8 @@ class RincianService
     {
         $user = auth()->user();
 
-        // Jika user adalah admin atau role monitoring/verifikator, lihat semua
-        if (! $user || ! in_array($user->role, ['user', 'pembuat_spt'])) {
+        // Jika user adalah admin, verifikator, atau role monitoring, lihat semua
+        if (! $user || $user->isAdmin() || $user->isVerifikator() || $user->isMonitoring()) {
             return;
         }
 
@@ -102,6 +103,26 @@ class RincianService
     public function createRincian(array $data, int $authId)
     {
         return DB::transaction(function () use ($data, $authId) {
+            $user = auth()->user();
+
+            // Validasi keamanan: Pastikan SPD yang dipilih boleh diakses oleh user
+            if ($user && ! $user->isAdmin() && ! $user->isMonitoring() && ! $user->isVerifikator()) {
+                $pegawai = Pegawai::where('user_id', $user->id)->first();
+                $nip = $pegawai?->nip;
+
+                $isValidSpd = Spd::where('id', $data['spd_id'])
+                    ->where(function ($q) use ($user, $nip) {
+                        $q->where('pembuat_id', $user->id);
+                        if ($nip) {
+                            $q->orWhere('nip_pegawai', $nip);
+                        }
+                    })->exists();
+
+                if (! $isValidSpd) {
+                    throw new \Exception('Anda tidak memiliki akses untuk membuat Rincian dari SPD ini.');
+                }
+            }
+
             // Jika ada file lampiran
             $lampiranPath = null;
             if (isset($data['lampiran']) && $data['lampiran'] instanceof UploadedFile) {
@@ -174,9 +195,49 @@ class RincianService
         });
     }
 
+    /**
+     * Memproses verifikasi SPJ (Approve/Reject/Revise) oleh Verifikator Keuangan.
+     */
+    public function verifySpj(Rincian $rincian, string $status, ?string $catatan, int $verifikatorId)
+    {
+        return DB::transaction(function () use ($rincian, $status, $catatan, $verifikatorId) {
+            $rincian->update([
+                'status' => $status,
+                'catatan_verifikator' => $catatan,
+                'verifikator_id' => $verifikatorId,
+            ]);
+
+            $message = match ($status) {
+                Rincian::STATUS_APPROVED => 'Bundel SPJ berhasil disetujui.',
+                Rincian::STATUS_REVISED => 'Bundel SPJ dikembalikan untuk direvisi.',
+                Rincian::STATUS_REJECTED => 'Bundel SPJ telah ditolak.',
+                default => 'Status Bundel SPJ berhasil diperbarui.',
+            };
+
+            session()->flash('success', $message);
+
+            return $rincian;
+        });
+    }
+
     public function searchSpd($query = '')
     {
-        return Spd::when($query, function ($q) use ($query) {
+        $user = auth()->user();
+        $q = Spd::query();
+
+        if ($user && ! $user->isAdmin() && ! $user->isMonitoring() && ! $user->isVerifikator()) {
+            $pegawai = Pegawai::where('user_id', $user->id)->first();
+            $nip = $pegawai?->nip;
+
+            $q->where(function ($queryBuilder) use ($user, $nip) {
+                $queryBuilder->where('pembuat_id', $user->id);
+                if ($nip) {
+                    $queryBuilder->orWhere('nip_pegawai', $nip);
+                }
+            });
+        }
+
+        return $q->when($query, function ($q) use ($query) {
             $q->where('nomor_spd', 'like', "%{$query}%");
         })
             ->latest()
@@ -192,7 +253,22 @@ class RincianService
 
     public function getSpdAjax($id)
     {
-        $spd = Spd::with(['spt', 'pegawai'])->find($id);
+        $user = auth()->user();
+        $q = Spd::with(['spt', 'pegawai']);
+
+        if ($user && ! $user->isAdmin() && ! $user->isMonitoring() && ! $user->isVerifikator()) {
+            $pegawai = Pegawai::where('user_id', $user->id)->first();
+            $nip = $pegawai?->nip;
+
+            $q->where(function ($queryBuilder) use ($user, $nip) {
+                $queryBuilder->where('pembuat_id', $user->id);
+                if ($nip) {
+                    $queryBuilder->orWhere('nip_pegawai', $nip);
+                }
+            });
+        }
+
+        $spd = $q->find($id);
 
         if (! $spd) {
             return [];

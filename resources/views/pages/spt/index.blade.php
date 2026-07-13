@@ -80,9 +80,9 @@
                                             ]" :selected="request('per_page', 10)" onchange="this.form.submit()" />
                                         </div>
                                         <div class="flex gap-2">
-                                            <button type="submit" class="bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-5 py-2 rounded-md transition-colors duration-150 cursor-pointer border border-transparent w-full justify-center text-center h-[38px]">
-                                                Filter
-                                            </button>
+                                            <x-action.button-primary type="submit" class="w-full justify-center text-center h-[38px]">
+                                            Filter
+                                        </x-action.button-primary>
                                         </div>
                                     </div>
                                 </form>
@@ -153,26 +153,33 @@
                                     $nomorSptLink = '<a href="' . route('user.spt.show', $spt->id) . '" class="text-primary hover:underline font-semibold" title="Lihat Rincian">' . e($spt->nomor_spt ?? '') . '</a>';
 
                                     // Edit hanya untuk admin — pembuat_spt punya tombol Edit di dashboard-nya sendiri
-                                    $hasAccess = Auth::user()->role === 'admin';
-                                    $editLink = $hasAccess
-                                        ? '<a href="' . route('user.spt.edit', $spt->id) . '" class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover" title="Edit SPT">Edit</a>'
-                                        : '<span class="text-muted text-xs">-</span>';
+                                    $hasAccess = Auth::user()->role === 'admin' && in_array($spt->status, [\App\Models\Spt::STATUS_DRAFT, \App\Models\Spt::STATUS_REVISED]);
+                                    
+                                    $actions = [
+                                        'detail' => route('user.spt.show', $spt->id),
+                                    ];
+                                    
+                                    if ($hasAccess) {
+                                        $actions['edit'] = route('user.spt.edit', $spt->id);
+                                    }
 
                                     return [
-                                        $iteration++,
-                                        $nomorSptLink,
-                                        $tglSpt,
-                                        e($namaPegawai),
-                                        e($nipPegawai),
-                                        e($pangkatPegawai),
-                                        e($jabatanPegawai),
-                                        '<div class="max-w-xs whitespace-normal line-clamp-2" title="' . e($spt->tujuan_kegiatan ?? '') . '">' . e($spt->tujuan_kegiatan ?? '') . '</div>',
-                                        '<div class="max-w-xs whitespace-normal" title="' . $destinationsText . '">' . $destinationsText . '</div>',
-                                        $tglBerangkat,
-                                        $tglKembali,
-                                        e($spt->lama_kegiatan ?? '') . ' Hari',
-                                        e($spt->kode_mak ?? '-'),
-                                        $editLink
+                                        'cells' => [
+                                            $iteration++,
+                                            $nomorSptLink,
+                                            $tglSpt,
+                                            e($namaPegawai),
+                                            e($nipPegawai),
+                                            e($pangkatPegawai),
+                                            e($jabatanPegawai),
+                                            '<div class="max-w-xs whitespace-normal line-clamp-2" title="' . e($spt->tujuan_kegiatan ?? '') . '">' . e($spt->tujuan_kegiatan ?? '') . '</div>',
+                                            '<div class="max-w-xs whitespace-normal" title="' . $destinationsText . '">' . $destinationsText . '</div>',
+                                            $tglBerangkat,
+                                            $tglKembali,
+                                            e($spt->lama_kegiatan ?? '') . ' Hari',
+                                            e($spt->kode_mak ?? '-'),
+                                        ],
+                                        'actions' => $actions
                                     ];
                                 })->filter()->toArray();
                             @endphp

@@ -10,22 +10,6 @@ use Illuminate\Support\Facades\DB;
 class SpdService
 {
     /**
-     * Get statistics count for SPDs (preventing N+1 memory loading).
-     */
-    public function getCounts(): array
-    {
-        $query = Spd::query();
-        $this->applyRoleFilter($query);
-
-        return [
-            'all' => (clone $query)->count(),
-            'disetujui' => (clone $query)->where('status', 'disetujui')->count(),
-            'direvisi' => (clone $query)->where('status', 'direvisi')->count(),
-            'ditolak' => (clone $query)->where('status', 'ditolak')->count(),
-        ];
-    }
-
-    /**
      * Get all SPD records with optional search and filter.
      */
     public function getAllLatest(array $filters = [], int $perPage = 10)
@@ -47,10 +31,6 @@ class SpdService
             $query->where('jenis_perjalanan', $filters['jenis_perjalanan']);
         }
 
-        if (! empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-
         return $query->latest()->paginate($perPage);
     }
 
@@ -63,8 +43,9 @@ class SpdService
     {
         $user = auth()->user();
 
-        // Jika user adalah admin atau role monitoring/verifikator, lihat semua
-        if (! $user || ! in_array($user->role, ['user', 'pembuat_spt'])) {
+        // Jika user adalah admin atau role monitoring, lihat semua
+        // (Verifikator, PPK, Bendahara, Pembuat SPT, Pegawai biasa hanya melihat miliknya)
+        if (! $user || $user->isAdmin() || $user->isMonitoring()) {
             return;
         }
 
@@ -97,15 +78,16 @@ class SpdService
             $user = auth()->user();
 
             // Validasi keamanan: Pastikan SPT yang dipilih boleh diakses oleh user
-            if ($user && in_array($user->role, ['user', 'pembuat_spt'])) {
+            if ($user && ! $user->isAdmin() && ! $user->isMonitoring()) {
                 $pegawai = Pegawai::where('user_id', $user->id)->first();
                 $nip = $pegawai?->nip;
 
                 $isValidSpt = Spt::where('id', $data['spt_id'])
-                    ->where(function ($q) use ($user, $nip) {
+                    ->where(function ($q) use ($user, $pegawai) {
                         $q->where('pembuat_id', $user->id);
-                        if ($nip) {
-                            $q->orWhere('pegawai_ditugaskan', 'like', '%'.$nip.'%');
+                        if ($pegawai) {
+                            $q->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawai->id]])
+                                ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawai->id]]);
                         }
                     })->exists();
 
@@ -115,8 +97,6 @@ class SpdService
             }
 
             $data['pembuat_id'] = $data['pembuat_id'] ?? auth()->id();
-            // Default status SPD adalah draft
-            $data['status'] = $data['status'] ?? 'draft';
 
             // SPD dibuat per akun: identitas pegawai selalu diambil dari akun yang login,
             // tidak boleh memilih/menginput pegawai lain dari form.
@@ -171,14 +151,13 @@ class SpdService
         $query = Spt::query();
 
         // Terapkan filter berdasarkan role/penugasan
-        if ($user && in_array($user->role, ['user', 'pembuat_spt'])) {
+        if ($user && ! $user->isAdmin() && ! $user->isMonitoring()) {
             $pegawai = Pegawai::where('user_id', $user->id)->first();
-            $nip = $pegawai?->nip;
-
-            $query->where(function ($q) use ($user, $nip) {
+            $query->where(function ($q) use ($user, $pegawai) {
                 $q->where('pembuat_id', $user->id);
-                if ($nip) {
-                    $q->orWhere('pegawai_ditugaskan', 'like', '%'.$nip.'%');
+                if ($pegawai) {
+                    $q->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawai->id]])
+                        ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawai->id]]);
                 }
             });
         }
@@ -208,14 +187,13 @@ class SpdService
         $query = Spt::query();
 
         // Keamanan: Pastikan user hanya bisa mengambil detail SPT yang boleh mereka akses
-        if ($user && in_array($user->role, ['user', 'pembuat_spt'])) {
+        if ($user && ! $user->isAdmin() && ! $user->isMonitoring()) {
             $pegawai = Pegawai::where('user_id', $user->id)->first();
-            $nip = $pegawai?->nip;
-
-            $query->where(function ($q) use ($user, $nip) {
+            $query->where(function ($q) use ($user, $pegawai) {
                 $q->where('pembuat_id', $user->id);
-                if ($nip) {
-                    $q->orWhere('pegawai_ditugaskan', 'like', '%'.$nip.'%');
+                if ($pegawai) {
+                    $q->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawai->id]])
+                        ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawai->id]]);
                 }
             });
         }

@@ -243,10 +243,9 @@
                         class="inline-flex items-center justify-center px-5 py-2.5 rounded-md border border-border-custom text-sm font-medium text-text-main hover:bg-background transition duration-150 ease-in-out">
                         Batal
                     </a>
-                    <button type="submit"
-                        class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-2.5 px-5 rounded-md transition duration-150 ease-in-out border border-transparent">
-                        Simpan
-                    </button>
+                    <x-action.button-primary type="submit">
+                        Simpan & Buat SPD
+                    </x-action.button-primary>
                 </div>
 
             </form>
@@ -379,6 +378,25 @@
 
             tglBerangkatInput.addEventListener('change', calculateDays);
             tglKembaliInput.addEventListener('change', calculateDays);
+
+            // --- PPK Autofill ---
+            const ppkData = @json($ppkData);
+            const ppkSelect = document.getElementById('ppk');
+            const namaPpkInput = document.getElementById('nama_ppk');
+            const nipPpkInput = document.getElementById('nip_ppk');
+
+            if (ppkSelect) {
+                ppkSelect.addEventListener('change', function() {
+                    const selectedRole = this.value;
+                    if (ppkData[selectedRole]) {
+                        namaPpkInput.value = ppkData[selectedRole].nama;
+                        nipPpkInput.value = ppkData[selectedRole].nip;
+                    } else {
+                        namaPpkInput.value = '';
+                        nipPpkInput.value = '';
+                    }
+                });
+            }
 
             // Initialize Select2 for existing alat_angkut fields with tags: true to allow manual typing
             $('select[name="alat_angkut[]"]').select2({

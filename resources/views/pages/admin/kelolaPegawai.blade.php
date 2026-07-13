@@ -55,88 +55,66 @@
                         <h3 class="text-lg font-semibold text-text-main">Daftar Pegawai</h3>
                     </div>
 
-                    <div class="p-0 overflow-x-auto">
-                        <table class="w-full text-sm text-left">
-                            <thead class="bg-background/50">
-                                <tr class="border-b border-border-custom">
-                                    <th class="px-6 py-4 font-medium text-muted">NIP</th>
-                                    <th class="px-6 py-4 font-medium text-muted">Nama Pegawai</th>
-                                    <th class="px-6 py-4 font-medium text-muted">Jabatan</th>
-                                    <th class="px-6 py-4 font-medium text-muted">Role Akses</th>
-                                    <th class="px-6 py-4 font-medium text-muted text-right">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-border-custom">
-                                @forelse ($pegawais as $pegawai)
-                                    <tr class="hover:bg-background/50 transition-colors">
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $pegawai->nip }}</td>
-                                        <td class="px-6 py-4 font-medium text-text-main">
-                                            {{ $pegawai->nama_pegawai }}<br>
-                                            <span
-                                                class="text-xs text-muted font-normal">{{ $pegawai->user?->email }}</span>
-                                        </td>
-                                        <td class="px-6 py-4 text-muted">
-                                            {{ $pegawai->jabatan ?? '-' }}<br>
-                                            <span class="text-xs">{{ $pegawai->sub_seksi ?? '' }}</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @php
-                                                $roleColor = match ($pegawai->user?->role) {
-                                                    'admin' => 'purple',
-                                                    'verifikator' => 'blue',
-                                                    'pembuat_spt' => 'green',
-                                                    'kepala_balai',
-                                                    'kepala_tu',
-                                                    'kepala_seksi_pephphl',
-                                                    'kepala_seksi_ppphphl'
-                                                        => 'yellow',
-                                                    default => 'gray',
-                                                };
-                                            @endphp
-                                            <x-data.badge :label="$pegawai->user?->roleLabel() ?? 'Unknown'" :color="$roleColor" />
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right">
-                                            {{-- Dropdown Aksi --}}
-                                            @php
-                                                $pegawaiData = [
-                                                    'id' => $pegawai->id,
-                                                    'nip' => $pegawai->nip,
-                                                    'nama_pegawai' => $pegawai->nama_pegawai,
-                                                    'email' => $pegawai->user?->email,
-                                                    'pangkat' => $pegawai->pangkat,
-                                                    'golongan' => $pegawai->golongan,
-                                                    'jabatan' => $pegawai->jabatan,
-                                                    'sub_seksi' => $pegawai->sub_seksi,
-                                                    'role' => $pegawai->user?->role,
-                                                ];
-                                            @endphp
+                    <div class="p-0 overflow-x-auto border-t border-border-custom">
+                        @php
+                            $headers = [
+                                'NIP',
+                                'Nama Pegawai',
+                                'Jabatan',
+                                'Role Akses',
+                                'Aksi'
+                            ];
+                            
+                            $rows = $pegawais->map(function($pegawai) {
+                                $roleColor = match ($pegawai->user?->role) {
+                                    'admin' => 'primary',
+                                    'verifikator' => 'info',
+                                    'pembuat_spt' => 'success',
+                                    'kepala_balai',
+                                    'kepala_tu',
+                                    'kepala_seksi_pephphl',
+                                    'kepala_seksi_ppphphl' => 'warning',
+                                    default => 'gray',
+                                };
+                                
+                                $badge = \Illuminate\Support\Facades\Blade::render('<x-data.badge label="' . ($pegawai->user?->roleLabel() ?? 'Unknown') . '" color="' . $roleColor . '" />');
 
-                                            <div class="flex items-center justify-end gap-2">
-                                                <button
-                                                    onclick="openEditModalHandler({{ $pegawaiData['id'] }}, '{{ route('admin.kelolaPegawai.update', $pegawai->id) }}', {{ json_encode($pegawaiData) }})"
-                                                    class="p-2 text-muted hover:text-primary hover:bg-primary-light rounded-md transition-colors"
-                                                    title="Edit">
-                                                    <x-utility.icon name="pencil" class="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onclick="openDeleteModalHandler('{{ route('admin.kelolaPegawai.destroy', $pegawai->id) }}')"
-                                                    class="p-2 text-muted hover:text-danger hover:bg-red-50 rounded-md transition-colors"
-                                                    title="Hapus">
-                                                    <x-utility.icon name="trash" class="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="px-6 py-12">
-                                            <x-data.empty-state title="Belum Ada Pegawai"
-                                                description="Data pegawai belum ditambahkan ke dalam sistem." />
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                
+                                $pegawaiData = [
+                                    'id' => $pegawai->id,
+                                    'nip' => $pegawai->nip,
+                                    'nama_pegawai' => $pegawai->nama_pegawai,
+                                    'email' => $pegawai->user?->email,
+                                    'pangkat' => $pegawai->pangkat,
+                                    'golongan' => $pegawai->golongan,
+                                    'jabatan' => $pegawai->jabatan,
+                                    'sub_seksi' => $pegawai->sub_seksi,
+                                    'role' => $pegawai->user?->role,
+                                ];
+                                
+                                $editUrl = route('admin.kelolaPegawai.update', $pegawai->id);
+                                $deleteUrl = route('admin.kelolaPegawai.destroy', $pegawai->id);
+
+                                return [
+                                    'cells' => [
+                                        $pegawai->nip,
+                                        '<div class="font-medium text-text-main">' . e($pegawai->nama_pegawai) . '</div><div class="text-xs text-muted font-normal">' . e($pegawai->user?->email) . '</div>',
+                                        '<div class="text-muted">' . e($pegawai->jabatan ?? '-') . '</div><div class="text-xs">' . e($pegawai->sub_seksi ?? '') . '</div>',
+                                        $badge
+                                    ],
+                                    'actions' => [
+                                        'edit' => [
+                                            'onclick' => "openEditModalHandler({$pegawai->id}, '{$editUrl}', " . json_encode($pegawaiData) . ")"
+                                        ],
+                                        'delete' => [
+                                            'onclick' => "openDeleteModalHandler('{$deleteUrl}')"
+                                        ]
+                                    ]
+                                ];
+                            })->toArray();
+                        @endphp
+                        
+                        <x-data.table :headers="$headers" :rows="$rows" :striped="false" class="border-0 rounded-none" />
                     </div>
 
                     @if ($pegawais->hasPages())

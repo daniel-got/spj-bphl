@@ -1,5 +1,6 @@
 @props([
     'name',
+    'id'          => null,
     'label'       => null,
     'type'        => 'text',
     'placeholder' => null,
@@ -10,16 +11,20 @@
     'hint'        => null,
 ])
 
+@php
+    $inputId = $id ?? $name;
+@endphp
+
 <div {{ $attributes->only('class')->merge(['class' => 'flex flex-col gap-1']) }}>
     @if($label)
-        <label for="{{ $name }}" class="text-sm font-medium text-text-main">
+        <label for="{{ $inputId }}" class="text-sm font-medium text-text-main">
             {{ $label }}
             @if($required) <span class="text-danger">*</span> @endif
         </label>
     @endif
 
     <input
-        id="{{ $name }}"
+        id="{{ $inputId }}"
         name="{{ $name }}"
         type="{{ $type }}"
         value="{{ old($name, $value) }}"

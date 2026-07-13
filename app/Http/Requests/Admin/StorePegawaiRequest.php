@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\Golongan;
+use App\Enums\Pangkat;
+use App\Enums\UserRole;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-
 use Illuminate\Validation\Rule;
 
 class StorePegawaiRequest extends FormRequest
@@ -25,15 +27,15 @@ class StorePegawaiRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_pegawai'     => ['required', 'string', 'max:255'],
-            'nip'              => ['required', 'string', 'max:50', Rule::unique('data_pegawai', 'nip')],
-            'email'            => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password'         => ['required', 'string', 'min:8'],
-            'role'             => ['required', 'string', Rule::in(\App\Enums\UserRole::values())],
-            'pangkat'          => ['nullable', 'string', Rule::in(\App\Enums\Pangkat::values())],
-            'golongan'         => ['nullable', 'string', Rule::in(\App\Enums\Golongan::values())],
-            'jabatan'          => ['nullable', 'string', 'max:100'],
-            'sub_seksi'        => ['nullable', 'string', 'max:100'],
+            'nama_pegawai' => ['required', 'string', 'max:255'],
+            'nip' => ['required', 'string', 'max:50', Rule::unique('data_pegawai', 'nip')],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8'],
+            'role' => ['required', 'string', Rule::in(UserRole::values())],
+            'pangkat' => ['nullable', 'string', Rule::in(Pangkat::values())],
+            'golongan' => ['nullable', 'string', Rule::in(Golongan::values())],
+            'jabatan' => ['nullable', 'string', 'max:100'],
+            'sub_seksi' => ['nullable', 'string', 'max:100'],
         ];
     }
 

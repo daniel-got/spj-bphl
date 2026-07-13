@@ -4,17 +4,18 @@ namespace App\Models;
 
 use App\Enums\UserRole;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory;
+
     use Notifiable;
 
     protected $fillable = ['name', 'email', 'password', 'role'];
@@ -29,7 +30,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
+            'password' => 'hashed',
         ];
     }
 
@@ -58,7 +59,6 @@ class User extends Authenticatable
         return $this->hasMany(Rincian::class, 'verifikator_id');
     }
 
-
     // -------------------------------------------------------------------------
     // Query Scopes
     // -------------------------------------------------------------------------
@@ -75,7 +75,13 @@ class User extends Authenticatable
 
     public function scopeRolePegawai(Builder $query): Builder
     {
-        return $query->where('role', UserRole::USER->value);
+        return $query->whereIn('role', [
+            UserRole::USER->value,
+            UserRole::PPK1->value,
+            UserRole::PPK2->value,
+            UserRole::PPK3->value,
+            UserRole::BENDAHARA->value,
+        ]);
     }
 
     public function scopeMonitoring(Builder $query): Builder
@@ -104,7 +110,13 @@ class User extends Authenticatable
 
     public function isPegawai(): bool
     {
-        return $this->role === UserRole::USER->value;
+        return in_array($this->role, [
+            UserRole::USER->value,
+            UserRole::PPK1->value,
+            UserRole::PPK2->value,
+            UserRole::PPK3->value,
+            UserRole::BENDAHARA->value,
+        ]);
     }
 
     /**
@@ -122,6 +134,7 @@ class User extends Authenticatable
     public function roleLabel(): string
     {
         $enum = UserRole::tryFrom($this->role);
+
         return $enum ? $enum->label() : ucfirst($this->role);
     }
 }

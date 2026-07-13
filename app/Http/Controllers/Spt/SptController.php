@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Spt\StoreSptRequest;
 use App\Http\Requests\Spt\UpdateSptRequest;
 use App\Models\Pegawai;
+use App\Models\Spt;
 use App\Services\Spt\SptService;
 use Illuminate\Http\Request;
 
@@ -59,6 +60,7 @@ class SptController extends Controller
     public function show(string $id)
     {
         $spt = $this->sptService->getSptById($id);
+        $this->authorize('view', $spt);
 
         return view('pages.spt.show', compact('spt'));
     }
@@ -69,6 +71,12 @@ class SptController extends Controller
     public function edit(string $id)
     {
         $spt = $this->sptService->getSptById($id);
+        $this->authorize('update', $spt);
+
+        if (! in_array($spt->status, [Spt::STATUS_DRAFT, Spt::STATUS_REVISED])) {
+            abort(403, 'SPT sudah diajukan dan tidak dapat diubah.');
+        }
+
         $pegawaiList = Pegawai::orderBy('nama_pegawai')->get();
 
         return view('pages.spt.edit', compact('spt', 'pegawaiList'));
@@ -80,6 +88,11 @@ class SptController extends Controller
     public function update(UpdateSptRequest $request, string $id)
     {
         $spt = $this->sptService->getSptById($id);
+        $this->authorize('update', $spt);
+
+        if (! in_array($spt->status, [Spt::STATUS_DRAFT, Spt::STATUS_REVISED])) {
+            abort(403, 'SPT sudah diajukan dan tidak dapat diubah.');
+        }
 
         $this->sptService->updateSpt($spt, $request->validated());
 
@@ -94,11 +107,33 @@ class SptController extends Controller
     public function destroy(string $id)
     {
         $spt = $this->sptService->getSptById($id);
+        $this->authorize('delete', $spt);
+
+        if (! in_array($spt->status, [Spt::STATUS_DRAFT, Spt::STATUS_REVISED])) {
+            abort(403, 'SPT sudah diajukan dan tidak dapat dihapus.');
+        }
 
         $this->sptService->deleteSpt($spt);
 
         return redirect()
             ->route('user.spt.index')
             ->with('success', 'SPT berhasil dihapus.');
+    }
+
+    /**
+     * Submit SPT to be verified.
+     */
+    public function submit(string $id)
+    {
+        $spt = $this->sptService->getSptById($id);
+        $this->authorize('update', $spt);
+
+        if (! in_array($spt->status, [Spt::STATUS_DRAFT, Spt::STATUS_REVISED])) {
+            abort(403, 'SPT sudah diajukan atau diproses.');
+        }
+
+        $this->sptService->updateSpt($spt, ['status' => Spt::STATUS_WAITING_TU]);
+
+        return back()->with('success', 'SPT berhasil diajukan untuk diverifikasi.');
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRole;
+use App\Models\Pegawai;
 use App\Models\Spd;
 use App\Models\User;
-use App\Models\Pegawai;
-use App\Enums\UserRole;
 
 class SpdPolicy
 {

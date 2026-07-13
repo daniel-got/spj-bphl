@@ -21,10 +21,33 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="{{ route('user.spt.edit', $spt->id) }}"
-                        class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors duration-150">
-                        Edit SPT
-                    </a>
+                    @if(in_array($spt->status, [\App\Models\Spt::STATUS_DRAFT, \App\Models\Spt::STATUS_REVISED]) && auth()->user()->role === \App\Enums\UserRole::PEMBUAT_SPT->value)
+                        <a href="{{ route('user.spt.edit', $spt->id) }}"
+                            class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors duration-150">
+                            Edit SPT
+                        </a>
+                        <form action="{{ route('user.spt.submit', $spt->id) }}" method="POST" class="inline-block">
+                            @csrf
+                            <x-action.button-primary type="submit" onclick="return confirm('Apakah Anda yakin ingin mengajukan SPT ini untuk diverifikasi Kepala TU?')">
+                                Ajukan SPT
+                            </x-action.button-primary>
+                        </form>
+                        <x-feedback.confirm-dialog
+                            id="confirm-hapus-{{ $spt->id }}"
+                            title="Hapus SPT?"
+                            message="Data SPT yang dihapus tidak dapat dikembalikan."
+                            confirm-label="Ya, Hapus"
+                            cancel-label="Batal"
+                            action="{{ route('user.spt.destroy', $spt->id) }}"
+                            method="DELETE"
+                        />
+                        <x-action.button
+                            onclick="openModal('confirm-hapus-{{ $spt->id }}')"
+                            class="bg-danger hover:bg-red-700 text-white px-4 py-2 text-xs font-semibold rounded-lg transition-colors duration-150"
+                        >
+                            Hapus SPT
+                        </x-action.button>
+                    @endif
                     <x-data.status-badge status="{{ $spt->status ?? 'draft' }}" class="text-xs px-3 py-1" />
                 </div>
             </div>
@@ -34,30 +57,26 @@
                 {{-- Status & Validasi Card --}}
                 <x-layout.card title="Status & Validasi Pertanggungjawaban">
                     <div class="overflow-x-auto mt-4">
-                        <table class="min-w-full divide-y divide-border-custom text-sm">
-                            <thead class="bg-background text-muted uppercase text-[10px] font-bold tracking-wider">
-                                <tr>
-                                    <th class="px-4 py-3 text-left w-1/4">Status spt</th>
-                                    <th class="px-4 py-3 text-left">Detail Alasan / Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-border-custom bg-surface">
-                                <tr>
-                                    <td class="px-4 py-4">
-                                        <x-data.status-badge status="{{ $spt->status ?? 'draft' }}" />
-                                    </td>
-                                    <td class="px-4 py-4 text-text-main">
-                                        @if($spt->status === 'disetujui')
-                                            <span class="text-xs text-muted italic">Tidak membutuhkan catatan alasan tambahan (Disetujui penuh oleh PPK).</span>
-                                        @elseif(in_array($spt->status, ['direvisi', 'ditolak']) && !empty($spt->alasan))
-                                            <span class="font-bold text-xs text-text-main bg-background border border-border-custom px-3 py-2 rounded-lg block max-w-2xl leading-relaxed">{{ $spt->alasan }}</span>
-                                        @else
-                                            <span class="text-xs text-muted italic">Belum ada rincian catatan status.</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        @php
+                            $statusBadge = '<x-data.status-badge status="' . ($spt->status ?? 'draft') . '" />';
+
+                            $keterangan = '';
+                            if ($spt->status === 'disetujui') {
+                                $keterangan = '<span class="text-xs text-muted italic">Tidak membutuhkan catatan alasan tambahan (Disetujui penuh oleh PPK).</span>';
+                            } elseif (in_array($spt->status, ['direvisi', 'ditolak']) && !empty($spt->alasan)) {
+                                $keterangan = '<span class="font-bold text-xs text-text-main bg-background border border-border-custom px-3 py-2 rounded-lg block max-w-2xl leading-relaxed">' . e($spt->alasan) . '</span>';
+                            } else {
+                                $keterangan = '<span class="text-xs text-muted italic">Belum ada rincian catatan status.</span>';
+                            }
+
+                            $headersStatus = ['Status SPT', 'Detail Alasan / Keterangan'];
+                            $rowsStatus = [
+                                [
+                                    'cells' => [$statusBadge, $keterangan]
+                                ]
+                            ];
+                        @endphp
+                        <x-data.table :headers="$headersStatus" :rows="$rowsStatus" :striped="false" />
                     </div>
                 </x-layout.card>
 
@@ -90,33 +109,34 @@
                                 $pegawaiList = is_array($pegawaiData) ? $pegawaiData : [];
                             @endphp
 
-                            <div class="mt-3 space-y-3">
-                                @forelse($pegawaiList as $pegawai)
-                                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4 bg-background border border-border-custom rounded-lg px-4 py-3">
-                                         <div>
-                                             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Nama Pegawai</span>
-                                             <p class="text-sm font-bold text-text-main mt-0.5">{{ $pegawai['nama_pegawai'] ?? '-' }}</p>
-                                         </div>
-                                         <div>
-                                             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Peran SPT</span>
-                                             <p class="text-sm font-bold text-primary mt-0.5">{{ $pegawai['peran'] ?? 'Anggota' }}</p>
-                                         </div>
-                                         <div>
-                                             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">NIP</span>
-                                             <p class="text-sm font-medium text-text-main mt-0.5">{{ $pegawai['nip'] ?? '-' }}</p>
-                                         </div>
-                                         <div>
-                                             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Pangkat / Golongan</span>
-                                             <p class="text-sm font-medium text-text-main mt-0.5">{{ $pegawai['pangkat'] ?? '-' }}</p>
-                                         </div>
-                                         <div>
-                                             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Jabatan</span>
-                                             <p class="text-sm font-medium text-text-main mt-0.5">{{ $pegawai['jabatan'] ?? '-' }}</p>
-                                         </div>
-                                     </div>
-                                @empty
+                            <div class="mt-3">
+                                @php
+                                    $headersPegawai = ['Nama Pegawai', 'Peran SPT', 'NIP', 'Pangkat / Golongan', 'Jabatan'];
+                                    
+                                    $rowsPegawai = array_map(function($pegawai) {
+                                        $peranClass = ($pegawai['peran'] ?? 'Anggota') === 'Penanggung Jawab' 
+                                            ? 'bg-amber-100 text-amber-700' 
+                                            : 'bg-slate-100 text-slate-600';
+                                            
+                                        $peranBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold ' . $peranClass . '">' . e($pegawai['peran'] ?? 'Anggota') . '</span>';
+                                        
+                                        return [
+                                            'cells' => [
+                                                '<span class="font-bold text-text-main">' . e($pegawai['nama_pegawai'] ?? '-') . '</span>',
+                                                $peranBadge,
+                                                '<span class="font-medium text-text-main">' . e($pegawai['nip'] ?? '-') . '</span>',
+                                                '<span class="font-medium text-text-main">' . e($pegawai['pangkat'] ?? '-') . '</span>',
+                                                '<span class="font-medium text-text-main">' . e($pegawai['jabatan'] ?? '-') . '</span>'
+                                            ]
+                                        ];
+                                    }, $pegawaiList);
+                                @endphp
+                                
+                                @if(empty($rowsPegawai))
                                     <p class="text-sm text-muted italic">Belum ada pegawai yang ditugaskan.</p>
-                                @endforelse
+                                @else
+                                    <x-data.table :headers="$headersPegawai" :rows="$rowsPegawai" :striped="false" />
+                                @endif
                             </div>
                         </div>
                     </div>

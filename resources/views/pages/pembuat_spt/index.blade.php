@@ -1,4 +1,4 @@
-<x-layout.app title="Pembuat SPT - SPJ BPHL 4">
+<x-layout.app title="Dashboard Pembuat SPT - SPJ BPHL 4">
 
     <div class="flex flex-1 w-full">
         <x-layout.sidebar />
@@ -18,7 +18,7 @@
                     @endif
 
                     {{-- Header Halaman --}}
-                    <x-layout.page-header title="Pembuat SPT" subtitle="Dashboard & Riwayat SPT yang Anda Buat / Ditugaskan">
+                    <x-layout.page-header title="Dashboard Pembuat SPT" subtitle="Ringkasan Statistik dan Riwayat Singkat Data Surat Perintah Tugas (SPT).">
                         <x-slot:actions>
                             <a href="{{ route('user.spt.create') }}"
                                 class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-150 h-[38px]">
@@ -27,160 +27,78 @@
                         </x-slot:actions>
                     </x-layout.page-header>
 
-                    {{-- Tabel Riwayat SPT --}}
-                    <div class="mb-8">
-                        @php
-                            $isStatusDetailView = in_array(request('status'), ['disetujui', 'ditolak', 'selesai']);
-                        @endphp
-
-                        <x-layout.card>
-                            @if ($isStatusDetailView)
-                                <x-slot:header>
-                                    @php
-                                        $statusTitleColors = [
-                                            'disetujui' => 'bg-green-50 text-green-700 border-green-200/80',
-                                            'ditolak'   => 'bg-red-50 text-red-700 border-red-200/80',
-                                            'selesai'   => 'bg-blue-50 text-blue-700 border-blue-200/80',
-                                        ];
-                                        $statusColorClass = $statusTitleColors[request('status')] ?? 'bg-gray-50 text-text-main border-border-custom';
-                                    @endphp
-                                    <h3 class="text-lg font-semibold text-text-main flex items-center gap-2.5">
-                                        <span>Status SPT :</span>
-                                        <span class="inline-flex items-center px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-lg border {{ $statusColorClass }} shadow-2xs">
-                                            {{ request('status') }}
-                                        </span>
-                                    </h3>
-                                </x-slot:header>
-                            @else
-                                <x-slot:header>
-                                    <h3 class="text-lg font-semibold text-text-main">
-                                        Riwayat SPT{{ request('status') ? ' — Status: ' . ucfirst(request('status')) : '' }}
-                                    </h3>
-                                </x-slot:header>
-                            @endif
-
-                            {{-- Filter & Pencarian --}}
-                            <div class="mb-6 mt-2 border-b border-border-custom pb-6">
-                                <form method="GET" action="{{ route('pembuat_spt.index') }}">
-                                    <input type="hidden" name="status" value="{{ request('status') }}">
-
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                                        <div class="flex flex-col gap-1">
-                                            <label for="search" class="text-sm font-medium text-text-main">Pencarian</label>
-                                            <x-form.search name="search" placeholder="Cari nomor SPT, tujuan..." :value="request('search')" />
-                                        </div>
-                                        <div class="flex flex-col gap-1">
-                                            <x-form.select name="per_page" label="Tampilkan" :options="[
-                                                '10' => '10 Data',
-                                                '25' => '25 Data',
-                                                '50' => '50 Data',
-                                            ]" :selected="request('per_page', 10)" onchange="this.form.submit()" />
-                                        </div>
-                                        <div class="flex gap-2">
-                                            <button type="submit" class="bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-5 py-2 rounded-md transition-colors duration-150 cursor-pointer border border-transparent w-full justify-center text-center h-[38px]">
-                                                Filter
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
+                    {{-- Ringkasan Statistik --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        {{-- Total Dibuat --}}
+                        <div class="bg-surface rounded-xl border border-border-custom p-6 shadow-xs flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-muted">Total SPT Dibuat</p>
+                                <p class="text-3xl font-bold text-text-main mt-1">{{ $counts['dibuat'] ?? 0 }}</p>
                             </div>
-
-                            {{-- Tabel Riwayat --}}
-                            @php
-                                $headers = [
-                                    'No', 'Nomor SPT', 'Tgl SPT', 'Nama Pegawai', 'NIP', 'Pangkat/Golongan', 'Jabatan',
-                                    'Tujuan Kegiatan', 'Tempat Tujuan', 'Tgl. Berangkat', 'Tgl. Kembali', 'Lama (Hari)', 'Kode MAK', 'Status', 'Aksi'
-                                ];
-
-                                $iteration = 1;
-                                $sptItems = ($spts ?? null) && method_exists($spts, 'items') ? $spts->items() : ($spts ?? []);
-
-                                $statusBadgeMap = [
-                                    'draft'     => 'bg-gray-100 text-gray-600',
-                                    'disetujui' => 'bg-green-100 text-green-700',
-                                    'ditolak'   => 'bg-red-100 text-red-700',
-                                    'direvisi'  => 'bg-yellow-100 text-yellow-700',
-                                    'selesai'   => 'bg-blue-100 text-blue-700',
-                                ];
-
-                                $rows = collect($sptItems)->map(function ($spt) use (&$iteration, $statusBadgeMap) {
-                                    if (!is_object($spt)) { return null; }
-
-                                    // Tempat tujuan
-                                    $destinations = $spt->tempat_tujuan;
-                                    if (is_array($destinations)) {
-                                        $destinationsText = implode(', ', $destinations);
-                                    } else {
-                                        $decoded = json_decode($destinations, true);
-                                        $destinationsText = is_array($decoded) ? implode(', ', $decoded) : (string) $destinations;
-                                    }
-                                    $destinationsText = e($destinationsText);
-
-                                    // Format tanggal
-                                    $tglSpt       = $spt->tgl_spt       ? \Carbon\Carbon::parse($spt->tgl_spt)->format('d/m/Y')       : '-';
-                                    $tglBerangkat = $spt->tgl_berangkat ? \Carbon\Carbon::parse($spt->tgl_berangkat)->format('d/m/Y') : '-';
-                                    $tglKembali   = $spt->tgl_kembali   ? \Carbon\Carbon::parse($spt->tgl_kembali)->format('d/m/Y')   : '-';
-
-                                    // Menampilkan penanggung jawab saja sesuai permintaan issue
-                                    $namaPegawai = $spt->penanggung_jawab ?? '-';
-                                    $nipPegawai = '-';
-                                    $pangkatPegawai = '-';
-                                    $jabatanPegawai = '-';
-
-                                    // Ambil detail penanggung jawab dari JSON jika ada untuk melengkapi NIP dll
-                                    $pegawaiData = $spt->pegawai_ditugaskan;
-                                    if (is_string($pegawaiData)) {
-                                        $pegawaiData = json_decode($pegawaiData, true);
-                                    }
-
-                                    if (is_array($pegawaiData)) {
-                                        foreach ($pegawaiData as $pegawai) {
-                                            if (is_array($pegawai) && ($pegawai['peran'] ?? '') === 'Penanggung Jawab') {
-                                                $nipPegawai = $pegawai['nip'] ?? '-';
-                                                $pangkatPegawai = $pegawai['pangkat'] ?? '-';
-                                                $jabatanPegawai = $pegawai['jabatan'] ?? '-';
-                                                break;
-                                            }
-                                        }
-                                    }
-
-                                    // Nomor SPT link
-                                    $nomorSptLink = '<a href="' . route('user.spt.show', $spt->id) . '" class="text-primary hover:underline font-semibold" title="Lihat Rincian">' . e($spt->nomor_spt ?? '') . '</a>';
-
-                                    // Status badge
-                                    $status      = $spt->status ?? 'draft';
-                                    $badgeClass  = $statusBadgeMap[$status] ?? 'bg-gray-100 text-gray-600';
-                                    $statusBadge = '<span class="inline-flex items-center px-2 py-0.5 text-xs font-bold uppercase tracking-wider rounded-full ' . $badgeClass . '">' . e($status) . '</span>';
-
-                                    // Edit link (eksklusif di halaman ini)
-                                    $editLink = '<a href="' . route('user.spt.edit', $spt->id) . '" class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover" title="Edit SPT">Edit</a>';
-
-                                    return [
-                                        $iteration++,
-                                        $nomorSptLink,
-                                        $tglSpt,
-                                        e($namaPegawai),
-                                        e($nipPegawai),
-                                        e($pangkatPegawai),
-                                        e($jabatanPegawai),
-                                        '<div class="max-w-xs whitespace-normal line-clamp-2" title="' . e($spt->tujuan_kegiatan ?? '') . '">' . e($spt->tujuan_kegiatan ?? '') . '</div>',
-                                        '<div class="max-w-xs whitespace-normal" title="' . $destinationsText . '">' . $destinationsText . '</div>',
-                                        $tglBerangkat,
-                                        $tglKembali,
-                                        e($spt->lama_kegiatan ?? '') . ' Hari',
-                                        e($spt->kode_mak ?? '-'),
-                                        $statusBadge,
-                                        $editLink,
-                                    ];
-                                })->filter()->toArray();
-                            @endphp
-
-                            <x-data.table :headers="$headers" :rows="$rows" :striped="true" />
-
-                            <div class="mt-4 text-xs text-muted">
-                                <span>Menampilkan {{ count($rows) }} entri SPT.</span>
+                            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
+                                <x-utility.icon name="document-text" class="w-6 h-6" />
                             </div>
-                        </x-layout.card>
+                        </div>
+
+                        {{-- Disetujui --}}
+                        <div class="bg-surface rounded-xl border border-green-200/50 p-6 shadow-xs flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-muted">Disetujui</p>
+                                <p class="text-3xl font-bold text-green-700 mt-1">{{ $counts['disetujui'] ?? 0 }}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-50 text-green-600 rounded-lg flex items-center justify-center">
+                                <x-utility.icon name="check-circle" class="w-6 h-6" />
+                            </div>
+                        </div>
+
+                        {{-- Ditolak / Direvisi --}}
+                        <div class="bg-surface rounded-xl border border-red-200/50 p-6 shadow-xs flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-muted">Ditolak / Direvisi</p>
+                                <p class="text-3xl font-bold text-red-700 mt-1">{{ $counts['ditolak'] ?? 0 }}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-red-50 text-red-600 rounded-lg flex items-center justify-center">
+                                <x-utility.icon name="x-circle" class="w-6 h-6" />
+                            </div>
+                        </div>
+
+                        {{-- Selesai --}}
+                        <div class="bg-surface rounded-xl border border-purple-200/50 p-6 shadow-xs flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-muted">Selesai / Dicairkan</p>
+                                <p class="text-3xl font-bold text-purple-700 mt-1">{{ $counts['selesai'] ?? 0 }}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center">
+                                <x-utility.icon name="check-badge" class="w-6 h-6" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Tombol Aksi & Navigasi Cepat --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <a href="{{ route('user.spt.kelola') }}" class="group block bg-surface rounded-xl border border-border-custom p-6 shadow-xs hover:border-primary/30 hover:shadow-sm transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-gray-50 group-hover:bg-primary/10 rounded-lg flex items-center justify-center transition-colors">
+                                    <x-utility.icon name="table-cells" class="w-6 h-6 text-muted group-hover:text-primary transition-colors" />
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-text-main group-hover:text-primary transition-colors">Kelola Data SPT Pegawai</h3>
+                                    <p class="text-sm text-muted mt-1">Akses tabel penuh untuk mencari, mengedit, dan menghapus seluruh riwayat SPT yang telah Anda buat.</p>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('pembuat_spt.spj_selesai.index') }}" class="group block bg-surface rounded-xl border border-border-custom p-6 shadow-xs hover:border-blue-500/30 hover:shadow-sm transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-gray-50 group-hover:bg-blue-50 rounded-lg flex items-center justify-center transition-colors">
+                                    <x-utility.icon name="check-badge" class="w-6 h-6 text-muted group-hover:text-blue-600 transition-colors" />
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-text-main group-hover:text-blue-600 transition-colors">Proses Akhir SPJ Selesai</h3>
+                                    <p class="text-sm text-muted mt-1">Lihat dan cetak rincian pengeluaran dokumen SPJ yang telah diverifikasi sepenuhnya oleh bagian keuangan.</p>
+                                </div>
+                            </div>
+                        </a>
                     </div>
 
                 </div>

@@ -28,7 +28,7 @@ return [
         // --- GRUP: UTAMA ---
         [
             'header' => 'Utama',
-            'roles' => ['admin', 'pembuat_spt', 'user', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
+            'roles' => ['admin', 'pembuat_spt', 'user', 'ppk_1', 'ppk_2', 'ppk_3', 'bendahara_pengeluaran', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
             'label' => 'Dashboard',
@@ -52,31 +52,31 @@ return [
             'label' => 'Dashboard',
             'url' => '/user/dashboard',
             'icon' => 'home',
-            'roles' => ['user', 'verifikator'],
+            'roles' => ['user', 'ppk_1', 'ppk_2', 'ppk_3', 'bendahara_pengeluaran', 'verifikator'],
         ],
 
         // --- GRUP: TUGAS SAYA (Semua Aktor) ---
         [
             'header' => 'Tugas Saya',
-            'roles' => ['admin', 'pembuat_spt', 'user', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
+            'roles' => ['admin', 'pembuat_spt', 'user', 'ppk_1', 'ppk_2', 'ppk_3', 'bendahara_pengeluaran', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
             'label' => 'SPT Saya',
             'url' => '/user/spt',
             'icon' => 'document-text',
-            'roles' => ['admin', 'user', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
+            'roles' => ['admin', 'user', 'ppk_1', 'ppk_2', 'ppk_3', 'bendahara_pengeluaran', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
             'label' => 'SPD Saya',
             'url' => '/user/spd',
             'icon' => 'clipboard',
-            'roles' => ['admin', 'user', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
+            'roles' => ['admin', 'user', 'ppk_1', 'ppk_2', 'ppk_3', 'bendahara_pengeluaran', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
             'label' => 'Rincian Saya',
             'url' => '/user/rincian',
             'icon' => 'calculator',
-            'roles' => ['admin', 'user', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
+            'roles' => ['admin', 'user', 'ppk_1', 'ppk_2', 'ppk_3', 'bendahara_pengeluaran', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
 
         // --- GRUP: OPERASIONAL (Input & Verifikasi) ---
@@ -115,8 +115,8 @@ return [
             'roles' => ['admin'],
         ],
         [
-            'label' => 'Master Tarif',
-            'url' => '/admin/tarif',
+            'label' => 'Data Uang Harian',
+            'url' => '/admin/uang-harian',
             'icon' => 'currency-dollar',
             'roles' => ['admin'],
         ],

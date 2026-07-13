@@ -86,6 +86,7 @@ class Rincian extends Model
     public function getTempatTujuanAttribute()
     {
         $tt = $this->spd?->tempat_tujuan;
+
         return is_array($tt) ? implode(', ', $tt) : $tt;
     }
 
@@ -112,6 +113,7 @@ class Rincian extends Model
     public function getAlatAngkutAttribute()
     {
         $aa = $this->spd?->alat_angkut;
+
         return is_array($aa) ? implode(', ', $aa) : $aa;
     }
 

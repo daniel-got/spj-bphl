@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\Golongan;
+use App\Enums\Pangkat;
+use App\Enums\UserRole;
 use Illuminate\Foundation\Http\FormRequest;
-
 use Illuminate\Validation\Rule;
 
 class UpdatePegawaiRequest extends FormRequest
@@ -19,16 +21,16 @@ class UpdatePegawaiRequest extends FormRequest
         $pegawai = $this->route('pegawai');
 
         return [
-            'nama_pegawai'     => ['required', 'string', 'max:255'],
-            'nip'              => ['required', 'string', 'max:50', Rule::unique('data_pegawai', 'nip')->ignore($pegawai->id)],
+            'nama_pegawai' => ['required', 'string', 'max:255'],
+            'nip' => ['required', 'string', 'max:50', Rule::unique('data_pegawai', 'nip')->ignore($pegawai->id)],
             // Nanti di Service kita yang cari user-nya dari relasi $pegawai->user_id
-            'email'            => ['required', 'string', 'email', 'max:255'],
-            'password'         => ['nullable', 'string', 'min:8'], // Opsional saat update
-            'role'             => ['required', 'string', Rule::in(\App\Enums\UserRole::values())],
-            'pangkat'          => ['nullable', 'string', Rule::in(\App\Enums\Pangkat::values())],
-            'golongan'         => ['nullable', 'string', Rule::in(\App\Enums\Golongan::values())],
-            'jabatan'          => ['nullable', 'string', 'max:100'],
-            'sub_seksi'        => ['nullable', 'string', 'max:100'],
+            'email' => ['required', 'string', 'email', 'max:255'],
+            'password' => ['nullable', 'string', 'min:8'], // Opsional saat update
+            'role' => ['required', 'string', Rule::in(UserRole::values())],
+            'pangkat' => ['nullable', 'string', Rule::in(Pangkat::values())],
+            'golongan' => ['nullable', 'string', Rule::in(Golongan::values())],
+            'jabatan' => ['nullable', 'string', 'max:100'],
+            'sub_seksi' => ['nullable', 'string', 'max:100'],
         ];
     }
 

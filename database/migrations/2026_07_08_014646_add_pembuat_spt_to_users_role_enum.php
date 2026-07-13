@@ -15,8 +15,8 @@ return new class extends Migration
     {
         // Karena PostgreSQL menggunakan CHECK constraint untuk ENUM Laravel, kita hapus constraint-nya.
         // HANYA jalankan perintah ini jika menggunakan PostgreSQL (agar tidak error saat testing dengan SQLite)
-        if (\Illuminate\Support\Facades\DB::getDriverName() === 'pgsql') {
-            \Illuminate\Support\Facades\DB::statement('ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check');
         }
 
         Schema::table('users', function (Blueprint $table) {

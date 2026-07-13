@@ -150,6 +150,7 @@ class SptTest extends TestCase
         $response->assertRedirect(route('user.spt.index'));
         $this->assertDatabaseMissing('data_spt', ['id' => $spt->id]);
     }
+
     public function test_user_dapat_mengajukan_spt_baru_dengan_banyak_pegawai(): void
     {
         $user = User::factory()->create();

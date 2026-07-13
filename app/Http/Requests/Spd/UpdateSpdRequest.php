@@ -24,8 +24,6 @@ class UpdateSpdRequest extends FormRequest
 
         return [
             'nomor_spd' => 'required|string|unique:data_spd,nomor_spd,'.$spdId,
-            'status' => 'nullable|string|in:draft,diajukan,direvisi,disetujui,ditolak',
-            'alasan' => 'nullable|string',
             'tgl_spd' => 'required|date',
             'nip_pegawai' => 'required|string|max:50',
             // Catatan: tujuan_kegiatan, tempat_tujuan, tgl_berangkat, tgl_kembali,

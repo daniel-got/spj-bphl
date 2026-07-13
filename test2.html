@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<body>
+<button type="button" onclick="openEditModalHandler(1, &#039;http://localhost/admin/uang-harian/1&#039;, {&quot;id&quot;:1,&quot;provinsi&quot;:&quot;Jambi&quot;,&quot;luar_kota&quot;:370000,&quot;dalam_kota_lebih_8_jam&quot;:150000,&quot;diklat&quot;:110000})">Click Me</button>
+<script>
+function openEditModalHandler(id, url, data) {
+    console.log(id, url, data);
+    alert('Success: ' + id + ' ' + url + ' ' + JSON.stringify(data));
+}
+</script>
+</body>
+</html>

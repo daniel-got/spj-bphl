@@ -14,14 +14,18 @@ namespace App\Enums;
  */
 enum UserRole: string
 {
-    case ADMIN                  = 'admin';
-    case VERIFIKATOR            = 'verifikator';
-    case KEPALA_BALAI           = 'kepala_balai';
-    case KEPALA_TU              = 'kepala_tu';
-    case KEPALA_SEKSI_PEPHPHL   = 'kepala_seksi_pephphl';
-    case KEPALA_SEKSI_PPPHPHL   = 'kepala_seksi_ppphphl';
-    case USER                   = 'user';
-    case PEMBUAT_SPT            = 'pembuat_spt';
+    case ADMIN = 'admin';
+    case VERIFIKATOR = 'verifikator';
+    case KEPALA_BALAI = 'kepala_balai';
+    case KEPALA_TU = 'kepala_tu';
+    case KEPALA_SEKSI_PEPHPHL = 'kepala_seksi_pephphl';
+    case KEPALA_SEKSI_PPPHPHL = 'kepala_seksi_ppphphl';
+    case USER = 'user';
+    case PEMBUAT_SPT = 'pembuat_spt';
+    case PPK1 = 'ppk_1';
+    case PPK2 = 'ppk_2';
+    case PPK3 = 'ppk_3';
+    case BENDAHARA = 'bendahara_pengeluaran';
 
     /**
      * Label yang ditampilkan di UI (readable).
@@ -29,14 +33,18 @@ enum UserRole: string
     public function label(): string
     {
         return match ($this) {
-            self::ADMIN                 => 'Administrator',
-            self::VERIFIKATOR           => 'Verifikator',
-            self::KEPALA_BALAI          => 'Kepala Balai',
-            self::KEPALA_TU             => 'Kepala Sub Bagian TU',
-            self::KEPALA_SEKSI_PEPHPHL  => 'Kepala Seksi PEPHPHL',
-            self::KEPALA_SEKSI_PPPHPHL  => 'Kepala Seksi PPPHPHL',
-            self::USER                  => 'Pegawai',
-            self::PEMBUAT_SPT           => 'Pembuat SPT',
+            self::ADMIN => 'Administrator',
+            self::VERIFIKATOR => 'Verifikator',
+            self::KEPALA_BALAI => 'Kepala Balai',
+            self::KEPALA_TU => 'Kepala Sub Bagian TU',
+            self::KEPALA_SEKSI_PEPHPHL => 'Kepala Seksi PEPHPHL',
+            self::KEPALA_SEKSI_PPPHPHL => 'Kepala Seksi PPPHPHL',
+            self::USER => 'Pegawai',
+            self::PEMBUAT_SPT => 'Pembuat SPT',
+            self::PPK1 => 'Pejabat Pembuat Komitmen 1',
+            self::PPK2 => 'Pejabat Pembuat Komitmen 2',
+            self::PPK3 => 'Pejabat Pembuat Komitmen 3',
+            self::BENDAHARA => 'Bendahara Pengeluaran',
         };
     }
 

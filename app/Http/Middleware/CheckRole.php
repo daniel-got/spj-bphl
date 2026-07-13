@@ -21,7 +21,7 @@ class CheckRole
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         // Pastikan user sudah login
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return redirect()->route('login');
         }
 
@@ -36,7 +36,7 @@ class CheckRole
         // Gunakan ->value jika role adalah Enum
         $roleValue = is_object($user->role) && method_exists($user->role, 'value') ? $user->role->value : $user->role;
 
-        if (!in_array($roleValue, $roles)) {
+        if (! in_array($roleValue, $roles)) {
             abort(403, 'Akses Ditolak. Halaman ini butuh hak akses khusus.');
         }
 

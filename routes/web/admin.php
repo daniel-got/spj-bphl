@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaPegawaiController;
+use App\Http\Controllers\Admin\UangHarianController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,10 +33,13 @@ Route::middleware(['auth', 'role:admin'])
         Route::post('/kelolaPegawai/import', [KelolaPegawaiController::class, 'import'])->name('kelolaPegawai.import');
         Route::post('/kelolaPegawai/validate-import', [KelolaPegawaiController::class, 'validateImport'])->name('kelolaPegawai.validateImport');
 
-        // Master Tarif
-        Route::get('/tarif', function () {
-            return view('pages.admin.tarif');
-        })->name('tarif');
+        // Master Uang Harian
+        Route::get('/uang-harian', [UangHarianController::class, 'index'])->name('uang-harian.index');
+        Route::post('/uang-harian', [UangHarianController::class, 'store'])->name('uang-harian.store');
+        Route::put('/uang-harian/{uangHarian}', [UangHarianController::class, 'update'])->name('uang-harian.update');
+        Route::delete('/uang-harian/{uangHarian}', [UangHarianController::class, 'destroy'])->name('uang-harian.destroy');
+        Route::post('/uang-harian/import', [UangHarianController::class, 'import'])->name('uang-harian.import');
+        Route::post('/uang-harian/validate-import', [UangHarianController::class, 'validateImport'])->name('uang-harian.validateImport');
 
         // Kelola PPK
         Route::get('/ppk', function () {

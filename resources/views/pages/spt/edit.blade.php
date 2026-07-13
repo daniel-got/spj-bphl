@@ -250,10 +250,9 @@
                         class="inline-flex items-center justify-center px-5 py-2.5 rounded-md border border-border-custom text-sm font-medium text-text-main hover:bg-background transition duration-150 ease-in-out">
                         Batal
                     </a>
-                    <button type="submit"
-                        class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-2.5 px-5 rounded-md transition duration-150 ease-in-out border border-transparent">
+                    <x-action.button-primary type="submit">
                         Simpan Perubahan
-                    </button>
+                    </x-action.button-primary>
                 </div>
 
             </form>
