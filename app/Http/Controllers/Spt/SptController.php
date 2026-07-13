@@ -24,7 +24,7 @@ class SptController extends Controller
      */
     public function index(Request $request)
     {
-        $data = $this->sptService->getIndexPageData($request->all());
+        $data = $this->sptService->getIndexPageData($request->all(), true);
 
         return view('pages.spt.index', $data);
     }

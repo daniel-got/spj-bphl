@@ -14,9 +14,9 @@ class SptService
     /**
      * Get all structured data needed for the SPT Index page.
      */
-    public function getIndexPageData(array $requestData): array
+    public function getIndexPageData(array $requestData, bool $strictPersonal = false): array
     {
-        $counts = $this->getCounts();
+        $counts = $this->getCounts($strictPersonal);
 
         $filters = [
             'search' => $requestData['search'] ?? null,
@@ -24,7 +24,7 @@ class SptService
         ];
 
         $perPage = isset($requestData['per_page']) ? (int) $requestData['per_page'] : 10;
-        $spts = $this->getAllLatest($filters, $perPage);
+        $spts = $this->getAllLatest($filters, $perPage, $strictPersonal);
 
         return compact('counts', 'spts');
     }
@@ -32,10 +32,10 @@ class SptService
     /**
      * Get statistics count for SPTs.
      */
-    public function getCounts(): array
+    public function getCounts(bool $strictPersonal = false): array
     {
         $query = Spt::query();
-        $this->applyRoleFilter($query);
+        $this->applyRoleFilter($query, $strictPersonal);
 
         return [
             'all' => (clone $query)->count(),
@@ -49,10 +49,10 @@ class SptService
     /**
      * Get all SPT records with optional search and filter.
      */
-    public function getAllLatest(array $filters = [], int $perPage = 10)
+    public function getAllLatest(array $filters = [], int $perPage = 10, bool $strictPersonal = false)
     {
         $query = Spt::query();
-        $this->applyRoleFilter($query);
+        $this->applyRoleFilter($query, $strictPersonal);
 
         if (! empty($filters['search'])) {
             $search = $filters['search'];
@@ -75,32 +75,30 @@ class SptService
      * Terapkan filter berdasarkan role agar pegawai biasa (dan pembuat_spt di menu umum)
      * hanya bisa melihat SPT di mana mereka ditugaskan.
      */
-    protected function applyRoleFilter($query): void
+    protected function applyRoleFilter($query, bool $strictPersonal = false): void
     {
         $user = auth()->user();
 
-        // Jika user adalah admin atau role monitoring, mereka bisa melihat semua (return tanpa filter)
-        if (! $user || $user->isAdmin() || $user->isMonitoring()) {
+        // Jika strictPersonal tidak aktif dan user adalah admin atau role monitoring, mereka bisa melihat semua
+        if (! $strictPersonal && (! $user || $user->isAdmin() || $user->isMonitoring())) {
             return;
         }
 
-        // Jika role user biasa / pembuat_spt, filter berdasarkan pegawai_id mereka di json pegawai_ditugaskan
+        // Filter berdasarkan pegawai_id mereka di json pegawai_ditugaskan atau pembuat_id
         $pegawaiId = (int) Pegawai::where('user_id', $user->id)->value('id');
 
-        if ($pegawaiId) {
-            $query->where(function ($q) use ($user, $pegawaiId) {
-                $q->where('pembuat_id', $user->id)
-                    ->orWhere(function ($subQ) use ($pegawaiId) {
-                        $subQ->where(function ($jsonQ) use ($pegawaiId) {
-                            $jsonQ->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                                ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
-                        })->whereIn('status', ['disetujui', 'selesai']);
-                    });
-            });
-        } else {
-            // Jika user tidak punya data pegawai, setidaknya mereka bisa lihat yang mereka buat
-            $query->where('pembuat_id', $user->id);
-        }
+        $query->where(function ($q) use ($user, $pegawaiId) {
+            $q->where('pembuat_id', $user->id);
+
+            if ($pegawaiId) {
+                $q->orWhere(function ($subQ) use ($pegawaiId) {
+                    $subQ->where(function ($jsonQ) use ($pegawaiId) {
+                        $jsonQ->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
+                            ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                    })->whereIn('status', ['disetujui', 'selesai']);
+                });
+            }
+        });
     }
 
     /**

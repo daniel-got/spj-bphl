@@ -33,10 +33,10 @@ class CheckRole
         }
 
         // Pastikan role user ada di dalam array $roles yang diizinkan
-        // Gunakan ->value jika role adalah Enum
-        $roleValue = is_object($user->role) && method_exists($user->role, 'value') ? $user->role->value : $user->role;
+        $userRoles = $user->roles ?? [];
+        $hasAllowedRole = count(array_intersect($userRoles, $roles)) > 0;
 
-        if (! in_array($roleValue, $roles)) {
+        if (! $hasAllowedRole) {
             abort(403, 'Akses Ditolak. Halaman ini butuh hak akses khusus.');
         }
 

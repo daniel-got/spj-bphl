@@ -37,7 +37,7 @@
                                             ]" :selected="request('per_page', 10)" />
                                         </div>
                                         <div class="flex gap-2">
-                                            <x-action.button-primary type="submit" class="w-full justify-center text-center h-[38px]">
+                                            <x-action.button-primary type="submit" class="w-full justify-center text-center ">
                                                 Filter
                                             </x-action.button-primary>
                                         </div>

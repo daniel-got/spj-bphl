@@ -20,7 +20,7 @@ class SptRoleAccessTest extends TestCase
     public function test_regular_employee_is_forbidden_to_access_create_spt(): void
     {
         $user = User::factory()->create([
-            'role' => 'user',
+            'roles' => ['user'],
         ]);
 
         $response = $this->actingAs($user)->get(route('user.spt.create'));
@@ -31,7 +31,7 @@ class SptRoleAccessTest extends TestCase
     public function test_admin_is_allowed_to_access_create_spt(): void
     {
         $user = User::factory()->create([
-            'role' => 'admin',
+            'roles' => ['admin'],
         ]);
 
         $response = $this->actingAs($user)->get(route('user.spt.create'));

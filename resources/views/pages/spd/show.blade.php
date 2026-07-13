@@ -12,7 +12,7 @@
                     <a href="{{ route('user.spd.index') }}"
                         class="inline-flex items-center justify-center w-10 h-10 rounded-full border border-border-custom bg-surface text-text-main hover:bg-background transition duration-150 shadow-xs"
                         title="Kembali">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                        <x-utility.icon name="arrow-left" class="w-5 h-5" />
                     </a>
                     <div>
                         <h1 class="text-2xl font-extrabold tracking-tight text-text-main">
@@ -24,7 +24,7 @@
                 <div class="flex items-center gap-3">
                     <a href="{{ route('user.spd.print', $spd->id) }}" target="_blank"
                         class="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors duration-150 shadow-sm gap-1" title="Cetak SPD">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                        <x-utility.icon name="printer" class="w-3.5 h-3.5" />
                         Cetak SPD
                     </a>
                     @can('update', $spd)
@@ -143,7 +143,7 @@
                                 @endphp
                                 @forelse($destinationList as $dest)
                                     <span class="inline-flex items-center gap-1 bg-background border border-border-custom text-text-main text-xs font-medium px-3 py-1.5 rounded-lg shadow-2xs">
-                                        <svg class="w-3.5 h-3.5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        <x-utility.icon name="location-marker" class="w-3.5 h-3.5 text-muted" />
                                         {{ $dest }}
                                     </span>
                                 @empty

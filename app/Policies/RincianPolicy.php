@@ -22,7 +22,7 @@ class RincianPolicy
      */
     public function view(User $user, Rincian $rincian): bool
     {
-        if ($user->role === UserRole::ADMIN->value || in_array($user->role, UserRole::monitoringRoles()) || $user->role === UserRole::VERIFIKATOR->value) {
+        if ($user->isAdmin() || $user->isMonitoring() || $user->isVerifikator()) {
             return true;
         }
 
@@ -44,7 +44,7 @@ class RincianPolicy
      */
     public function update(User $user, Rincian $rincian): bool
     {
-        return $user->id === $rincian->pembuat_id || $user->role === UserRole::ADMIN->value;
+        return $user->id === $rincian->pembuat_id || $user->isAdmin();
     }
 
     /**
@@ -52,6 +52,6 @@ class RincianPolicy
      */
     public function delete(User $user, Rincian $rincian): bool
     {
-        return $user->id === $rincian->pembuat_id || $user->role === UserRole::ADMIN->value;
+        return $user->id === $rincian->pembuat_id || $user->isAdmin();
     }
 }

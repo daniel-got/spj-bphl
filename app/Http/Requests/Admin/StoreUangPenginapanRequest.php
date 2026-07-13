@@ -12,7 +12,7 @@ class StoreUangPenginapanRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->role === 'admin';
+        return auth()->check() && auth()->user()->isAdmin();
     }
 
     /**

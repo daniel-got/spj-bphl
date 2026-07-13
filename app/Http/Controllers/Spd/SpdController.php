@@ -24,7 +24,7 @@ class SpdController extends Controller
     {
         $filters = request()->only(['search', 'jenis_perjalanan']);
         $perPage = (int) request('per_page', 10);
-        $spds = $this->spdService->getAllLatest($filters, $perPage);
+        $spds = $this->spdService->getAllLatest($filters, $perPage, true);
 
         return view('pages.spd.index', compact('spds'));
     }

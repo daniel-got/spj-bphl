@@ -39,7 +39,7 @@ class KelolaPegawaiService
                 'name' => $data['nama_pegawai'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
-                'role' => $data['role'],
+                'roles' => $data['roles'] ?? ['user'],
             ]);
 
             // 2. Buat profil Pegawai terkait
@@ -75,7 +75,7 @@ class KelolaPegawaiService
             $user = $pegawai->user;
             $user->name = $data['nama_pegawai'];
             $user->email = $data['email'];
-            $user->role = $data['role'];
+            $user->roles = $data['roles'] ?? ['user'];
 
             if (! empty($data['password'])) {
                 $user->password = Hash::make($data['password']);
@@ -110,7 +110,7 @@ class KelolaPegawaiService
         $header = fgetcsv($handle, 1000, ',');
 
         // Pastikan format kolom sesuai dengan template
-        $expectedHeader = ['nama_pegawai', 'nip', 'pangkat', 'golongan', 'jabatan', 'sub_seksi', 'email', 'password', 'role'];
+        $expectedHeader = ['nama_pegawai', 'nip', 'pangkat', 'golongan', 'jabatan', 'sub_seksi', 'email', 'password', 'roles'];
 
         // Membersihkan BOM jika ada pada karakter pertama (biasa terjadi pada file CSV dari Excel)
         $header[0] = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $header[0]);
@@ -157,10 +157,30 @@ class KelolaPegawaiService
                     continue;
                 }
 
-                // Cek role valid
+                // Parsing roles (comma separated or single)
+                $rawRoles = array_map('trim', explode(',', $data['roles']));
+                $parsedRoles = [];
                 $validRoles = UserRole::values();
-                if (! in_array($data['role'], $validRoles)) {
-                    $errors[] = "Baris $rowNum: Role '{$data['role']}' tidak valid.";
+                $hasInvalidRole = false;
+
+                foreach ($rawRoles as $r) {
+                    if (empty($r)) {
+                        continue;
+                    }
+                    if (! in_array($r, $validRoles)) {
+                        $hasInvalidRole = true;
+                        break;
+                    }
+                    $parsedRoles[] = $r;
+                }
+
+                if (empty($parsedRoles)) {
+                    $parsedRoles = ['user'];
+                }
+
+                // Cek role valid
+                if ($hasInvalidRole) {
+                    $errors[] = "Baris $rowNum: Salah satu Role dalam '{$data['roles']}' tidak valid.";
                     $gagal++;
                     $rowNum++;
 
@@ -191,7 +211,7 @@ class KelolaPegawaiService
                     'name' => $data['nama_pegawai'],
                     'email' => $data['email'],
                     'password' => Hash::make($data['password']),
-                    'role' => $data['role'],
+                    'roles' => $parsedRoles,
                 ]);
 
                 // Insert Pegawai
@@ -234,7 +254,7 @@ class KelolaPegawaiService
         $handle = fopen($file->getRealPath(), 'r');
         $header = fgetcsv($handle, 1000, ',');
 
-        $expectedHeader = ['nama_pegawai', 'nip', 'pangkat', 'golongan', 'jabatan', 'sub_seksi', 'email', 'password', 'role'];
+        $expectedHeader = ['nama_pegawai', 'nip', 'pangkat', 'golongan', 'jabatan', 'sub_seksi', 'email', 'password', 'roles'];
         $header[0] = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $header[0]);
 
         if ($header !== $expectedHeader) {
@@ -282,7 +302,21 @@ class KelolaPegawaiService
             if (User::where('email', $data['email'])->exists() || in_array($data['email'], $seenEmails)) {
                 $rowErrors[] = 'Email sudah digunakan.';
             }
-            if (! in_array($data['role'], $validRoles)) {
+
+            // Validasi roles
+            $rawRoles = array_map('trim', explode(',', $data['roles']));
+            $hasInvalidRole = false;
+            foreach ($rawRoles as $r) {
+                if (empty($r)) {
+                    continue;
+                }
+                if (! in_array($r, $validRoles)) {
+                    $hasInvalidRole = true;
+                    break;
+                }
+            }
+
+            if ($hasInvalidRole) {
                 $rowErrors[] = 'Role tidak valid.';
             }
             if (! empty($data['pangkat']) && ! in_array($data['pangkat'], Pangkat::values())) {
@@ -308,7 +342,7 @@ class KelolaPegawaiService
                     $preview[] = [
                         'nama' => $data['nama_pegawai'],
                         'nip' => $data['nip'],
-                        'role' => $data['role'],
+                        'roles' => $data['roles'],
                     ];
                 }
             }

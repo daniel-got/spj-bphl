@@ -23,10 +23,10 @@ class RincianController extends Controller
      */
     public function index()
     {
-        $counts = $this->rincianService->getCounts();
+        $counts = $this->rincianService->getCounts(true);
         $filters = request()->only(['search', 'jenis_perjalanan', 'status']);
         $perPage = (int) request('per_page', 10);
-        $rincians = $this->rincianService->getAllLatest($filters, $perPage);
+        $rincians = $this->rincianService->getAllLatest($filters, $perPage, true);
 
         return view('pages.rincian.index', compact('rincians', 'counts'));
     }

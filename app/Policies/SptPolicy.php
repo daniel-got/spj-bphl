@@ -22,7 +22,7 @@ class SptPolicy
      */
     public function view(User $user, Spt $spt): bool
     {
-        if ($user->role === UserRole::ADMIN->value || in_array($user->role, UserRole::monitoringRoles())) {
+        if ($user->isAdmin() || $user->isMonitoring()) {
             return true;
         }
 
@@ -50,7 +50,7 @@ class SptPolicy
      */
     public function create(User $user): bool
     {
-        return in_array($user->role, [UserRole::ADMIN->value, UserRole::PEMBUAT_SPT->value]);
+        return $user->isAdmin() || $user->isPembuatSpt();
     }
 
     /**
@@ -59,7 +59,7 @@ class SptPolicy
     public function update(User $user, Spt $spt): bool
     {
         // Hanya pembuat atau admin yang bisa update
-        return $user->id === $spt->pembuat_id || $user->role === UserRole::ADMIN->value;
+        return $user->id === $spt->pembuat_id || $user->isAdmin();
     }
 
     /**
@@ -67,6 +67,6 @@ class SptPolicy
      */
     public function delete(User $user, Spt $spt): bool
     {
-        return $user->id === $spt->pembuat_id || $user->role === UserRole::ADMIN->value;
+        return $user->id === $spt->pembuat_id || $user->isAdmin();
     }
 }

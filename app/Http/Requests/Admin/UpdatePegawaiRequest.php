@@ -26,7 +26,8 @@ class UpdatePegawaiRequest extends FormRequest
             // Nanti di Service kita yang cari user-nya dari relasi $pegawai->user_id
             'email' => ['required', 'string', 'email', 'max:255'],
             'password' => ['nullable', 'string', 'min:8'], // Opsional saat update
-            'role' => ['required', 'string', Rule::in(UserRole::values())],
+            'roles' => ['required', 'array', 'min:1'],
+            'roles.*' => ['required', 'string', Rule::in(UserRole::values())],
             'pangkat' => ['nullable', 'string', Rule::in(Pangkat::values())],
             'golongan' => ['nullable', 'string', Rule::in(Golongan::values())],
             'jabatan' => ['nullable', 'string', 'max:100'],

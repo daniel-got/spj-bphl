@@ -66,18 +66,20 @@
                             ];
                             
                             $rows = $pegawais->map(function($pegawai) {
-                                $roleColor = match ($pegawai->user?->role) {
-                                    'admin' => 'primary',
-                                    'verifikator' => 'info',
-                                    'pembuat_spt' => 'success',
-                                    'kepala_balai',
-                                    'kepala_tu',
-                                    'kepala_seksi_pephphl',
-                                    'kepala_seksi_ppphphl' => 'warning',
-                                    default => 'gray',
-                                };
+                                $userRoles = $pegawai->user?->roles ?? ['user'];
+                                $badges = array_map(function($role) {
+                                    $roleColor = match ($role) {
+                                        'admin' => 'primary',
+                                        'verifikator' => 'info',
+                                        'pembuat_spt' => 'success',
+                                        'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl' => 'warning',
+                                        default => 'gray',
+                                    };
+                                    $label = \App\Enums\UserRole::tryFrom($role)?->label() ?? ucfirst($role);
+                                    return \Illuminate\Support\Facades\Blade::render('<x-data.badge label="' . $label . '" color="' . $roleColor . '" />');
+                                }, $userRoles);
                                 
-                                $badge = \Illuminate\Support\Facades\Blade::render('<x-data.badge label="' . ($pegawai->user?->roleLabel() ?? 'Unknown') . '" color="' . $roleColor . '" />');
+                                $badge = '<div class="flex flex-wrap gap-1">' . implode('', $badges) . '</div>';
 
                                 
                                 $pegawaiData = [
@@ -89,7 +91,7 @@
                                     'golongan' => $pegawai->golongan,
                                     'jabatan' => $pegawai->jabatan,
                                     'sub_seksi' => $pegawai->sub_seksi,
-                                    'role' => $pegawai->user?->role,
+                                    'roles' => $pegawai->user?->roles ?? ['user'],
                                 ];
                                 
                                 $editUrl = route('admin.kelolaPegawai.update', $pegawai->id);
@@ -148,11 +150,17 @@
                         :required="true" />
                 </div>
 
-                <x-form.select name="role" label="Role Akses Sistem" :options="array_combine(
-                    \App\Enums\UserRole::values(),
-                    array_map(fn($role) => \App\Enums\UserRole::from($role)->label(), \App\Enums\UserRole::values()),
-                )" :selected="old('role')"
-                    :required="true" />
+                <div class="flex flex-col gap-1 relative mt-2 tags-input-container" data-target="tambah">
+                    <label class="text-sm font-medium text-text-main">Role Akses Sistem <span class="text-danger">*</span></label>
+                    <div class="tags-wrapper flex flex-wrap items-center gap-2 p-1.5 min-h-[42px] bg-surface border border-border-custom rounded-md shadow-sm transition-all duration-200 focus-within:ring-2 focus-within:ring-primary focus-within:border-primary cursor-text">
+                        <input type="text" class="role-input flex-1 min-w-[120px] bg-transparent border-none outline-none text-sm text-text-main placeholder-muted py-1 px-1 focus:ring-0" placeholder="Ketik role..." autocomplete="off">
+                    </div>
+                    <div class="hidden-inputs-container"></div>
+                    
+                    <div class="suggestions-container absolute left-0 right-0 top-[100%] mt-1 bg-surface border border-border-custom rounded-md shadow-lg overflow-hidden z-50 hidden opacity-0 transition-opacity duration-200">
+                        <div class="suggestions-list max-h-52 overflow-y-auto py-1"></div>
+                    </div>
+                </div>
 
                 <hr class="border-border-custom my-4">
 
@@ -225,15 +233,16 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-1">
-                    <label class="text-sm font-medium text-text-main">Role Akses Sistem <span
-                            class="text-danger">*</span></label>
-                    <select id="edit-role" name="role" required
-                        class="w-full bg-surface border border-border-custom text-text-main text-sm rounded-md focus:ring-primary focus:border-primary block px-3 py-2">
-                        @foreach (\App\Enums\UserRole::cases() as $role)
-                            <option value="{{ $role->value }}">{{ $role->label() }}</option>
-                        @endforeach
-                    </select>
+                <div class="flex flex-col gap-1 relative mt-2 tags-input-container" data-target="edit">
+                    <label class="text-sm font-medium text-text-main">Role Akses Sistem <span class="text-danger">*</span></label>
+                    <div class="tags-wrapper flex flex-wrap items-center gap-2 p-1.5 min-h-[42px] bg-surface border border-border-custom rounded-md shadow-sm transition-all duration-200 focus-within:ring-2 focus-within:ring-primary focus-within:border-primary cursor-text">
+                        <input type="text" class="role-input flex-1 min-w-[120px] bg-transparent border-none outline-none text-sm text-text-main placeholder-muted py-1 px-1 focus:ring-0" placeholder="Ketik role..." autocomplete="off">
+                    </div>
+                    <div class="hidden-inputs-container"></div>
+                    
+                    <div class="suggestions-container absolute left-0 right-0 top-[100%] mt-1 bg-surface border border-border-custom rounded-md shadow-lg overflow-hidden z-50 hidden opacity-0 transition-opacity duration-200">
+                        <div class="suggestions-list max-h-52 overflow-y-auto py-1"></div>
+                    </div>
                 </div>
 
                 <hr class="border-border-custom my-4">
@@ -333,10 +342,7 @@
                     </h2>
                     <button type="button" onclick="tutupImportModal()"
                         class="p-1 rounded-md text-muted hover:text-text-main hover:bg-background transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <x-utility.icon name="x-mark" class="w-5 h-5" />
                     </button>
                 </div>
 
@@ -346,16 +352,12 @@
                     {{-- STEP 1: Upload --}}
                     <div id="import-step-upload">
                         <div class="p-4 bg-blue-50 text-blue-700 text-sm rounded-md flex items-start gap-3 mb-4">
-                            <svg class="w-5 h-5 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                    clip-rule="evenodd" />
-                            </svg>
+                            <x-utility.icon name="information-circle" class="w-5 h-5 shrink-0 mt-0.5 text-blue-500" />
                             <div>
                                 <p class="font-medium mb-1">Panduan Import Data</p>
                                 <ul class="list-disc pl-4 space-y-1 text-blue-600">
                                     <li>Format kolom: <code class="text-xs bg-blue-100 px-1 rounded">nama_pegawai, nip,
-                                            pangkat, golongan, jabatan, sub_seksi, email, password, role</code></li>
+                                            pangkat, golongan, jabatan, sub_seksi, email, password, roles</code></li>
                                     <li>Klik <strong>Cek Data CSV</strong> untuk memvalidasi sebelum import ke database.
                                     </li>
                                 </ul>
@@ -384,11 +386,7 @@
                         {{-- SUKSES --}}
                         <div id="import-result-success" style="display: none;" class="space-y-4">
                             <div class="flex items-center gap-3 p-4 bg-green-50 text-green-700 rounded-lg">
-                                <svg class="w-8 h-8 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clip-rule="evenodd" />
-                                </svg>
+                                <x-utility.icon name="check-circle" class="w-8 h-8 shrink-0 text-green-500" />
                                 <div>
                                     <p class="font-semibold">Data CSV valid!</p>
                                     <p id="import-success-msg" class="text-sm"></p>
@@ -417,11 +415,7 @@
                         {{-- GAGAL / ADA ERROR --}}
                         <div id="import-result-error" style="display: none;" class="space-y-4">
                             <div class="flex items-center gap-3 p-4 bg-red-50 text-danger rounded-lg">
-                                <svg class="w-8 h-8 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                        clip-rule="evenodd" />
-                                </svg>
+                                <x-utility.icon name="x-circle" class="w-8 h-8 shrink-0 text-red-500" />
                                 <div>
                                     <p class="font-semibold">Ditemukan kesalahan pada data!</p>
                                     <p id="import-error-msg" class="text-sm"></p>
@@ -443,10 +437,7 @@
                             class="border border-border-custom text-text-main hover:bg-background px-4 py-2 text-sm rounded-md transition-colors">Batal</button>
                         <button type="button" onclick="cekDataCSV()"
                             class="bg-primary hover:bg-primary-hover text-white px-4 py-2 text-sm rounded-md transition-colors flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                            <x-utility.icon name="check-circle" class="w-4 h-4" />
                             Cek Data CSV
                         </button>
                     </div>
@@ -457,10 +448,7 @@
                             class="border border-border-custom text-text-main hover:bg-background px-4 py-2 text-sm rounded-md transition-colors">Tutup</button>
                         <button type="button" onclick="importSekarang()"
                             class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm rounded-md transition-colors flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                            </svg>
+                            <x-utility.icon name="upload" class="w-4 h-4" />
                             Import Data Sekarang
                         </button>
                     </div>
@@ -471,10 +459,7 @@
                             class="border border-border-custom text-text-main hover:bg-background px-4 py-2 text-sm rounded-md transition-colors">Tutup</button>
                         <button type="button" onclick="resetImportModal()"
                             class="bg-warning hover:bg-yellow-600 text-white px-4 py-2 text-sm rounded-md transition-colors flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
+                            <x-utility.icon name="download" class="w-4 h-4" />
                             Import Ulang
                         </button>
                     </div>
@@ -495,6 +480,165 @@
          Menggunakan Alpine.store-free approach: akses component via $root
     ================================================================ --}}
     <script>
+        // Master roles data from Enum
+        const masterRoles = @json(
+            array_values(array_map(function($case) { 
+                return ['value' => $case->value, 'label' => $case->label()]; 
+            }, \App\Enums\UserRole::cases()))
+        );
+
+        // State untuk menyimpan role yang sudah dipilih per modal
+        let selectedRoles = {
+            'tambah': ['user'],
+            'edit': []
+        };
+        
+        function initTagsInput() {
+            document.querySelectorAll('.tags-input-container').forEach(container => {
+                const target = container.getAttribute('data-target');
+                const tagsWrapper = container.querySelector('.tags-wrapper');
+                const roleInput = container.querySelector('.role-input');
+                const suggestionsContainer = container.querySelector('.suggestions-container');
+                const suggestionsList = container.querySelector('.suggestions-list');
+                const hiddenInputsContainer = container.querySelector('.hidden-inputs-container');
+
+                function renderTags() {
+                    container.querySelectorAll('.role-tag').forEach(el => el.remove());
+                    hiddenInputsContainer.innerHTML = '';
+                    
+                    selectedRoles[target].forEach(roleVal => {
+                        const roleData = masterRoles.find(r => r.value === roleVal) || {value: roleVal, label: roleVal};
+                        
+                        const tagEl = document.createElement('span');
+                        tagEl.className = 'role-tag inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-primary text-white shadow-sm transition-transform hover:scale-[1.02]';
+                        
+                        tagEl.innerHTML = `
+                            ${roleData.label}
+                            <button type="button" class="tag-close focus:outline-none text-white/80 hover:text-white transition-colors" data-role="${roleData.value}">
+                                <x-utility.icon name="x-mark" class="w-3 h-3 pointer-events-none" />
+                            </button>
+                        `;
+                        tagsWrapper.insertBefore(tagEl, roleInput);
+                        
+                        // Add hidden input
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'roles[]';
+                        hiddenInput.value = roleData.value;
+                        hiddenInputsContainer.appendChild(hiddenInput);
+                    });
+                }
+
+                function renderSuggestions(query = "") {
+                    suggestionsList.innerHTML = '';
+                    
+                    const filteredRoles = masterRoles.filter(role => 
+                        role.label.toLowerCase().includes(query.toLowerCase()) && 
+                        !selectedRoles[target].includes(role.value)
+                    );
+
+                    if (filteredRoles.length === 0) {
+                        suggestionsList.innerHTML = '<div class="px-4 py-3 text-sm text-muted text-center italic">Tidak ada role tersisa.</div>';
+                    } else {
+                        filteredRoles.forEach((role, index) => {
+                            const item = document.createElement('div');
+                            item.className = 'suggestion-item px-4 py-2 text-sm text-text-main cursor-pointer hover:bg-background transition-colors';
+                            item.textContent = role.label;
+                            
+                            if(index === 0 && query !== "") {
+                                item.classList.add('bg-background');
+                            }
+                            
+                            item.addEventListener('mousedown', (e) => {
+                                e.preventDefault(); // Prevent input from losing focus
+                                addRole(role.value);
+                            });
+                            
+                            suggestionsList.appendChild(item);
+                        });
+                    }
+                    
+                    suggestionsContainer.classList.remove('hidden');
+                    setTimeout(() => {
+                        suggestionsContainer.classList.remove('opacity-0');
+                        suggestionsContainer.classList.add('opacity-100');
+                    }, 10);
+                }
+
+                function hideSuggestions() {
+                    suggestionsContainer.classList.remove('opacity-100');
+                    suggestionsContainer.classList.add('opacity-0');
+                    setTimeout(() => {
+                        suggestionsContainer.classList.add('hidden');
+                    }, 200);
+                }
+
+                function addRole(roleValue) {
+                    if (!selectedRoles[target].includes(roleValue)) {
+                        selectedRoles[target].push(roleValue);
+                        renderTags();
+                        roleInput.value = '';
+                        roleInput.focus();
+                        renderSuggestions(); 
+                    }
+                }
+
+                function removeRole(roleValue) {
+                    selectedRoles[target] = selectedRoles[target].filter(r => r !== roleValue);
+                    renderTags();
+                    if(document.activeElement === roleInput) {
+                        renderSuggestions(roleInput.value);
+                    }
+                }
+
+                roleInput.addEventListener('input', (e) => {
+                    renderSuggestions(e.target.value);
+                });
+
+                roleInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const activeSuggestion = suggestionsList.querySelector('.suggestion-item.bg-background') || suggestionsList.querySelector('.suggestion-item');
+                        if (activeSuggestion) {
+                            const foundRole = masterRoles.find(r => r.label === activeSuggestion.textContent);
+                            if(foundRole) addRole(foundRole.value);
+                        }
+                    }
+                    
+                    if (e.key === 'Backspace' && roleInput.value === '' && selectedRoles[target].length > 0) {
+                        removeRole(selectedRoles[target][selectedRoles[target].length - 1]);
+                    }
+                });
+
+                roleInput.addEventListener('focus', () => {
+                    renderSuggestions(roleInput.value);
+                });
+                
+                roleInput.addEventListener('blur', () => {
+                    hideSuggestions();
+                });
+
+                tagsWrapper.addEventListener('mousedown', (e) => {
+                    if (e.target.closest('.tag-close')) {
+                        e.preventDefault(); // prevent blur
+                        const btn = e.target.closest('.tag-close');
+                        const roleToRemove = btn.getAttribute('data-role');
+                        removeRole(roleToRemove);
+                    } else {
+                        roleInput.focus();
+                    }
+                });
+
+                // Attach methods to container so they can be triggered from outside
+                container.renderTags = renderTags;
+                
+                // Initial render
+                renderTags();
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', initTagsInput);
+
         function openEditModalHandler(id, url, pegawai) {
             // Langsung isi value DOM element — paling andal, tidak bergantung pada Alpine.js
             document.getElementById('edit-nama').value = pegawai.nama_pegawai || '';
@@ -505,10 +649,11 @@
             document.getElementById('edit-jabatan').value = pegawai.jabatan || '';
             document.getElementById('edit-sub-seksi').value = pegawai.sub_seksi || '';
 
-            // Set selected option pada dropdown Role
-            const roleSelect = document.getElementById('edit-role');
-            if (roleSelect && pegawai.role) {
-                roleSelect.value = pegawai.role;
+            // Update role tags state for edit modal
+            selectedRoles['edit'] = pegawai.roles || [];
+            const editContainer = document.querySelector('.tags-input-container[data-target="edit"]');
+            if(editContainer && editContainer.renderTags) {
+                editContainer.renderTags();
             }
 
             // Set action form ke URL yang benar
@@ -610,7 +755,7 @@
                     result.preview.forEach(row => {
                         const tr = document.createElement('tr');
                         tr.innerHTML =
-                            `<td class="px-3 py-2 text-text-main">${row.nama}</td><td class="px-3 py-2 text-muted">${row.nip}</td><td class="px-3 py-2 text-muted">${row.role}</td>`;
+                            `<td class="px-3 py-2 text-text-main">${row.nama}</td><td class="px-3 py-2 text-muted">${row.nip}</td><td class="px-3 py-2 text-muted">${row.roles}</td>`;
                         tbody.appendChild(tr);
                     });
 

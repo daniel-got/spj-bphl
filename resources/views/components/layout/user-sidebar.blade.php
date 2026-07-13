@@ -1,5 +1,5 @@
 @php
-    $isPembuatSpt = Auth::check() && Auth::user()->role === 'pembuat_spt';
+    $isPembuatSpt = Auth::check() && Auth::user()->isPembuatSpt();
     $isPembuatSptMenuOpen = request()->routeIs('pembuat_spt.*')
         || request()->routeIs('user.spt.create')
         || request()->routeIs('user.spt.edit');

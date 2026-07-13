@@ -19,11 +19,7 @@ class EnsurePembuatSpt
 
         $user = auth()->user();
 
-        // KUNCI PERBAIKAN: Gunakan strtolower() agar mengecek role tanpa peduli huruf besar atau kecilnya
-        $roleUser = strtolower($user->role);
-
-        // Sekarang 'PEMBUAT_SPT', 'pembuat_spt', 'ADMIN', atau 'admin' semuanya akan terbaca dengan benar
-        if ($roleUser !== 'pembuat_spt' && $roleUser !== 'admin') {
+        if (! $user->isPembuatSpt() && ! $user->isAdmin()) {
             abort(403, 'Akses Ditolak. Halaman ini hanya dapat diakses oleh Pembuat SPT.');
         }
 

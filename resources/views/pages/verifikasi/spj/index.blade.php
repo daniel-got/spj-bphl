@@ -25,29 +25,39 @@
                     <div class="mb-8">
                         @php
                             $isStatusDetailView = in_array(request('status'), ['disetujui', 'ditolak', 'direvisi']);
+                            $activeFilters = 0;
+                            if (request()->filled('search')) $activeFilters++;
+                            if (request()->filled('status') && request('status') !== 'diajukan') $activeFilters++;
                         @endphp
 
                         <x-layout.card>
                             <x-slot:header>
-                                <h3 class="text-lg font-semibold text-text-main">
-                                    Daftar SPJ 
-                                    @if(request('status'))
-                                        - Status: {{ ucfirst(request('status')) }}
-                                    @else
-                                        - Menunggu Verifikasi
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-lg font-semibold text-text-main">
+                                        Daftar SPJ 
+                                        @if(request('status'))
+                                            - Status: {{ ucfirst(request('status')) }}
+                                        @else
+                                            - Menunggu Verifikasi
+                                        @endif
+                                    </h3>
+                                    @if($activeFilters > 0)
+                                        <span class="text-xs bg-primary-light text-primary px-2 py-0.5 rounded-full">
+                                            {{ $activeFilters }} filter aktif
+                                        </span>
                                     @endif
-                                </h3>
+                                </div>
                             </x-slot:header>
 
                             {{-- Filter & Pencarian --}}
                             <div class="mb-6 mt-2 border-b border-border-custom pb-6">
-                                <form method="GET" action="{{ route('verifikasi.spj.index') }}">
-                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                                        <div class="flex flex-col gap-1">
+                                <form method="GET" action="{{ route('verifikasi.spj.index') }}" x-data x-on:input.debounce.500ms="$el.submit()">
+                                    <div class="grid grid-cols-12 gap-4 items-end">
+                                        <div class="col-span-12 md:col-span-5 flex flex-col gap-1">
                                             <label for="search" class="text-sm font-medium text-text-main">Pencarian</label>
                                             <x-form.search name="search" placeholder="Cari nomor SPD, NIP..." :value="request('search')" />
                                         </div>
-                                        <div class="flex flex-col gap-1">
+                                        <div class="col-span-6 md:col-span-3 flex flex-col gap-1">
                                             <x-form.select name="status" label="Status Dokumen" :options="[
                                                 'diajukan' => 'Menunggu Verifikasi (Diajukan)',
                                                 'disetujui' => 'Telah Disetujui',
@@ -55,17 +65,22 @@
                                                 'ditolak' => 'Ditolak'
                                             ]" :selected="request('status', 'diajukan')" onchange="this.form.submit()" />
                                         </div>
-                                        <div class="flex flex-col gap-1">
+                                        <div class="col-span-6 md:col-span-2 flex flex-col gap-1">
                                             <x-form.select name="per_page" label="Tampilkan" :options="[
                                                 '10' => '10 Data',
                                                 '25' => '25 Data',
                                                 '50' => '50 Data',
                                             ]" :selected="request('per_page', 10)" onchange="this.form.submit()" />
                                         </div>
-                                        <div class="flex gap-2">
-                                            <x-action.button-primary type="submit" class="w-full justify-center text-center h-[38px]">
+                                        <div class="col-span-12 md:col-span-2 flex flex-col gap-2 items-center md:items-start justify-end md:pb-1">
+                                            <x-action.button-primary type="submit" class="w-full justify-center text-center ">
                                                 Filter
                                             </x-action.button-primary>
+                                            @if($activeFilters > 0)
+                                                <a href="{{ route('verifikasi.spj.index') }}" class="text-sm text-muted hover:text-text-main underline">
+                                                    Reset Filter
+                                                </a>
+                                            @endif
                                         </div>
                                     </div>
                                 </form>

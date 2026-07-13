@@ -19,7 +19,7 @@ class SpdTest extends TestCase
 
     public function test_user_dapat_melihat_halaman_daftar_spd(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
 
         $response = $this->actingAs($user)->get(route('user.spd.index'));
 
@@ -39,7 +39,7 @@ class SpdTest extends TestCase
 
     public function test_user_dapat_membuka_halaman_tambah_spd(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
 
         $response = $this->actingAs($user)->get(route('user.spd.create'));
 
@@ -52,7 +52,7 @@ class SpdTest extends TestCase
 
     public function test_user_dapat_membuat_spd_baru(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         $spt = Spt::factory()->create(['pembuat_id' => $user->id]);
 
         $payload = [
@@ -76,7 +76,7 @@ class SpdTest extends TestCase
 
     public function test_nip_pegawai_dipaksa_dari_akun_yang_login(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         $pegawai = Pegawai::factory()->create(['user_id' => $user->id]);
         $spt = Spt::factory()->create(['pembuat_id' => $user->id]);
 
@@ -104,7 +104,7 @@ class SpdTest extends TestCase
 
     public function test_riwayat_spd_menampilkan_identitas_pegawai(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         $pegawai = Pegawai::factory()->create(['user_id' => $user->id]);
         $spd = Spd::factory()->create([
             'pembuat_id' => $user->id,
@@ -124,8 +124,8 @@ class SpdTest extends TestCase
 
     public function test_user_gagal_membuat_spd_untuk_spt_orang_lain(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
-        $otherUser = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
+        $otherUser = User::factory()->create(['roles' => ['user']]);
         $spt = Spt::factory()->create(['pembuat_id' => $otherUser->id]);
 
         $payload = [
@@ -149,7 +149,7 @@ class SpdTest extends TestCase
 
     public function test_gagal_membuat_spd_jika_nomor_spd_duplikat(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         $spt = Spt::factory()->create(['pembuat_id' => $user->id]);
         Spd::factory()->create(['nomor_spd' => 'SPD/001/BPHL/'.now()->year, 'pembuat_id' => $user->id, 'spt_id' => $spt->id]);
 
@@ -165,7 +165,7 @@ class SpdTest extends TestCase
 
     public function test_gagal_membuat_spd_jika_field_wajib_kosong(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
 
         $response = $this->actingAs($user)->post(route('user.spd.store'), []);
 
@@ -178,7 +178,7 @@ class SpdTest extends TestCase
 
     public function test_user_dapat_melihat_detail_spd(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         $spd = Spd::factory()->create(['pembuat_id' => $user->id]);
 
         $response = $this->actingAs($user)->get(route('user.spd.show', $spd));
@@ -192,7 +192,7 @@ class SpdTest extends TestCase
 
     public function test_halaman_edit_spd_menampilkan_tanggal_dari_spt(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         $spt = Spt::factory()->create([
             'pembuat_id' => $user->id,
             'tgl_berangkat' => '2026-08-10',
@@ -212,7 +212,7 @@ class SpdTest extends TestCase
 
     public function test_user_dapat_mengedit_spd(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         $spt = Spt::factory()->create();
         $spd = Spd::factory()->create([
             'pembuat_id' => $user->id,
@@ -243,7 +243,7 @@ class SpdTest extends TestCase
 
     public function test_user_dapat_menghapus_spd(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         $spd = Spd::factory()->create(['pembuat_id' => $user->id]);
 
         $response = $this->actingAs($user)->delete(route('user.spd.destroy', $spd));

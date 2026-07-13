@@ -35,5 +35,4 @@ class SpdFactory extends Factory
             'spt_id' => Spt::factory(),
         ];
     }
-
 }

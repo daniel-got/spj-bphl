@@ -55,9 +55,7 @@
 
                     <div class="pt-4 border-t border-gray-100 text-center">
                         <a href="/" class="inline-flex items-center text-xs font-bold text-emerald-800 hover:text-emerald-900 transition-colors duration-150">
-                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
+                            <x-utility.icon name="arrow-left" class="w-4 h-4 mr-1.5" />
                             Kembali ke Beranda
                         </a>
                     </div>

@@ -14,10 +14,10 @@ class SpdService
     /**
      * Get all SPD records with optional search and filter.
      */
-    public function getAllLatest(array $filters = [], int $perPage = 10)
+    public function getAllLatest(array $filters = [], int $perPage = 10, bool $strictPersonal = false)
     {
         $query = Spd::query()->with('pegawai');
-        $this->applyRoleFilter($query);
+        $this->applyRoleFilter($query, $strictPersonal);
 
         if (! empty($filters['search'])) {
             $search = $filters['search'];
@@ -41,13 +41,12 @@ class SpdService
      * SPD miliknya sendiri (atau yang ia buat), dan pembuat_spt bisa melihat
      * yang ia buat dan ditugaskan kepadanya.
      */
-    protected function applyRoleFilter($query): void
+    protected function applyRoleFilter($query, bool $strictPersonal = false): void
     {
         $user = auth()->user();
 
-        // Jika user adalah admin atau role monitoring, lihat semua
-        // (Verifikator, PPK, Bendahara, Pembuat SPT, Pegawai biasa hanya melihat miliknya)
-        if (! $user || $user->isAdmin() || $user->isMonitoring()) {
+        // Jika strictPersonal tidak aktif dan user adalah admin atau role monitoring, lihat semua
+        if (! $strictPersonal && (! $user || $user->isAdmin() || $user->isMonitoring())) {
             return;
         }
 
@@ -241,7 +240,7 @@ class SpdService
 
         $ppkData = [];
         foreach ($roles as $label => $roleValue) {
-            $user = User::where('role', $roleValue)->with('pegawai')->first();
+            $user = User::whereJsonContains('roles', $roleValue)->with('pegawai')->first();
             $ppkData[$label] = [
                 'nama' => $user?->pegawai?->nama_pegawai ?? $user?->name ?? '',
                 'nip' => $user?->pegawai?->nip ?? '',

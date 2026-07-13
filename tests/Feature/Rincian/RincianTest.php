@@ -19,7 +19,7 @@ class RincianTest extends TestCase
 
     public function test_user_dapat_melihat_halaman_daftar_rincian(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
 
         $response = $this->actingAs($user)->get(route('user.rincian.index'));
 
@@ -35,7 +35,7 @@ class RincianTest extends TestCase
 
     public function test_ajax_spd_mengembalikan_nama_pegawai_dan_tanggal_terformat(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         $pegawai = Pegawai::factory()->create(['user_id' => $user->id]);
         $spd = Spd::factory()->create([
             'pembuat_id' => $user->id,
@@ -58,7 +58,7 @@ class RincianTest extends TestCase
 
     public function test_user_dapat_membuka_halaman_tambah_rincian(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
 
         $response = $this->actingAs($user)->get(route('user.rincian.create'));
 
@@ -71,7 +71,7 @@ class RincianTest extends TestCase
 
     public function test_ajax_pencarian_spd_mengembalikan_json(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         Spd::factory()->create(['nomor_spd' => 'SPD/TEST/BPHL/2026', 'pembuat_id' => $user->id]);
 
         $response = $this->actingAs($user)->getJson(route('user.rincian.spd.search', ['q' => 'SPD/TEST']));
@@ -82,7 +82,7 @@ class RincianTest extends TestCase
 
     public function test_ajax_detail_spd_mengembalikan_data_lengkap(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         $spd = Spd::factory()->create(['pembuat_id' => $user->id]);
 
         $response = $this->actingAs($user)->getJson(route('user.rincian.spd.ajax', $spd->id));
@@ -93,7 +93,7 @@ class RincianTest extends TestCase
 
     public function test_ajax_detail_spd_mengembalikan_array_kosong_jika_id_tidak_valid(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
 
         $response = $this->actingAs($user)->getJson(route('user.rincian.spd.ajax', 99999));
 
@@ -106,7 +106,7 @@ class RincianTest extends TestCase
 
     public function test_user_dapat_membuat_rincian_dari_spd_dengan_data_dinamis_ganda(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
 
         // Buat SPD
         $spd = Spd::factory()->create([
@@ -143,7 +143,7 @@ class RincianTest extends TestCase
 
     public function test_gagal_membuat_rincian_tanpa_spd_id(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
 
         $response = $this->actingAs($user)->post(route('user.rincian.store'), [
             'rincian_biaya' => [
@@ -158,7 +158,7 @@ class RincianTest extends TestCase
 
     public function test_gagal_membuat_rincian_jika_spd_id_tidak_valid(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
 
         $response = $this->actingAs($user)->post(route('user.rincian.store'), [
             'spd_id' => 99999,
@@ -173,7 +173,7 @@ class RincianTest extends TestCase
 
     public function test_user_dapat_melihat_detail_rincian(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         $rincian = Rincian::factory()->create(['pembuat_id' => $user->id]);
 
         $response = $this->actingAs($user)->get(route('user.rincian.show', $rincian));
@@ -187,7 +187,7 @@ class RincianTest extends TestCase
 
     public function test_user_dapat_mengedit_biaya_rincian_menjadi_ganda(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         $rincian = Rincian::factory()->create(['pembuat_id' => $user->id]);
 
         $response = $this->actingAs($user)->put(route('user.rincian.update', $rincian), [
@@ -219,7 +219,7 @@ class RincianTest extends TestCase
 
     public function test_user_dapat_menghapus_rincian(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         $rincian = Rincian::factory()->create(['pembuat_id' => $user->id]);
 
         $response = $this->actingAs($user)->delete(route('user.rincian.destroy', $rincian));
@@ -234,11 +234,11 @@ class RincianTest extends TestCase
 
     public function test_user_dapat_melihat_rincian_yang_ditugaskan_kepadanya_melalui_nip(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['roles' => ['user']]);
         $pegawai = Pegawai::factory()->create(['user_id' => $user->id]);
 
         // Rincian dibuat oleh orang lain (admin), tapi ditugaskan ke user ini (NIP sama di SPD)
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['roles' => ['admin']]);
         $spd = Spd::factory()->create([
             'nip_pegawai' => $pegawai->nip,
             'pembuat_id' => $admin->id,

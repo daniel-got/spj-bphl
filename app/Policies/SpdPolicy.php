@@ -22,7 +22,7 @@ class SpdPolicy
      */
     public function view(User $user, Spd $spd): bool
     {
-        if ($user->role === UserRole::ADMIN->value || in_array($user->role, UserRole::monitoringRoles())) {
+        if ($user->isAdmin() || $user->isMonitoring()) {
             return true;
         }
 
@@ -44,7 +44,7 @@ class SpdPolicy
      */
     public function update(User $user, Spd $spd): bool
     {
-        return $user->id === $spd->pembuat_id || $user->role === UserRole::ADMIN->value;
+        return $user->id === $spd->pembuat_id || $user->isAdmin();
     }
 
     /**
@@ -52,6 +52,6 @@ class SpdPolicy
      */
     public function delete(User $user, Spd $spd): bool
     {
-        return $user->id === $spd->pembuat_id || $user->role === UserRole::ADMIN->value;
+        return $user->id === $spd->pembuat_id || $user->isAdmin();
     }
 }

@@ -31,7 +31,7 @@ class PegawaiSeeder extends Seeder
                     [
                         'name' => $data[0],
                         'password' => Hash::make($data[7]), // password123
-                        'role' => $data[8],
+                        'roles' => [$data[8]],
                     ]
                 );
 

@@ -9,12 +9,12 @@
 
     // Filter berdasarkan role user jika item memiliki kunci 'roles'
     if (auth()->check()) {
-        $userRole = auth()->user()->role;
-        $menuItems = array_filter($menuItems, function ($item) use ($userRole) {
+        $userRoles = auth()->user()->roles ?? [];
+        $menuItems = array_filter($menuItems, function ($item) use ($userRoles) {
             if (!isset($item['roles'])) {
                 return true;
             }
-            return in_array($userRole, $item['roles']);
+            return count(array_intersect($userRoles, $item['roles'])) > 0;
         });
     }
 

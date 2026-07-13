@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('nomor_spt')->unique();
             $table->date('tgl_spt');
-            
+
             // Kolom Surat Dasar untuk menampung acuan Poin 3 (Opsional)
             $table->text('surat_dasar')->nullable();
-            
+
             // Menyimpan data array pegawai (ID, Nama, NIP, Pangkat, Jabatan, Peran) dalam bentuk JSON
             $table->json('pegawai_ditugaskan');
-            
+
             $table->text('tujuan_kegiatan');
             $table->string('tempat_tujuan');
             $table->date('tgl_berangkat');

@@ -19,10 +19,10 @@
 
                     {{-- Header Halaman --}}
                     <x-layout.page-header title="Data SPT" subtitle="Daftar Surat Perintah Tugas">
-                        @if (Auth::user()->role === 'admin')
+                        @if (Auth::user()->isAdmin())
                             <x-slot:actions>
                                 <a href="{{ route('user.spt.create') }}"
-                                    class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-150 h-[38px]">
+                                    class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-150 ">
                                     + Tambah Baru
                                 </a>
                             </x-slot:actions>
@@ -80,7 +80,7 @@
                                             ]" :selected="request('per_page', 10)" onchange="this.form.submit()" />
                                         </div>
                                         <div class="flex gap-2">
-                                            <x-action.button-primary type="submit" class="w-full justify-center text-center h-[38px]">
+                                            <x-action.button-primary type="submit" class="w-full justify-center text-center ">
                                             Filter
                                         </x-action.button-primary>
                                         </div>
@@ -153,7 +153,7 @@
                                     $nomorSptLink = '<a href="' . route('user.spt.show', $spt->id) . '" class="text-primary hover:underline font-semibold" title="Lihat Rincian">' . e($spt->nomor_spt ?? '') . '</a>';
 
                                     // Edit hanya untuk admin — pembuat_spt punya tombol Edit di dashboard-nya sendiri
-                                    $hasAccess = Auth::user()->role === 'admin' && in_array($spt->status, [\App\Models\Spt::STATUS_DRAFT, \App\Models\Spt::STATUS_REVISED]);
+                                    $hasAccess = Auth::user()->isAdmin() && in_array($spt->status, [\App\Models\Spt::STATUS_DRAFT, \App\Models\Spt::STATUS_REVISED]);
                                     
                                     $actions = [
                                         'detail' => route('user.spt.show', $spt->id),
@@ -163,9 +163,9 @@
                                         $actions['edit'] = route('user.spt.edit', $spt->id);
                                     }
 
-                                    if (Auth::user()->role === 'admin' || Auth::user()->role === 'pembuat_spt') {
+                                    if (Auth::user()->isAdmin() || Auth::user()->isPembuatSpt()) {
                                         $actions['raw'] = '<a href="' . route('admin.spt.pdf', $spt->id) . '" target="_blank" class="inline-flex items-center gap-1 p-2 text-xs font-semibold text-green-600 hover:text-green-900 hover:bg-green-50 rounded-md transition-colors" title="Cetak PDF">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                                                        <x-utility.icon name="printer" class="w-4 h-4" />
                                                       </a>';
                                     }
 

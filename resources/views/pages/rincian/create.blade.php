@@ -89,7 +89,7 @@
                             <h3 class="text-base font-bold text-text-main">Biaya Rincian</h3>
                             <button type="button" id="btn-tambah-biaya"
                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-primary text-primary text-sm font-medium hover:bg-primary hover:text-white transition duration-150">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                <x-utility.icon name="plus" class="w-4 h-4" />
                                 Tambah Rincian
                             </button>
                         </div>
@@ -100,7 +100,7 @@
                                 <button type="button"
                                     class="btn-hapus-baris absolute top-3 right-3 text-muted hover:text-danger transition hidden"
                                     title="Hapus baris ini">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    <x-utility.icon name="trash" class="w-4 h-4" />
                                 </button>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div class="flex flex-col gap-1">
@@ -236,7 +236,7 @@
                         <button type="button"
                             class="btn-hapus-baris absolute top-3 right-3 text-muted hover:text-danger transition"
                             title="Hapus baris ini">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <x-utility.icon name="trash" class="w-4 h-4" />
                         </button>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="flex flex-col gap-1">

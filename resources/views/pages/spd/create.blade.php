@@ -191,12 +191,7 @@
                                         @if ($index > 0)
                                             <button type="button"
                                                 class="remove-alatangkut-btn text-danger hover:text-red-700 transition duration-150 p-1">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
+                                                <x-utility.icon name="trash" class="w-4 h-4" />
                                             </button>
                                         @endif
                                     </div>
@@ -210,10 +205,7 @@
                             <div class="mt-2">
                                 <button type="button" id="add-alatangkut-btn"
                                     class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover transition duration-150">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4v16m8-8H4" />
-                                    </svg>
+                                    <x-utility.icon name="plus" class="w-4 h-4" />
                                     Tambah Alat Angkut
                                 </button>
                             </div>
@@ -415,7 +407,7 @@
                             removeBtn.className =
                                 'remove-alatangkut-btn text-danger hover:text-red-700 transition duration-150 p-1';
                             removeBtn.innerHTML =
-                                `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
+                                `<x-utility.icon name="trash" class="w-4 h-4" />`;
                             removeBtn.addEventListener('click', function() {
                                 item.remove();
                                 updateRemoveButtons();

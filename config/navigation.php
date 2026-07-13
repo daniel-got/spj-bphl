@@ -43,16 +43,10 @@ return [
             'roles' => ['pembuat_spt'],
         ],
         [
-            'label' => 'Dashboard Statistik',
-            'url' => '/user/spt', // Nanti arahkan ke dashboard statistik pimpinan
-            'icon' => 'chart-bar',
-            'roles' => ['kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
-        ],
-        [
             'label' => 'Dashboard',
             'url' => '/user/dashboard',
             'icon' => 'home',
-            'roles' => ['user', 'ppk_1', 'ppk_2', 'ppk_3', 'bendahara_pengeluaran', 'verifikator'],
+            'roles' => ['user', 'ppk_1', 'ppk_2', 'ppk_3', 'bendahara_pengeluaran', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
 
         // --- GRUP: TUGAS SAYA (Semua Aktor) ---

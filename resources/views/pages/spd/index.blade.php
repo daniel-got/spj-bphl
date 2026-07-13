@@ -21,7 +21,7 @@
             <x-layout.page-header title="Data SPD" subtitle="Daftar Surat Perjalanan Dinas">
                 <x-slot:actions>
                     <a href="{{ route('user.spd.create') }}"
-                        class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-150 h-[38px]">
+                        class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-150 ">
                         + Tambah Baru
                     </a>
                 </x-slot:actions>
@@ -61,7 +61,7 @@
                                         :selected="request('per_page', 10)" onchange="this.form.submit()" />
                                 </div>
                                 <div class="flex gap-2">
-                                        <x-action.button-primary type="submit" class="w-full justify-center text-center h-[38px]">
+                                        <x-action.button-primary type="submit" class="w-full justify-center text-center ">
                                             Filter
                                         </x-action.button-primary>
                                 </div>

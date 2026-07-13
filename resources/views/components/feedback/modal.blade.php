@@ -40,7 +40,7 @@ $maxW = $sizeMap[$size] ?? $sizeMap['md'];
                         class="p-1 rounded-md text-muted hover:text-text-main hover:bg-background transition-colors"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 6 6 18" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m6 6 12 12" />
                         </svg>
                     </button>
                 @endif

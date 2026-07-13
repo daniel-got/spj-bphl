@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('data_spt', function (Blueprint $table) {
             // Kita cek dulu, jika kolom belum ada, baru kita tambahkan agar tidak error
-            if (!Schema::hasColumn('data_spt', 'surat_dasar')) {
+            if (! Schema::hasColumn('data_spt', 'surat_dasar')) {
                 $table->text('surat_dasar')->nullable()->after('tgl_spt');
             }
         });

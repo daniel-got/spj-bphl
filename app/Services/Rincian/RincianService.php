@@ -5,6 +5,7 @@ namespace App\Services\Rincian;
 use App\Models\Pegawai;
 use App\Models\Rincian;
 use App\Models\Spd;
+use App\Models\UangHarian;
 use App\Models\UangPenginapan;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -15,10 +16,10 @@ class RincianService
     /**
      * Get statistics count for Rincian.
      */
-    public function getCounts(): array
+    public function getCounts(bool $strictPersonal = false): array
     {
         $query = Rincian::query();
-        $this->applyRoleFilter($query);
+        $this->applyRoleFilter($query, $strictPersonal);
 
         return [
             'all' => (clone $query)->count(),
@@ -32,10 +33,10 @@ class RincianService
     /**
      * Get all Rincian records with optional search and filter.
      */
-    public function getAllLatest(array $filters = [], int $perPage = 10)
+    public function getAllLatest(array $filters = [], int $perPage = 10, bool $strictPersonal = false)
     {
         $query = Rincian::query();
-        $this->applyRoleFilter($query);
+        $this->applyRoleFilter($query, $strictPersonal);
 
         if (! empty($filters['search'])) {
             $search = $filters['search'];
@@ -67,12 +68,12 @@ class RincianService
      * Rincian miliknya sendiri (atau yang ia buat), dan pembuat_spt bisa melihat
      * yang ia buat dan ditugaskan kepadanya.
      */
-    protected function applyRoleFilter($query): void
+    protected function applyRoleFilter($query, bool $strictPersonal = false): void
     {
         $user = auth()->user();
 
-        // Jika user adalah admin, verifikator, atau role monitoring, lihat semua
-        if (! $user || $user->isAdmin() || $user->isVerifikator() || $user->isMonitoring()) {
+        // Jika strictPersonal tidak aktif dan user adalah admin, verifikator, atau role monitoring, lihat semua
+        if (! $strictPersonal && (! $user || $user->isAdmin() || $user->isVerifikator() || $user->isMonitoring())) {
             return;
         }
 
@@ -319,7 +320,7 @@ class RincianService
                     if ($uangPenginapan) {
                         break;
                     }
-                    
+
                     // Fallback cek sebaliknya
                     if (! $uangPenginapan) {
                         $uangPenginapan = UangPenginapan::where('provinsi', 'LIKE', '%'.trim($tujuan).'%')->first();
@@ -348,17 +349,17 @@ class RincianService
         if ($spd->tempat_tujuan) {
             $tempatTujuans = is_array($spd->tempat_tujuan) ? $spd->tempat_tujuan : [$spd->tempat_tujuan];
 
-            $uangHarian = \App\Models\UangHarian::whereIn('provinsi', $tempatTujuans)->first();
+            $uangHarian = UangHarian::whereIn('provinsi', $tempatTujuans)->first();
 
             if (! $uangHarian) {
                 foreach ($tempatTujuans as $tujuan) {
-                    $uangHarian = \App\Models\UangHarian::whereRaw('? LIKE CONCAT("%", provinsi, "%")', [trim($tujuan)])->first();
+                    $uangHarian = UangHarian::whereRaw('? LIKE CONCAT("%", provinsi, "%")', [trim($tujuan)])->first();
                     if ($uangHarian) {
                         break;
                     }
-                    
+
                     if (! $uangHarian) {
-                        $uangHarian = \App\Models\UangHarian::where('provinsi', 'LIKE', '%'.trim($tujuan).'%')->first();
+                        $uangHarian = UangHarian::where('provinsi', 'LIKE', '%'.trim($tujuan).'%')->first();
                         if ($uangHarian) {
                             break;
                         }

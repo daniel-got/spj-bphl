@@ -91,7 +91,7 @@ class UangPenginapanService
             }
 
             // Skip if row is completely empty
-            if (empty(array_filter($row, fn($v) => trim($v) !== ''))) {
+            if (empty(array_filter($row, fn ($v) => trim($v) !== ''))) {
                 continue;
             }
 
@@ -169,7 +169,7 @@ class UangPenginapanService
             }
 
             // Skip if row is completely empty
-            if (empty(array_filter($row, fn($v) => trim($v) !== ''))) {
+            if (empty(array_filter($row, fn ($v) => trim($v) !== ''))) {
                 continue;
             }
 
