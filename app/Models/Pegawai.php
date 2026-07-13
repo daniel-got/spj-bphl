@@ -35,6 +35,14 @@ class Pegawai extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    /**
+     * Relasi dummy ke diri sendiri untuk menghindari error eager loading.
+     */
+    public function pegawai()
+    {
+        return $this->belongsTo(Pegawai::class, 'id', 'id');
+    }
+
     // -------------------------------------------------------------------------
     // Query Scopes
     // -------------------------------------------------------------------------

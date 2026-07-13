@@ -200,4 +200,18 @@ class SptService
             return $spt;
         });
     }
+
+    /**
+     * Ambil riwayat surat dasar yang pernah dipakai.
+     */
+    public function getRiwayatSuratDasar(int $limit = 50): \Illuminate\Support\Collection
+    {
+        return DB::table('data_spt')
+            ->whereNotNull('surat_dasar')
+            ->where('surat_dasar', '!=', '')
+            ->distinct()
+            ->orderBy('surat_dasar', 'asc')
+            ->take($limit)
+            ->pluck('surat_dasar');
+    }
 }

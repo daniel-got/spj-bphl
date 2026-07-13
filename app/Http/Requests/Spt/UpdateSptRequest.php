@@ -46,6 +46,19 @@ class UpdateSptRequest extends FormRequest
             'pegawai_ditugaskan.*.jabatan' => 'required|string',
             'pegawai_ditugaskan.*.peran' => 'required|string|in:Penanggung Jawab,Anggota',
 
+            // Tambahan validasi Kategori dan Surat Dasar Baru
+            'jenis_tugas' => 'required|in:pelatihan,keuangan,administrasi',
+            'surat_dasar' => 'nullable|string',
+
+            // Tambahan validasi untuk Penanggung Jawab dan Anggota
+            'penanggung_jawab' => 'nullable|string',
+            'anggota' => 'nullable|string',
+
+            // Tambahan validasi untuk keperluan generate PDF Surat Tugas
+            'menimbang' => 'nullable|string',
+            'dasar' => 'nullable|string',
+            'biaya' => 'nullable|string',
+
             'tujuan_kegiatan' => 'required|string',
             'tempat_tujuan' => 'required|string|max:255',
             'tgl_berangkat' => 'required|date',

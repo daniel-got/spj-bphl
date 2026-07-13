@@ -9,6 +9,7 @@ use App\Models\Pegawai;
 use App\Models\Spt;
 use App\Services\Spt\SptService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SptController extends Controller
 {
@@ -24,9 +25,7 @@ class SptController extends Controller
      */
     public function index(Request $request)
     {
-        // Semua filter, pencarian, dan kalkulasi dipindah ke Service
         $data = $this->sptService->getIndexPageData($request->all());
-
         return view('pages.spt.index', $data);
     }
 
@@ -34,11 +33,30 @@ class SptController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
+{
+    $pegawaiList = Pegawai::orderBy('nama_pegawai')->get();
+    
+    // Delegasikan ke Service
+    $riwayatSuratDasar = $this->sptService->getRiwayatSuratDasar(50); 
+
+    return view('pages.spt.create', compact('pegawaiList', 'riwayatSuratDasar'));
+}
+
+    public function edit(string $id)
     {
-        // Hanya mengambil data referensi untuk view dropdown
+        $spt = $this->sptService->getSptById($id);
+        $this->authorize('update', $spt);
+
+        if (! in_array($spt->status, [Spt::STATUS_DRAFT, Spt::STATUS_REVISED])) {
+            abort(403, 'SPT sudah diajukan dan tidak dapat diubah.');
+        }
+
         $pegawaiList = Pegawai::orderBy('nama_pegawai')->get();
 
-        return view('pages.spt.create', compact('pegawaiList'));
+        // Delegasikan ke Service
+        $riwayatSuratDasar = $this->sptService->getRiwayatSuratDasar(50);
+
+        return view('pages.spt.edit', compact('spt', 'pegawaiList', 'riwayatSuratDasar'));
     }
 
     /**
@@ -46,7 +64,6 @@ class SptController extends Controller
      */
     public function store(StoreSptRequest $request)
     {
-        // Penentuan status default dan pembuat_id ditangani di dalam Service
         $this->sptService->createSpt($request->validated(), auth()->id());
 
         return redirect()
@@ -61,26 +78,53 @@ class SptController extends Controller
     {
         $spt = $this->sptService->getSptById($id);
         $this->authorize('view', $spt);
-
         return view('pages.spt.show', compact('spt'));
+    }
+
+    /**
+     * Generate PDF for the specified SPT.
+     */
+    public function generatePdf($id)
+    {
+        $spt = Spt::findOrFail($id);
+
+        $pegawaiData = $spt->pegawai_ditugaskan;
+        if (is_string($pegawaiData)) {
+            $pegawaiData = json_decode($pegawaiData, true);
+        }
+
+        $pegawais = collect();
+        if (is_array($pegawaiData)) {
+            foreach ($pegawaiData as $p) {
+                $pegawaiModel = Pegawai::find($p['pegawai_id'] ?? null);
+                if ($pegawaiModel) {
+                    $pegawaiModel->peran = $p['peran'] ?? 'Anggota';
+                    $pegawaiModel->setRelation('pegawai', $pegawaiModel);
+                    $pegawais->push($pegawaiModel);
+                } else {
+                    $dummy = new Pegawai([
+                        'nama_pegawai' => $p['nama_pegawai'] ?? $p['nama'] ?? '-',
+                        'nip' => $p['nip'] ?? '-',
+                        'pangkat' => $p['pangkat'] ?? '-',
+                        'golongan' => $p['golongan'] ?? '',
+                        'jabatan' => $p['jabatan'] ?? '-',
+                    ]);
+                    $dummy->id = $p['pegawai_id'] ?? 0;
+                    $dummy->peran = $p['peran'] ?? 'Anggota';
+                    $dummy->setRelation('pegawai', $dummy);
+                    $pegawais->push($dummy);
+                }
+            }
+        }
+        $spt->setRelation('pegawais', $pegawais);
+
+        return view('pages.spt.print', compact('spt'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
-    {
-        $spt = $this->sptService->getSptById($id);
-        $this->authorize('update', $spt);
 
-        if (! in_array($spt->status, [Spt::STATUS_DRAFT, Spt::STATUS_REVISED])) {
-            abort(403, 'SPT sudah diajukan dan tidak dapat diubah.');
-        }
-
-        $pegawaiList = Pegawai::orderBy('nama_pegawai')->get();
-
-        return view('pages.spt.edit', compact('spt', 'pegawaiList'));
-    }
 
     /**
      * Update the specified resource in storage.
@@ -93,7 +137,6 @@ class SptController extends Controller
         if (! in_array($spt->status, [Spt::STATUS_DRAFT, Spt::STATUS_REVISED])) {
             abort(403, 'SPT sudah diajukan dan tidak dapat diubah.');
         }
-
         $this->sptService->updateSpt($spt, $request->validated());
 
         return redirect()
@@ -112,14 +155,12 @@ class SptController extends Controller
         if (! in_array($spt->status, [Spt::STATUS_DRAFT, Spt::STATUS_REVISED])) {
             abort(403, 'SPT sudah diajukan dan tidak dapat dihapus.');
         }
-
         $this->sptService->deleteSpt($spt);
 
         return redirect()
             ->route('user.spt.index')
             ->with('success', 'SPT berhasil dihapus.');
     }
-
     /**
      * Submit SPT to be verified.
      */

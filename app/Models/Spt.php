@@ -29,6 +29,11 @@ class Spt extends Model
         'catatan_verifikator',
         'penanggung_jawab',
         'anggota',
+        'jenis_tugas',
+        'surat_dasar',
+        'menimbang',
+        'dasar',
+        'biaya',
     ];
 
     const STATUS_DRAFT = 'draft';

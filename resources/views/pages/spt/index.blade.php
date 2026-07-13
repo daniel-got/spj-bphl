@@ -163,6 +163,12 @@
                                         $actions['edit'] = route('user.spt.edit', $spt->id);
                                     }
 
+                                    if (Auth::user()->role === 'admin' || Auth::user()->role === 'pembuat_spt') {
+                                        $actions['raw'] = '<a href="' . route('admin.spt.pdf', $spt->id) . '" target="_blank" class="inline-flex items-center gap-1 p-2 text-xs font-semibold text-green-600 hover:text-green-900 hover:bg-green-50 rounded-md transition-colors" title="Cetak PDF">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                                                      </a>';
+                                    }
+
                                     return [
                                         'cells' => [
                                             $iteration++,
