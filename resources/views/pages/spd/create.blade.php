@@ -189,10 +189,9 @@
                                             </select>
                                         </div>
                                         @if ($index > 0)
-                                            <button type="button"
-                                                class="remove-alatangkut-btn text-danger hover:text-red-700 transition duration-150 p-1">
+                                            <x-action.icon-button color="danger" class="remove-alatangkut-btn p-1">
                                                 <x-utility.icon name="trash" class="w-4 h-4" />
-                                            </button>
+                                            </x-action.icon-button>
                                         @endif
                                     </div>
                                 @endforeach
@@ -203,11 +202,11 @@
                             @endif
 
                             <div class="mt-2">
-                                <button type="button" id="add-alatangkut-btn"
-                                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover transition duration-150">
+                                <x-action.button id="add-alatangkut-btn"
+                                    class="border-primary text-primary text-sm hover:bg-primary hover:text-white px-3 py-1.5 gap-1.5 mt-2">
                                     <x-utility.icon name="plus" class="w-4 h-4" />
                                     Tambah Alat Angkut
-                                </button>
+                                </x-action.button>
                             </div>
                         </div>
                     </div>
@@ -402,12 +401,13 @@
                     let removeBtn = item.querySelector('.remove-alatangkut-btn');
                     if (index > 0) {
                         if (!removeBtn) {
-                            removeBtn = document.createElement('button');
-                            removeBtn.type = 'button';
-                            removeBtn.className =
-                                'remove-alatangkut-btn text-danger hover:text-red-700 transition duration-150 p-1';
-                            removeBtn.innerHTML =
-                                `<x-utility.icon name="trash" class="w-4 h-4" />`;
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = `
+                                <x-action.icon-button color="danger" class="remove-alatangkut-btn p-1">
+                                    <x-utility.icon name="trash" class="w-4 h-4" />
+                                </x-action.icon-button>
+                            `.trim();
+                            removeBtn = tempDiv.firstChild;
                             removeBtn.addEventListener('click', function() {
                                 item.remove();
                                 updateRemoveButtons();

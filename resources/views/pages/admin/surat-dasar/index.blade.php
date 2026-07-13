@@ -101,33 +101,31 @@
                                         <td class="px-6 py-4 text-center">
                                             <div class="flex items-center justify-center gap-1">
                                                 {{-- Edit --}}
-                                                <button
-                                                    type="button"
+                                                <x-action.icon-button
+                                                    color="primary"
                                                     title="Edit"
-                                                    onclick="openEditModal({{ $item->id }}, {{ json_encode($item->teks) }}, {{ $item->aktif ? 'true' : 'false' }})"
-                                                    class="p-1.5 rounded text-muted hover:text-primary hover:bg-primary-light transition-colors">
+                                                    onclick="openEditModal({{ $item->id }}, {{ json_encode($item->teks) }}, {{ $item->aktif ? 'true' : 'false' }})">
                                                     <x-utility.icon name="pencil" class="w-4 h-4" />
-                                                </button>
+                                                </x-action.icon-button>
 
                                                 {{-- Toggle Aktif --}}
                                                 <form method="POST" action="{{ route('admin.surat-dasar.toggle', $item) }}" class="inline">
                                                     @csrf
                                                     @method('PATCH')
-                                                    <button type="submit"
-                                                        title="{{ $item->aktif ? 'Nonaktifkan' : 'Aktifkan' }}"
-                                                        class="p-1.5 rounded transition-colors {{ $item->aktif ? 'text-warning hover:bg-warning/10' : 'text-success hover:bg-success/10' }}">
+                                                    <x-action.icon-button type="submit"
+                                                        color="{{ $item->aktif ? 'warning' : 'success' }}"
+                                                        title="{{ $item->aktif ? 'Nonaktifkan' : 'Aktifkan' }}">
                                                         <x-utility.icon name="{{ $item->aktif ? 'eye-slash' : 'eye' }}" class="w-4 h-4" />
-                                                    </button>
+                                                    </x-action.icon-button>
                                                 </form>
 
                                                 {{-- Hapus --}}
-                                                <button
-                                                    type="button"
+                                                <x-action.icon-button
+                                                    color="danger"
                                                     title="Hapus"
-                                                    onclick="openModal('confirm-hapus-{{ $item->id }}')"
-                                                    class="p-1.5 rounded text-muted hover:text-danger hover:bg-danger/10 transition-colors">
+                                                    onclick="openModal('confirm-hapus-{{ $item->id }}')">
                                                     <x-utility.icon name="trash" class="w-4 h-4" />
-                                                </button>
+                                                </x-action.icon-button>
                                             </div>
                                         </td>
                                     </tr>

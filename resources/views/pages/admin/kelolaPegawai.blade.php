@@ -340,10 +340,9 @@
                     <h2 class="text-base font-semibold text-text-main">
                         Import Data Pegawai (CSV)
                     </h2>
-                    <button type="button" onclick="tutupImportModal()"
-                        class="p-1 rounded-md text-muted hover:text-text-main hover:bg-background transition-colors">
+                    <x-action.icon-button onclick="tutupImportModal()">
                         <x-utility.icon name="x-mark" class="w-5 h-5" />
-                    </button>
+                    </x-action.icon-button>
                 </div>
 
                 {{-- Body --}}
@@ -433,35 +432,29 @@
                 <div class="px-6 py-4 border-t border-border-custom flex justify-end gap-2">
                     {{-- Step Upload --}}
                     <div id="import-footer-upload" class="flex gap-2">
-                        <button type="button" onclick="tutupImportModal()"
-                            class="border border-border-custom text-text-main hover:bg-background px-4 py-2 text-sm rounded-md transition-colors">Batal</button>
-                        <button type="button" onclick="cekDataCSV()"
-                            class="bg-primary hover:bg-primary-hover text-white px-4 py-2 text-sm rounded-md transition-colors flex items-center gap-2">
+                        <x-action.button onclick="tutupImportModal()">Batal</x-action.button>
+                        <x-action.button-primary onclick="cekDataCSV()" class="gap-2">
                             <x-utility.icon name="check-circle" class="w-4 h-4" />
                             Cek Data CSV
-                        </button>
+                        </x-action.button-primary>
                     </div>
 
                     {{-- Step Result: VALID --}}
                     <div id="import-footer-success" style="display: none;" class="flex gap-2">
-                        <button type="button" onclick="tutupImportModal()"
-                            class="border border-border-custom text-text-main hover:bg-background px-4 py-2 text-sm rounded-md transition-colors">Tutup</button>
-                        <button type="button" onclick="importSekarang()"
-                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm rounded-md transition-colors flex items-center gap-2">
+                        <x-action.button onclick="tutupImportModal()">Tutup</x-action.button>
+                        <x-action.button onclick="importSekarang()" class="bg-green-600 hover:bg-green-700 text-white border-transparent gap-2">
                             <x-utility.icon name="upload" class="w-4 h-4" />
                             Import Data Sekarang
-                        </button>
+                        </x-action.button>
                     </div>
 
                     {{-- Step Result: ADA ERROR --}}
                     <div id="import-footer-error" style="display: none;" class="flex gap-2">
-                        <button type="button" onclick="tutupImportModal()"
-                            class="border border-border-custom text-text-main hover:bg-background px-4 py-2 text-sm rounded-md transition-colors">Tutup</button>
-                        <button type="button" onclick="resetImportModal()"
-                            class="bg-warning hover:bg-yellow-600 text-white px-4 py-2 text-sm rounded-md transition-colors flex items-center gap-2">
+                        <x-action.button onclick="tutupImportModal()">Tutup</x-action.button>
+                        <x-action.button onclick="resetImportModal()" class="bg-warning hover:bg-yellow-600 text-white border-transparent gap-2">
                             <x-utility.icon name="download" class="w-4 h-4" />
                             Import Ulang
-                        </button>
+                        </x-action.button>
                     </div>
                 </div>
             </div>

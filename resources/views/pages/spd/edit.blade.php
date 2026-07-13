@@ -108,21 +108,20 @@
                                                 class="w-full px-3 py-2 text-sm border rounded-md shadow-sm placeholder-muted bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom" />
                                         </div>
                                         @if (count($destinations) > 1 || $index > 0)
-                                            <button type="button"
-                                                class="remove-destination-btn text-danger hover:text-red-700 transition duration-150 p-2">
+                                            <x-action.icon-button color="danger" class="remove-destination-btn p-2">
                                                 <x-utility.icon name="trash" class="w-5 h-5" />
-                                            </button>
+                                            </x-action.icon-button>
                                         @endif
                                     </div>
                                 @endforeach
                             </div>
 
                             <div class="mt-2">
-                                <button type="button" id="add-destination-btn"
-                                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover transition duration-150">
+                                <x-action.button id="add-destination-btn"
+                                    class="border-primary text-primary text-sm hover:bg-primary hover:text-white px-3 py-1.5 gap-1.5">
                                     <x-utility.icon name="plus" class="w-4 h-4" />
                                     Tambah Tempat Tujuan
-                                </button>
+                                </x-action.button>
                             </div>
                             @if ($errors->has('tempat_tujuan'))
                                 <p class="text-xs text-danger mt-1">{{ $errors->first('tempat_tujuan') }}</p>
@@ -214,10 +213,9 @@
                                             </select>
                                         </div>
                                         @if ($index > 0)
-                                            <button type="button"
-                                                class="remove-alatangkut-btn text-danger hover:text-red-700 transition duration-150 p-1">
+                                            <x-action.icon-button color="danger" class="remove-alatangkut-btn p-1">
                                                 <x-utility.icon name="trash" class="w-4 h-4" />
-                                            </button>
+                                            </x-action.icon-button>
                                         @endif
                                     </div>
                                 @endforeach
@@ -228,11 +226,11 @@
                             @endif
 
                             <div class="mt-2">
-                                <button type="button" id="add-alatangkut-btn"
-                                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover transition duration-150">
+                                <x-action.button id="add-alatangkut-btn"
+                                    class="border-primary text-primary text-sm hover:bg-primary hover:text-white px-3 py-1.5 gap-1.5 mt-2">
                                     <x-utility.icon name="plus" class="w-4 h-4" />
                                     Tambah Alat Angkut
-                                </button>
+                                </x-action.button>
                             </div>
                         </div>
                     </div>
@@ -285,12 +283,13 @@
                     let removeBtn = item.querySelector('.remove-destination-btn');
                     if (items.length > 1) {
                         if (!removeBtn) {
-                            removeBtn = document.createElement('button');
-                            removeBtn.type = 'button';
-                            removeBtn.className =
-                                'remove-destination-btn text-danger hover:text-red-700 transition duration-150 p-2';
-                            removeBtn.innerHTML =
-                                `<x-utility.icon name="trash" class="w-5 h-5" />`;
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = `
+                                <x-action.icon-button color="danger" class="remove-destination-btn p-2">
+                                    <x-utility.icon name="trash" class="w-5 h-5" />
+                                </x-action.icon-button>
+                            `.trim();
+                            removeBtn = tempDiv.firstChild;
                             removeBtn.addEventListener('click', function() {
                                 item.remove();
                                 updateDestRemoveButtons();
@@ -348,12 +347,13 @@
                     let removeBtn = item.querySelector('.remove-alatangkut-btn');
                     if (index > 0) {
                         if (!removeBtn) {
-                            removeBtn = document.createElement('button');
-                            removeBtn.type = 'button';
-                            removeBtn.className =
-                                'remove-alatangkut-btn text-danger hover:text-red-700 transition duration-150 p-1';
-                            removeBtn.innerHTML =
-                                `<x-utility.icon name="trash" class="w-4 h-4" />`;
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = `
+                                <x-action.icon-button color="danger" class="remove-alatangkut-btn p-1">
+                                    <x-utility.icon name="trash" class="w-4 h-4" />
+                                </x-action.icon-button>
+                            `.trim();
+                            removeBtn = tempDiv.firstChild;
                             removeBtn.addEventListener('click', function() {
                                 item.remove();
                                 updateTransportRemoveButtons();

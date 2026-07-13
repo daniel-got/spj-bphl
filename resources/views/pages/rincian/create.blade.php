@@ -87,21 +87,21 @@
                     <div class="border-t border-border-custom pt-6 space-y-4">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-base font-bold text-text-main">Biaya Rincian</h3>
-                            <button type="button" id="btn-tambah-biaya"
-                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-primary text-primary text-sm font-medium hover:bg-primary hover:text-white transition duration-150">
+                            <x-action.button id="btn-tambah-biaya"
+                                class="border-primary text-primary text-sm hover:bg-primary hover:text-white px-3 py-1.5 gap-1.5">
                                 <x-utility.icon name="plus" class="w-4 h-4" />
                                 Tambah Rincian
-                            </button>
+                            </x-action.button>
                         </div>
 
                         <div id="rincian-biaya-container" class="space-y-4">
                             {{-- Baris pertama selalu ada --}}
                             <div class="rincian-row bg-background border border-border-custom rounded-lg p-4 relative">
-                                <button type="button"
-                                    class="btn-hapus-baris absolute top-3 right-3 text-muted hover:text-danger transition hidden"
+                                <x-action.icon-button color="danger"
+                                    class="btn-hapus-baris absolute top-3 right-3 hidden"
                                     title="Hapus baris ini">
                                     <x-utility.icon name="trash" class="w-4 h-4" />
-                                </button>
+                                </x-action.icon-button>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div class="flex flex-col gap-1">
                                         <label class="text-sm font-semibold text-text-main">Biaya Transport (Rp)</label>
@@ -233,11 +233,11 @@
             function buildRow(index) {
                 return `
                     <div class="rincian-row bg-background border border-border-custom rounded-lg p-4 relative">
-                        <button type="button"
-                            class="btn-hapus-baris absolute top-3 right-3 text-muted hover:text-danger transition"
+                        <x-action.icon-button color="danger"
+                            class="btn-hapus-baris absolute top-3 right-3"
                             title="Hapus baris ini">
                             <x-utility.icon name="trash" class="w-4 h-4" />
-                        </button>
+                        </x-action.icon-button>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="flex flex-col gap-1">
                                 <label class="text-sm font-semibold text-text-main">Biaya Transport (Rp)</label>

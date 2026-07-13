@@ -217,11 +217,11 @@
                         </div>
 
                         <div class="mt-3">
-                            <button type="button" id="add-pegawai-btn"
-                                class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover transition duration-150">
+                            <x-action.button id="add-pegawai-btn"
+                                class="border-primary text-primary text-sm hover:bg-primary hover:text-white px-3 py-1.5 gap-1.5">
                                 <x-utility.icon name="plus" class="w-4 h-4" />
                                 Tambah Pegawai
-                            </button>
+                            </x-action.button>
                         </div>
 
                         {{-- Hidden input berisi snapshot JSON lengkap --}}
@@ -464,13 +464,13 @@
                     const select = item.querySelector('.pegawai-select');
                     if (items.length > 1) {
                         if (!removeBtn) {
-                            removeBtn = document.createElement('button');
-                            removeBtn.type = 'button';
-                            // p-2 dipakai supaya area klik cukup besar (accessibility),
-                            // posisi vertikal kini otomatis sejajar dengan bawah input
-                            // lewat class items-end pada container, bukan margin tebakan (mt-5).
-                            removeBtn.className = 'remove-pegawai-btn text-danger hover:text-red-700 transition duration-150 p-2';
-                            removeBtn.innerHTML = `<x-utility.icon name="trash" class="w-5 h-5" />`;
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = `
+                                <x-action.icon-button color="danger" class="remove-pegawai-btn">
+                                    <x-utility.icon name="trash" class="w-5 h-5" />
+                                </x-action.icon-button>
+                            `.trim();
+                            removeBtn = tempDiv.firstChild;
                             removeBtn.addEventListener('click', function() {
                                 if (select && select.tomselect) {
                                     select.tomselect.destroy();
