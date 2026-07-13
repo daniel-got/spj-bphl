@@ -132,6 +132,12 @@ return [
             'icon' => 'identification',
             'roles' => ['admin'],
         ],
+        [
+            'label' => 'Master Surat Dasar',
+            'url' => '/admin/surat-dasar',
+            'icon' => 'document-duplicate',
+            'roles' => ['admin'],
+        ],
     ],
 
     /*

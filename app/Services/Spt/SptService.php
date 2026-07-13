@@ -5,6 +5,7 @@ namespace App\Services\Spt;
 use App\Helpers\SptHelper;
 use App\Models\Pegawai;
 use App\Models\Spt;
+use App\Models\SuratDasar;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -131,6 +132,14 @@ class SptService
 
             $spt = Spt::create($data);
 
+            // Sinkron surat_dasar ke tabel master jika diisi
+            if (! empty($data['surat_dasar'])) {
+                SuratDasar::firstOrCreate(
+                    ['teks' => $data['surat_dasar']],
+                    ['aktif' => true]
+                );
+            }
+
             session()->flash('success', 'SPT berhasil dibuat dan disimpan sebagai Draft.');
 
             return $spt;
@@ -158,6 +167,14 @@ class SptService
             }
 
             $spt->update($data);
+
+            // Sinkron surat_dasar ke tabel master jika diisi
+            if (! empty($data['surat_dasar'])) {
+                SuratDasar::firstOrCreate(
+                    ['teks' => $data['surat_dasar']],
+                    ['aktif' => true]
+                );
+            }
 
             return $spt;
         });
@@ -203,10 +220,18 @@ class SptService
     }
 
     /**
-     * Ambil riwayat surat dasar yang pernah dipakai.
+     * Ambil riwayat surat dasar dari tabel master.
+     * Jika tabel master kosong, fallback ke data_spt untuk kompatibilitas mundur.
      */
-    public function getRiwayatSuratDasar(int $limit = 50): Collection
+    public function getRiwayatSuratDasar(int $limit = 100): Collection
     {
+        $fromMaster = SuratDasar::aktif()->orderBy('teks')->take($limit)->pluck('teks');
+
+        if ($fromMaster->isNotEmpty()) {
+            return $fromMaster;
+        }
+
+        // Fallback ke data_spt jika tabel master masih kosong
         return DB::table('data_spt')
             ->whereNotNull('surat_dasar')
             ->where('surat_dasar', '!=', '')

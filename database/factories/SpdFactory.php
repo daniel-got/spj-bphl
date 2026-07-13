@@ -31,29 +31,9 @@ class SpdFactory extends Factory
             'ppk' => fake()->randomElement(['Pejabat Pembuat Komitmen 1', 'Pejabat Pembuat Komitmen 2']),
             'nama_ppk' => fake()->name(),
             'nip_ppk' => fake()->numerify('##################'),
-            'status' => 'draft',
             'pembuat_id' => User::factory(),
             'spt_id' => Spt::factory(),
         ];
     }
 
-    /**
-     * State: SPD sudah diajukan.
-     */
-    public function diajukan(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'diajukan',
-        ]);
-    }
-
-    /**
-     * State: SPD sudah disetujui.
-     */
-    public function disetujui(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'disetujui',
-        ]);
-    }
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaPegawaiController;
+use App\Http\Controllers\Admin\SuratDasarController;
 use App\Http\Controllers\Admin\UangHarianController;
 use App\Http\Controllers\Admin\UangPenginapanController;
 use App\Http\Controllers\Spt\SptController;
@@ -58,4 +59,12 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/ppk', function () {
             return view('pages.admin.ppk');
         })->name('ppk');
+
+        // Master Surat Dasar
+        Route::get('/surat-dasar', [SuratDasarController::class, 'index'])->name('surat-dasar.index');
+        Route::post('/surat-dasar', [SuratDasarController::class, 'store'])->name('surat-dasar.store');
+        Route::put('/surat-dasar/{surat_dasar}', [SuratDasarController::class, 'update'])->name('surat-dasar.update');
+        Route::delete('/surat-dasar/{surat_dasar}', [SuratDasarController::class, 'destroy'])->name('surat-dasar.destroy');
+        Route::patch('/surat-dasar/{surat_dasar}/toggle', [SuratDasarController::class, 'toggle'])->name('surat-dasar.toggle');
+        Route::post('/surat-dasar/sinkron', [SuratDasarController::class, 'sinkron'])->name('surat-dasar.sinkron');
     });
