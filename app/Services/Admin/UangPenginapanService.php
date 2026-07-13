@@ -2,47 +2,46 @@
 
 namespace App\Services\Admin;
 
-use App\Models\UangHarian;
+use App\Models\UangPenginapan;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
-class UangHarianService
+class UangPenginapanService
 {
     /**
-     * Mengambil daftar uang harian.
+     * Mengambil daftar uang penginapan.
      */
     public function getAllPaginated(int $perPage = 10)
     {
-        return UangHarian::orderBy('provinsi', 'asc')->paginate($perPage);
+        return UangPenginapan::orderBy('provinsi', 'asc')->paginate($perPage);
     }
 
     /**
-     * Menyimpan data uang harian baru.
+     * Menyimpan data uang penginapan baru.
      */
-    public function createUangHarian(array $data): UangHarian
+    public function createUangPenginapan(array $data): UangPenginapan
     {
-        return UangHarian::create($data);
+        return UangPenginapan::create($data);
     }
 
     /**
-     * Memperbarui data uang harian.
+     * Memperbarui data uang penginapan.
      */
-    public function updateUangHarian(UangHarian $uangHarian, array $data): bool
+    public function updateUangPenginapan(UangPenginapan $uangPenginapan, array $data): bool
     {
-        return $uangHarian->update($data);
+        return $uangPenginapan->update($data);
     }
 
     /**
-     * Menghapus data uang harian.
+     * Menghapus data uang penginapan.
      */
-    public function deleteUangHarian(UangHarian $uangHarian): ?bool
+    public function deleteUangPenginapan(UangPenginapan $uangPenginapan): ?bool
     {
-        return $uangHarian->delete();
+        return $uangPenginapan->delete();
     }
 
     /**
      * Validasi file CSV sebelum benar-benar diimpor (dry-run).
-     * Akan menyimpan file sementara dan mengembalikan token serta preview data.
      */
     public function validateCsvOnly(UploadedFile $file): array
     {
@@ -66,16 +65,11 @@ class UangHarianService
             $h = strtolower(trim($h));
             $h = preg_replace('/[^a-z0-9]/', '_', $h);
             $h = preg_replace('/_+/', '_', $h);
-            $h = trim($h, '_');
-            // Alias map
-            if ($h === 'dalam_kota') {
-                $h = 'dalam_kota_lebih_8_jam';
-            }
 
-            return $h;
+            return trim($h, '_');
         }, $data[0]);
 
-        $requiredHeaders = ['provinsi', 'luar_kota', 'dalam_kota_lebih_8_jam', 'diklat'];
+        $requiredHeaders = ['provinsi', 'gol_iv', 'gol_iii_ii_i'];
         $headerMap = [];
         foreach ($requiredHeaders as $reqHeader) {
             $idx = array_search($reqHeader, $headers);
@@ -113,9 +107,8 @@ class UangHarianService
             if (count($preview) < 5) {
                 $preview[] = [
                     'provinsi' => $provinsi,
-                    'luar_kota' => $row[$headerMap['luar_kota']],
-                    'dalam_kota_lebih_8_jam' => $row[$headerMap['dalam_kota_lebih_8_jam']],
-                    'diklat' => $row[$headerMap['diklat']],
+                    'gol_iv' => $row[$headerMap['gol_iv']],
+                    'gol_iii_ii_i' => $row[$headerMap['gol_iii_ii_i']],
                 ];
             }
         }
@@ -131,7 +124,7 @@ class UangHarianService
     }
 
     /**
-     * Memproses import dari token file sementara yang sudah divalidasi.
+     * Memproses import dari token file sementara.
      */
     public function importFromToken(string $token): array
     {
@@ -157,15 +150,11 @@ class UangHarianService
             $h = strtolower(trim($h));
             $h = preg_replace('/[^a-z0-9]/', '_', $h);
             $h = preg_replace('/_+/', '_', $h);
-            $h = trim($h, '_');
-            if ($h === 'dalam_kota') {
-                $h = 'dalam_kota_lebih_8_jam';
-            }
 
-            return $h;
+            return trim($h, '_');
         }, $data[0]);
 
-        $requiredHeaders = ['provinsi', 'luar_kota', 'dalam_kota_lebih_8_jam', 'diklat'];
+        $requiredHeaders = ['provinsi', 'gol_iv', 'gol_iii_ii_i'];
         $headerMap = [];
         foreach ($requiredHeaders as $reqHeader) {
             $headerMap[$reqHeader] = array_search($reqHeader, $headers);
@@ -189,19 +178,17 @@ class UangHarianService
                 continue;
             }
 
-            UangHarian::updateOrCreate(
+            UangPenginapan::updateOrCreate(
                 ['provinsi' => $provinsi],
                 [
-                    'luar_kota' => (int) preg_replace('/\D/', '', $row[$headerMap['luar_kota']]),
-                    'dalam_kota_lebih_8_jam' => (int) preg_replace('/\D/', '', $row[$headerMap['dalam_kota_lebih_8_jam']]),
-                    'diklat' => (int) preg_replace('/\D/', '', $row[$headerMap['diklat']]),
+                    'gol_iv' => (int) preg_replace('/\D/', '', $row[$headerMap['gol_iv']]),
+                    'gol_iii_ii_i' => (int) preg_replace('/\D/', '', $row[$headerMap['gol_iii_ii_i']]),
                 ]
             );
 
             $berhasil++;
         }
 
-        // Hapus file sementara setelah diproses
         @unlink($fullPath);
 
         return [

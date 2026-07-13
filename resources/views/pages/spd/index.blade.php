@@ -151,6 +151,7 @@
 
                                 $actions = [
                                     'detail' => route('user.spd.show', $spd->id),
+                                    'print' => route('user.spd.print', $spd->id),
                                 ];
                                 
                                 if ($canEdit) {

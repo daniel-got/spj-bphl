@@ -72,7 +72,12 @@ class RincianController extends Controller
             abort(403, 'Rincian SPJ sudah diajukan dan tidak dapat diubah.');
         }
 
-        return view('pages.rincian.edit', compact('rincian'));
+        $penginapanRate = 0;
+        if ($rincian->spd) {
+            $penginapanRate = $this->rincianService->calculatePenginapanRate($rincian->spd);
+        }
+
+        return view('pages.rincian.edit', compact('rincian', 'penginapanRate'));
     }
 
     /**
@@ -117,7 +122,9 @@ class RincianController extends Controller
         $rincian = $this->rincianService->getRincianById($id);
         $this->authorize('view', $rincian);
 
-        return view('pages.rincian.print', compact('rincian'));
+        $uangHarianRate = $this->rincianService->calculateUangHarianRate($rincian->spd);
+
+        return view('pages.rincian.print', compact('rincian', 'uangHarianRate'));
     }
 
     public function searchSpd(Request $request)

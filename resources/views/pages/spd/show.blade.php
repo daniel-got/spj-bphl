@@ -22,6 +22,11 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
+                    <a href="{{ route('user.spd.print', $spd->id) }}" target="_blank"
+                        class="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors duration-150 shadow-sm gap-1" title="Cetak SPD">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                        Cetak SPD
+                    </a>
                     @can('update', $spd)
                         @if(!$spd->rincian || in_array($spd->rincian->status, [\App\Models\Rincian::STATUS_DRAFT, \App\Models\Rincian::STATUS_REVISED]))
                             <a href="{{ route('user.spd.edit', $spd->id) }}"

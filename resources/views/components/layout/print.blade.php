@@ -110,9 +110,7 @@
         {{ $slot }}
 
         <script>
-            window.onload = function() {
-                window.print();
-            }
+            // Cetak dikendalikan oleh tombol di dalam halaman (A4/F4)
         </script>
     </body>
 </html>

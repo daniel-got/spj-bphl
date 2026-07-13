@@ -5,6 +5,7 @@ namespace App\Services\Rincian;
 use App\Models\Pegawai;
 use App\Models\Rincian;
 use App\Models\Spd;
+use App\Models\UangPenginapan;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -225,6 +226,9 @@ class RincianService
         $user = auth()->user();
         $q = Spd::query();
 
+        // Jangan tampilkan SPD yang sudah memiliki rincian
+        $q->whereDoesntHave('rincian');
+
         if ($user && ! $user->isAdmin() && ! $user->isMonitoring() && ! $user->isVerifikator()) {
             $pegawai = Pegawai::where('user_id', $user->id)->first();
             $nip = $pegawai?->nip;
@@ -274,6 +278,9 @@ class RincianService
             return [];
         }
 
+        // Determine rate penginapan
+        $penginapanRate = $this->calculatePenginapanRate($spd);
+
         return [
             'nomor_spd' => $spd->nomor_spd,
             'tgl_spd' => $spd->tgl_spd?->format('Y-m-d'),
@@ -290,6 +297,86 @@ class RincianService
             'ppk' => $spd->ppk,
             'nama_ppk' => $spd->nama_ppk,
             'nip_ppk' => $spd->nip_ppk,
+            'penginapan_rate' => $penginapanRate,
         ];
+    }
+
+    public function calculatePenginapanRate(Spd $spd)
+    {
+        $penginapanRate = 0;
+        if ($spd->pegawai && $spd->tempat_tujuan) {
+            $golongan = $spd->pegawai->golongan;
+            $tempatTujuans = is_array($spd->tempat_tujuan) ? $spd->tempat_tujuan : [$spd->tempat_tujuan];
+
+            // Try to find the matching province
+            $uangPenginapan = UangPenginapan::whereIn('provinsi', $tempatTujuans)->first();
+
+            // If not found, try fuzzy match (e.g., destination is "Kota Jambi", province is "Jambi")
+            if (! $uangPenginapan) {
+                foreach ($tempatTujuans as $tujuan) {
+                    // Cek apakah string tempat tujuan mengandung nama provinsi (misal: "Kota Jambi" mengandung "Jambi")
+                    $uangPenginapan = UangPenginapan::whereRaw('? LIKE CONCAT("%", provinsi, "%")', [trim($tujuan)])->first();
+                    if ($uangPenginapan) {
+                        break;
+                    }
+                    
+                    // Fallback cek sebaliknya
+                    if (! $uangPenginapan) {
+                        $uangPenginapan = UangPenginapan::where('provinsi', 'LIKE', '%'.trim($tujuan).'%')->first();
+                        if ($uangPenginapan) {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if ($uangPenginapan) {
+                if (in_array(strtoupper($golongan), ['IV/A', 'IV/B', 'IV/C', 'IV/D', 'IV/E', 'IV'])) {
+                    $penginapanRate = $uangPenginapan->gol_iv;
+                } else {
+                    $penginapanRate = $uangPenginapan->gol_iii_ii_i;
+                }
+            }
+        }
+
+        return $penginapanRate;
+    }
+
+    public function calculateUangHarianRate(Spd $spd)
+    {
+        $rate = 0;
+        if ($spd->tempat_tujuan) {
+            $tempatTujuans = is_array($spd->tempat_tujuan) ? $spd->tempat_tujuan : [$spd->tempat_tujuan];
+
+            $uangHarian = \App\Models\UangHarian::whereIn('provinsi', $tempatTujuans)->first();
+
+            if (! $uangHarian) {
+                foreach ($tempatTujuans as $tujuan) {
+                    $uangHarian = \App\Models\UangHarian::whereRaw('? LIKE CONCAT("%", provinsi, "%")', [trim($tujuan)])->first();
+                    if ($uangHarian) {
+                        break;
+                    }
+                    
+                    if (! $uangHarian) {
+                        $uangHarian = \App\Models\UangHarian::where('provinsi', 'LIKE', '%'.trim($tujuan).'%')->first();
+                        if ($uangHarian) {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if ($uangHarian) {
+                if ($spd->jenis_perjalanan == 'Dalam Kota') {
+                    $rate = $uangHarian->dalam_kota_lebih_8_jam;
+                } elseif ($spd->jenis_perjalanan == 'Diklat') {
+                    $rate = $uangHarian->diklat;
+                } else {
+                    $rate = $uangHarian->luar_kota;
+                }
+            }
+        }
+
+        return (int) $rate;
     }
 }

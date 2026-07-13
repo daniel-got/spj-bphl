@@ -150,15 +150,26 @@ class SpdService
         $user = auth()->user();
         $query = Spt::query();
 
+        $pegawai = null;
+        if ($user) {
+            $pegawai = Pegawai::where('user_id', $user->id)->first();
+        }
+
         // Terapkan filter berdasarkan role/penugasan
         if ($user && ! $user->isAdmin() && ! $user->isMonitoring()) {
-            $pegawai = Pegawai::where('user_id', $user->id)->first();
             $query->where(function ($q) use ($user, $pegawai) {
                 $q->where('pembuat_id', $user->id);
                 if ($pegawai) {
                     $q->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawai->id]])
                         ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawai->id]]);
                 }
+            });
+        }
+
+        // Jangan tampilkan SPT jika user (pegawai) ini sudah pernah membuat SPD untuk SPT tersebut
+        if ($pegawai) {
+            $query->whereDoesntHave('spds', function($q) use ($pegawai) {
+                $q->where('nip_pegawai', $pegawai->nip);
             });
         }
 

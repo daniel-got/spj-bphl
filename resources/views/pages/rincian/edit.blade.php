@@ -110,8 +110,8 @@
                                             <label class="text-sm font-semibold text-text-main">Biaya Hotel / Penginapan (Rp)</label>
                                             <input type="number" name="rincian_biaya[{{ $i }}][hotel_ril]" min="0"
                                                 value="{{ $baris['hotel_ril'] ?? '' }}"
-                                                placeholder="Contoh: 500000"
-                                                class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary" />
+                                                placeholder="Otomatis dihitung..." readonly
+                                                class="block w-full rounded-md border border-border-custom bg-surface-muted px-3 py-2 text-sm text-text-main focus:outline-none" />
                                         </div>
                                     </div>
                                 </div>
@@ -141,6 +141,9 @@
         // Dynamic Rincian Biaya Rows (Edit)
         // -----------------------------------------------------------------------
         (function () {
+            // Load rate penginapan dari backend
+            window.currentPenginapanRate = {{ $penginapanRate ?? 0 }};
+            
             const container = document.getElementById('rincian-biaya-container');
             const btnTambah = document.getElementById('btn-tambah-biaya');
 
@@ -171,8 +174,8 @@
                             <div class="flex flex-col gap-1">
                                 <label class="text-sm font-semibold text-text-main">Biaya Hotel / Penginapan (Rp)</label>
                                 <input type="number" name="rincian_biaya[${index}][hotel_ril]" min="0"
-                                    placeholder="Contoh: 500000"
-                                    class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    placeholder="Otomatis dihitung..." readonly
+                                    class="block w-full rounded-md border border-border-custom bg-surface-muted px-3 py-2 text-sm text-text-main focus:outline-none" />
                             </div>
                         </div>
                     </div>`;
@@ -208,6 +211,33 @@
                     reindex();
                 }
             });
+            
+            // Kalkulasi penginapan saat persentase berubah
+            container.addEventListener('change', function(e) {
+                if (e.target.matches('select[name*="[penginapan]"]')) {
+                    const row = e.target.closest('.rincian-row');
+                    calculateRowPenginapan(row);
+                }
+            });
+            
+            window.calculateRowPenginapan = function(row) {
+                const select = row.querySelector('select[name*="[penginapan]"]');
+                const inputHotel = row.querySelector('input[name*="[hotel_ril]"]');
+                const persentase = parseInt(select.value) || 0;
+                const rate = window.currentPenginapanRate || 0;
+                const lamaKegiatan = parseInt(document.getElementById('lama_kegiatan').value) || 0;
+                
+                let hariMenginap = lamaKegiatan > 0 ? lamaKegiatan : 1;
+                
+                const total = Math.round((rate * (persentase / 100)) * hariMenginap);
+                inputHotel.value = total > 0 ? total : '';
+            }
+            
+            window.calculateAllPenginapan = function() {
+                container.querySelectorAll('.rincian-row').forEach(row => {
+                    calculateRowPenginapan(row);
+                });
+            }
 
             reindex();
         })();

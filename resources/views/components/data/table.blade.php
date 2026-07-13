@@ -64,6 +64,7 @@
                                             $hoverClass = 'hover:text-gray-700 hover:bg-gray-100';
                                             $title = 'Cetak';
                                         }
+                                        $target = ($type === 'print') ? 'target="_blank"' : '';
                                     @endphp
                                     
                                     @if($onclick)
@@ -79,7 +80,7 @@
                                             </button>
                                         </form>
                                     @else
-                                        <a href="{{ $url }}" class="p-2 text-muted {{ $hoverClass }} rounded-md transition-colors inline-block" title="{{ $title }}">
+                                        <a href="{{ $url }}" {!! $target !!} class="p-2 text-muted {{ $hoverClass }} rounded-md transition-colors inline-block" title="{{ $title }}">
                                             <x-utility.icon name="{{ $icon }}" class="w-4 h-4" />
                                         </a>
                                     @endif

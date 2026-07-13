@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaPegawaiController;
 use App\Http\Controllers\Admin\UangHarianController;
+use App\Http\Controllers\Admin\UangPenginapanController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,6 +41,14 @@ Route::middleware(['auth', 'role:admin'])
         Route::delete('/uang-harian/{uangHarian}', [UangHarianController::class, 'destroy'])->name('uang-harian.destroy');
         Route::post('/uang-harian/import', [UangHarianController::class, 'import'])->name('uang-harian.import');
         Route::post('/uang-harian/validate-import', [UangHarianController::class, 'validateImport'])->name('uang-harian.validateImport');
+
+        // Master Uang Penginapan
+        Route::get('/uang-penginapan', [UangPenginapanController::class, 'index'])->name('uang-penginapan.index');
+        Route::post('/uang-penginapan', [UangPenginapanController::class, 'store'])->name('uang-penginapan.store');
+        Route::put('/uang-penginapan/{uangPenginapan}', [UangPenginapanController::class, 'update'])->name('uang-penginapan.update');
+        Route::delete('/uang-penginapan/{uangPenginapan}', [UangPenginapanController::class, 'destroy'])->name('uang-penginapan.destroy');
+        Route::post('/uang-penginapan/import', [UangPenginapanController::class, 'import'])->name('uang-penginapan.import');
+        Route::post('/uang-penginapan/validate-import', [UangPenginapanController::class, 'validateImport'])->name('uang-penginapan.validateImport');
 
         // Kelola PPK
         Route::get('/ppk', function () {

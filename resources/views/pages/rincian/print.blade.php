@@ -1,8 +1,32 @@
 <x-layout.print title="Rincian Biaya Perjalanan Dinas & Perhitungan SPD Rampung">
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+        }
+        body.paper-a4 @page { size: A4; margin: 15mm; }
+        body.paper-f4 @page { size: 215.9mm 330.2mm; margin: 15mm; }
+    </style>
+
+    <div class="no-print" style="margin-bottom: 20px; text-align: center; padding: 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+        <button type="button" onclick="document.body.classList.remove('paper-f4'); document.body.classList.add('paper-a4'); window.print();" style="padding: 8px 16px; background-color: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold;">🖨️ Cetak (A4)</button>
+        <button type="button" onclick="document.body.classList.remove('paper-a4'); document.body.classList.add('paper-f4'); window.print();" style="padding: 8px 16px; background-color: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🖨️ Cetak (F4)</button>
+        <p style="font-size: 12px; color: #64748b; margin-top: 8px;">Pilih ukuran kertas sebelum mencetak. Jendela cetak akan otomatis terbuka.</p>
+    </div>
+
     @php
-        $uangHarianTotal = 1110000; // Statis sementara
-        $transportTotal = $rincian->biaya_transport ?? 0;
-        $hotelTotal = $rincian->hotel_ril ?? 0;
+        $uangHarianRate = $uangHarianRate ?? 0;
+        $lamaKegiatan = $rincian->spd->lama_kegiatan ?? 0;
+        $uangHarianTotal = $uangHarianRate * $lamaKegiatan;
+        
+        $transportTotal = 0;
+        $hotelTotal = 0;
+        if (is_array($rincian->rincian_biaya)) {
+            foreach ($rincian->rincian_biaya as $item) {
+                $transportTotal += (int) ($item['biaya_transport'] ?? 0);
+                $hotelTotal += (int) ($item['hotel_ril'] ?? 0);
+            }
+        }
+        
         $totalKeseluruhan = $uangHarianTotal + $transportTotal + $hotelTotal;
     @endphp
     <div class="container">
@@ -38,7 +62,7 @@
                     <td>
                         Uang Harian :<br />
                         <span style="display: inline-block; margin-left: 20px">
-                            3.0 hari x Rp. 370.000 (Statis Sementara)
+                            {{ $lamaKegiatan }} hari x Rp. {{ number_format($uangHarianRate, 0, ',', '.') }}
                         </span>
                     </td>
                     <td style="vertical-align: bottom">
@@ -78,7 +102,7 @@
                     <td>
                         Penginapan :<br />
                         <span style="display: inline-block; margin-left: 20px">
-                            {{ $rincian->lama_kegiatan - 1 }} x Rp. {{ number_format( ($rincian->lama_kegiatan > 1 ? $hotelTotal / ($rincian->lama_kegiatan - 1) : $hotelTotal), 0, ',', '.') }},-
+                            {{ $lamaKegiatan > 1 ? $lamaKegiatan - 1 : 1 }} x Rp. {{ number_format( ($lamaKegiatan > 1 ? $hotelTotal / ($lamaKegiatan - 1) : $hotelTotal), 0, ',', '.') }},-
                         </span>
                     </td>
                     <td style="vertical-align: bottom">

@@ -121,6 +121,12 @@ return [
             'roles' => ['admin'],
         ],
         [
+            'label' => 'Data Uang Penginapan',
+            'url' => '/admin/uang-penginapan',
+            'icon' => 'building-office', // use building-office for hotel/penginapan
+            'roles' => ['admin'],
+        ],
+        [
             'label' => 'Kelola PPK',
             'url' => '/admin/ppk',
             'icon' => 'identification',
