@@ -21,6 +21,7 @@ enum UserRole: string
     case KEPALA_SEKSI_PEPHPHL   = 'kepala_seksi_pephphl';
     case KEPALA_SEKSI_PPPHPHL   = 'kepala_seksi_ppphphl';
     case USER                   = 'user';
+    case PEMBUAT_SPT            = 'pembuat_spt';
 
     /**
      * Label yang ditampilkan di UI (readable).
@@ -35,6 +36,7 @@ enum UserRole: string
             self::KEPALA_SEKSI_PEPHPHL  => 'Kepala Seksi PEPHPHL',
             self::KEPALA_SEKSI_PPPHPHL  => 'Kepala Seksi PPPHPHL',
             self::USER                  => 'Pegawai',
+            self::PEMBUAT_SPT           => 'Pembuat SPT',
         };
     }
 

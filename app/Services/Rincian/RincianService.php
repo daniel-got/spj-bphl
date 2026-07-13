@@ -2,6 +2,7 @@
 
 namespace App\Services\Rincian;
 
+use App\Models\Pegawai;
 use App\Models\Rincian;
 use App\Models\Spd;
 use Illuminate\Support\Facades\DB;
@@ -13,11 +14,14 @@ class RincianService
      */
     public function getCounts(): array
     {
+        $query = Rincian::query();
+        $this->applyRoleFilter($query);
+
         return [
-            'all' => Rincian::count(),
-            'disetujui' => Rincian::where('status', 'disetujui')->count(),
-            'direvisi' => Rincian::where('status', 'direvisi')->count(),
-            'ditolak' => Rincian::where('status', 'ditolak')->count(),
+            'all' => (clone $query)->count(),
+            'disetujui' => (clone $query)->where('status', 'disetujui')->count(),
+            'direvisi' => (clone $query)->where('status', 'direvisi')->count(),
+            'ditolak' => (clone $query)->where('status', 'ditolak')->count(),
         ];
     }
 
@@ -27,6 +31,7 @@ class RincianService
     public function getAllLatest(array $filters = [], int $perPage = 10)
     {
         $query = Rincian::query();
+        $this->applyRoleFilter($query);
 
         if (! empty($filters['search'])) {
             $search = $filters['search'];
@@ -47,6 +52,32 @@ class RincianService
         }
 
         return $query->latest()->paginate($perPage);
+    }
+
+    /**
+     * Terapkan filter berdasarkan role agar pegawai biasa hanya bisa melihat
+     * Rincian miliknya sendiri (atau yang ia buat), dan pembuat_spt bisa melihat
+     * yang ia buat dan ditugaskan kepadanya.
+     */
+    protected function applyRoleFilter($query): void
+    {
+        $user = auth()->user();
+
+        // Jika user adalah admin atau role monitoring/verifikator, lihat semua
+        if (! $user || ! in_array($user->role, ['user', 'pembuat_spt'])) {
+            return;
+        }
+
+        $pegawai = Pegawai::where('user_id', $user->id)->first();
+        $pegawaiNip = $pegawai?->nip;
+
+        $query->where(function ($q) use ($user, $pegawaiNip) {
+            $q->where('pembuat_id', $user->id);
+
+            if ($pegawaiNip) {
+                $q->orWhere('nip_pegawai', $pegawaiNip);
+            }
+        });
     }
 
     /**

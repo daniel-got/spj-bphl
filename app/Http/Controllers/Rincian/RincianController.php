@@ -91,6 +91,16 @@ class RincianController extends Controller
 
         return redirect()->route('user.rincian.index')->with('success', 'Data Rincian berhasil dihapus');
     }
+
+    /**
+     * Print the specified resource.
+     */
+    public function print(string $id)
+    {
+        $rincian = $this->rincianService->getRincianById($id);
+
+        return view('pages.rincian.print', compact('rincian'));
+    }
     public function searchSpd(\Illuminate\Http\Request $request)
     {
         return response()->json([

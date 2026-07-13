@@ -4,7 +4,7 @@ use App\Http\Controllers\Spd\SpdController;
 use App\Http\Controllers\User\DashboardController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'role:user'])
+Route::middleware(['auth'])
     ->prefix('user')
     ->name('user.')
     ->group(function () {

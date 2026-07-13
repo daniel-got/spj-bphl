@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Contoh pemakaian: Route::middleware(['auth', 'role:admin'])->...
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
+            'pembuat_spt' => \App\Http\Middleware\EnsurePembuatSpt::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

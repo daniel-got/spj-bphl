@@ -97,6 +97,11 @@ class User extends Authenticatable
         return $this->role === UserRole::VERIFIKATOR->value;
     }
 
+    public function isPembuatSpt(): bool
+    {
+        return $this->role === UserRole::PEMBUAT_SPT->value;
+    }
+
     public function isPegawai(): bool
     {
         return $this->role === UserRole::USER->value;
