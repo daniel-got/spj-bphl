@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers\Spd;
 
-use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Spd\StoreSpdRequest;
 use App\Http\Requests\Spd\UpdateSpdRequest;
 use App\Models\Pegawai;
 use App\Models\Rincian;
 use App\Models\Spd;
-use App\Models\User;
 use App\Services\Spd\SpdService;
 use Illuminate\Http\Request;
 
@@ -31,25 +29,9 @@ class SpdController extends Controller
         return view('pages.spd.index', compact('spds'));
     }
 
-    private function getPpkData()
+    private function getPpkData(): array
     {
-        $roles = [
-            UserRole::PPK1->label() => UserRole::PPK1->value,
-            UserRole::PPK2->label() => UserRole::PPK2->value,
-            UserRole::PPK3->label() => UserRole::PPK3->value,
-            UserRole::BENDAHARA->label() => UserRole::BENDAHARA->value,
-        ];
-
-        $ppkData = [];
-        foreach ($roles as $label => $roleValue) {
-            $user = User::where('role', $roleValue)->with('pegawai')->first();
-            $ppkData[$label] = [
-                'nama' => $user?->pegawai?->nama_pegawai ?? $user?->name ?? '',
-                'nip' => $user?->pegawai?->nip ?? '',
-            ];
-        }
-
-        return $ppkData;
+        return $this->spdService->getPpkData();
     }
 
     /**
@@ -158,6 +140,7 @@ class SpdController extends Controller
     public function print(string $id)
     {
         $spd = $this->spdService->getSpdById($id);
+        $this->authorize('view', $spd);
 
         return view('pages.spd.print', compact('spd'));
     }

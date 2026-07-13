@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('data_spt', function (Blueprint $table) {
-            $table->string('jenis_tugas')->nullable(); // Pilihan: pelatihan, keuangan, administrasi
-            $table->text('surat_dasar')->nullable();   // Bunyi teks undangan/nota dinas poin 3
+            if (! Schema::hasColumn('data_spt', 'jenis_tugas')) {
+                $table->string('jenis_tugas')->nullable(); // Pilihan: pelatihan, keuangan, administrasi
+            }
+            if (! Schema::hasColumn('data_spt', 'surat_dasar')) {
+                $table->text('surat_dasar')->nullable();   // Bunyi teks undangan/nota dinas poin 3
+            }
         });
     }
 

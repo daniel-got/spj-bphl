@@ -127,46 +127,46 @@
 
                     {{-- Baris Baru: Jenis Kategori SPT & Surat Dasar --}}
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-border-custom pt-6">
-                        <div class="flex flex-col">
-                            <label for="jenis_tugas" class="text-sm font-medium text-text-main mb-2 block">
-                                Jenis Kategori SPT <span class="text-danger">*</span>
-                            </label>
-                            <select name="jenis_tugas" id="jenis_tugas" required 
-                                class="w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background border-border-custom focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
-                                <option value="">-- Pilih Kategori Tugas --</option>
-                                <option value="pelatihan" {{ old('jenis_tugas', $spt->jenis_tugas) == 'pelatihan' ? 'selected' : '' }}>Pelatihan</option>
-                                <option value="keuangan" {{ old('jenis_tugas', $spt->jenis_tugas) == 'keuangan' ? 'selected' : '' }}>Keuangan</option>
-                                <option value="administrasi" {{ old('jenis_tugas', $spt->jenis_tugas) == 'administrasi' ? 'selected' : '' }}>Administrasi</option>
-                            </select>
-                            @if ($errors->has('jenis_tugas'))
-                                <p class="text-xs text-danger mt-1">{{ $errors->first('jenis_tugas') }}</p>
-                            @endif
-                        </div>
+                        {{-- Jenis Tugas menggunakan x-form.select --}}
+                        <x-form.select
+                            name="jenis_tugas"
+                            label="Jenis Kategori SPT"
+                            :required="true"
+                            :selected="old('jenis_tugas', $spt->jenis_tugas)"
+                            :error="$errors->first('jenis_tugas')"
+                            :options="['pelatihan' => 'Pelatihan', 'keuangan' => 'Keuangan', 'administrasi' => 'Administrasi']"
+                            placeholder="-- Pilih Kategori Tugas --"
+                        />
 
+                        {{-- Surat Dasar: TomSelect creatable dropdown --}}
                         <div class="md:col-span-2 flex flex-col">
                             <label for="surat_dasar" class="text-sm font-medium text-text-main mb-2 block">
                                 Surat Dasar / Acuan Poin 3 <span class="text-muted text-xs">(Opsional)</span>
                             </label>
-                            <textarea name="surat_dasar" id="surat_dasar" rows="2" 
-                                placeholder="Contoh: Nota Dinas Kepala Pusat Diklat SDM Lingkungan Hidup dan Kehutanan Nomor: ND.385/XI-3/2026 tanggal 10 Juli 2026"
-                                class="w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background border-border-custom focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">{{ old('surat_dasar', $spt->surat_dasar) }}</textarea>
-                            <small class="text-xs text-muted mt-1">Kosongkan jika surat jenis Administrasi atau tidak memerlukan dasar surat tambahan.</small>
+
+                            @php
+                                $currentSuratDasar = old('surat_dasar', $spt->surat_dasar);
+                            @endphp
+                            <select id="surat_dasar_select" name="surat_dasar"
+                                class="surat-dasar-tomselect w-full">
+                                <option value="">-- Pilih atau ketik surat dasar --</option>
+                                @foreach($riwayatSuratDasar as $riwayat)
+                                    <option value="{{ $riwayat }}"
+                                        {{ $currentSuratDasar === $riwayat ? 'selected' : '' }}>
+                                        {{ $riwayat }}
+                                    </option>
+                                @endforeach
+                                {{-- Jika nilai saat ini tidak ada di riwayat, tambahkan sebagai option terpilih --}}
+                                @if($currentSuratDasar && !in_array($currentSuratDasar, $riwayatSuratDasar->toArray()))
+                                    <option value="{{ $currentSuratDasar }}" selected>{{ $currentSuratDasar }}</option>
+                                @endif
+                            </select>
+
+                            <small class="text-xs text-muted mt-1">
+                                Pilih dari riwayat atau ketik surat baru &amp; tekan <kbd class="bg-surface border border-border-custom rounded px-1 py-0.5 text-xs">Enter</kbd> untuk menyimpan sebagai pilihan baru.
+                            </small>
                             @if ($errors->has('surat_dasar'))
                                 <p class="text-xs text-danger mt-1">{{ $errors->first('surat_dasar') }}</p>
-                            @endif
-
-                            {{-- PERBAIKAN: DAFTAR KLIK CEPAT RIWAYAT SURAT DASAR --}}
-                            @if(isset($riwayatSuratDasar) && count($riwayatSuratDasar) > 0)
-                                <div class="mt-2 text-muted" style="font-size: 11px;">
-                                    <span class="d-block mb-1"><strong>Klik Cepat Riwayat:</strong></span>
-                                    <div class="flex flex-wrap gap-1 mt-1">
-                                        @foreach($riwayatSuratDasar as $riwayat)
-                                            <button type="button" class="btn-pilih-dasar border border-border-custom bg-background/80 hover:bg-background rounded px-2 py-0.5 text-left text-text-main transition duration-150 max-w-full truncate" title="{{ $riwayat }}" data-teks="{{ $riwayat }}">
-                                                {{ $riwayat }}
-                                            </button>
-                                        @endforeach
-                                    </div>
-                                </div>
                             @endif
                         </div>
                     </div>
@@ -317,16 +317,25 @@
             const tglKembali = document.getElementById('tgl_kembali');
             const lamaKegiatan = document.getElementById('lama_kegiatan');
 
-            // Perbaikan handler klik otomatis untuk Surat Dasar
-            const txtSuratDasar = document.getElementById('surat_dasar');
-            const btnPilihDasar = document.querySelectorAll('.btn-pilih-dasar');
-            
-            if (btnPilihDasar.length > 0 && txtSuratDasar) {
-                btnPilihDasar.forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        txtSuratDasar.value = this.getAttribute('data-teks').trim();
-                        txtSuratDasar.focus();
-                    });
+            // TomSelect creatable dropdown untuk Surat Dasar
+            const suratDasarSelect = document.getElementById('surat_dasar_select');
+            if (suratDasarSelect) {
+                new TomSelect(suratDasarSelect, {
+                    create: true,
+                    maxItems: 1,
+                    placeholder: '-- Pilih atau ketik surat dasar baru --',
+                    createOnBlur: false,
+                    persist: false,
+                    render: {
+                        option_create: function(data, escape) {
+                            return `<div class="create">
+                                        Simpan: <strong>${escape(data.input)}</strong>&hellip;
+                                    </div>`;
+                        },
+                        no_results: function(data, escape) {
+                            return `<div class="no-results">Tidak ditemukan. Ketik lalu tekan Enter untuk menyimpan baru.</div>`;
+                        },
+                    }
                 });
             }
 

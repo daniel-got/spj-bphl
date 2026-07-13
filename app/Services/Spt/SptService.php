@@ -5,6 +5,7 @@ namespace App\Services\Spt;
 use App\Helpers\SptHelper;
 use App\Models\Pegawai;
 use App\Models\Spt;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class SptService
@@ -204,7 +205,7 @@ class SptService
     /**
      * Ambil riwayat surat dasar yang pernah dipakai.
      */
-    public function getRiwayatSuratDasar(int $limit = 50): \Illuminate\Support\Collection
+    public function getRiwayatSuratDasar(int $limit = 50): Collection
     {
         return DB::table('data_spt')
             ->whereNotNull('surat_dasar')
@@ -213,5 +214,45 @@ class SptService
             ->orderBy('surat_dasar', 'asc')
             ->take($limit)
             ->pluck('surat_dasar');
+    }
+
+    /**
+     * Siapkan data SPT beserta relasi pegawai untuk kebutuhan cetak PDF.
+     * Menangani kasus di mana pegawai tidak ditemukan di DB (dummy fallback).
+     */
+    public function getSptForPdf(string $id): Spt
+    {
+        $spt = Spt::findOrFail($id);
+
+        $pegawaiData = $spt->pegawai_ditugaskan;
+        if (is_string($pegawaiData)) {
+            $pegawaiData = json_decode($pegawaiData, true);
+        }
+
+        $pegawais = collect();
+        if (is_array($pegawaiData)) {
+            foreach ($pegawaiData as $p) {
+                $pegawaiModel = Pegawai::find($p['pegawai_id'] ?? null);
+                if ($pegawaiModel) {
+                    $pegawaiModel->peran = $p['peran'] ?? 'Anggota';
+                    $pegawais->push($pegawaiModel);
+                } else {
+                    $dummy = new Pegawai([
+                        'nama_pegawai' => $p['nama_pegawai'] ?? $p['nama'] ?? '-',
+                        'nip' => $p['nip'] ?? '-',
+                        'pangkat' => $p['pangkat'] ?? '-',
+                        'golongan' => $p['golongan'] ?? '',
+                        'jabatan' => $p['jabatan'] ?? '-',
+                    ]);
+                    $dummy->id = $p['pegawai_id'] ?? 0;
+                    $dummy->peran = $p['peran'] ?? 'Anggota';
+                    $pegawais->push($dummy);
+                }
+            }
+        }
+
+        $spt->setRelation('pegawais', $pegawais);
+
+        return $spt;
     }
 }

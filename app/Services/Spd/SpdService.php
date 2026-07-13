@@ -2,9 +2,11 @@
 
 namespace App\Services\Spd;
 
+use App\Enums\UserRole;
 use App\Models\Pegawai;
 use App\Models\Spd;
 use App\Models\Spt;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class SpdService
@@ -168,7 +170,7 @@ class SpdService
 
         // Jangan tampilkan SPT jika user (pegawai) ini sudah pernah membuat SPD untuk SPT tersebut
         if ($pegawai) {
-            $query->whereDoesntHave('spds', function($q) use ($pegawai) {
+            $query->whereDoesntHave('spds', function ($q) use ($pegawai) {
                 $q->where('nip_pegawai', $pegawai->nip);
             });
         }
@@ -222,5 +224,30 @@ class SpdService
             'kode_mak' => $spt->kode_mak,
             'pegawai_list' => $spt->pegawai_ditugaskan,
         ];
+    }
+
+    /**
+     * Kumpulkan data nama & NIP pejabat PPK dan Bendahara dari tabel users+pegawai.
+     * Dipindahkan dari Controller agar sesuai prinsip Thin Controller.
+     */
+    public function getPpkData(): array
+    {
+        $roles = [
+            UserRole::PPK1->label() => UserRole::PPK1->value,
+            UserRole::PPK2->label() => UserRole::PPK2->value,
+            UserRole::PPK3->label() => UserRole::PPK3->value,
+            UserRole::BENDAHARA->label() => UserRole::BENDAHARA->value,
+        ];
+
+        $ppkData = [];
+        foreach ($roles as $label => $roleValue) {
+            $user = User::where('role', $roleValue)->with('pegawai')->first();
+            $ppkData[$label] = [
+                'nama' => $user?->pegawai?->nama_pegawai ?? $user?->name ?? '',
+                'nip' => $user?->pegawai?->nip ?? '',
+            ];
+        }
+
+        return $ppkData;
     }
 }
