@@ -143,7 +143,7 @@
                                 'Tanggal Diperiksa',
                                 'Catatan',
                                 'Verifikator',
-                                'Aksi',
+                                ['label' => 'Aksi', 'align' => 'center'],
                             ];
 
                             $rows = collect($spds->items() ?? [])->map(function ($spd, $index) use ($spds) {
@@ -167,7 +167,7 @@
                                     '</a>';
 
                                 $aksiButtons =
-                                    '<div class="flex items-center gap-2">
+                                    '<div class="flex items-center justify-center gap-2">
                                     <a href="' .
                                     route('user.spd.show', $spd->id) .
                                     '" class="inline-flex items-center bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors duration-150 border border-blue-200/50" title="Detail">
@@ -177,6 +177,11 @@
                                     route('user.spd.edit', $spd->id) .
                                     '" class="inline-flex items-center bg-yellow-50 hover:bg-yellow-600 text-yellow-700 hover:text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors duration-150 border border-yellow-200/50" title="Edit">
                                         Edit
+                                    </a>
+                                    <a href="' .
+                                    route('user.spd.print', $spd->id) .
+                                    '" target="_blank" class="inline-flex items-center bg-green-50 hover:bg-green-600 text-green-700 hover:text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors duration-150 border border-green-200/50" title="Cetak">
+                                        Cetak
                                     </a>
                                 </div>';
 
@@ -211,9 +216,9 @@
                                 'Pejabat Pembuat (PPK)',
                                 'Nama PPK',
                                 'NIP PPK',
-                                'Status',
-                                'Aksi',
-                            ];
+                                    'Status',
+                                    ['label' => 'Aksi', 'align' => 'center'],
+                                ];
 
                             $rows = collect($spds->items() ?? [])->map(function ($spd, $index) use ($spds) {
                                 $destinations = $spd->tempat_tujuan;
@@ -290,7 +295,7 @@
                                     '</span>';
 
                                 $aksiButtons =
-                                    '<div class="flex items-center gap-2">
+                                    '<div class="flex items-center justify-center gap-2">
                                     <a href="' .
                                     route('user.spd.show', $spd->id) .
                                     '" class="inline-flex items-center bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors duration-150 border border-blue-200/50" title="Detail">
@@ -300,6 +305,11 @@
                                     route('user.spd.edit', $spd->id) .
                                     '" class="inline-flex items-center bg-yellow-50 hover:bg-yellow-600 text-yellow-700 hover:text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors duration-150 border border-yellow-200/50" title="Edit">
                                         Edit
+                                    </a>
+                                    <a href="' .
+                                    route('user.spd.print', $spd->id) .
+                                    '" target="_blank" class="inline-flex items-center bg-green-50 hover:bg-green-600 text-green-700 hover:text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors duration-150 border border-green-200/50" title="Cetak">
+                                        Cetak
                                     </a>
                                 </div>';
 

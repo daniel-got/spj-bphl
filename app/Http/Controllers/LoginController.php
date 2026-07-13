@@ -28,7 +28,7 @@ class LoginController extends Controller
 
 
             if ($user->isPegawai()) {
-                return redirect()->intended(route('user.spd.index'));
+                return redirect()->intended(route('user.dashboard'));
             }
 
             // Default: arahkan ke dashboard umum (akan dibuat nanti per role)

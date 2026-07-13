@@ -11,8 +11,10 @@
                 @foreach($headers as $header)
                     @php
                         $label = is_array($header) ? $header['label'] : $header;
+                        $align = is_array($header) && isset($header['align']) ? $header['align'] : 'left';
+                        $alignClass = $align === 'center' ? 'text-center' : ($align === 'right' ? 'text-right' : 'text-left');
                     @endphp
-                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-muted uppercase tracking-wider whitespace-nowrap">
+                    <th scope="col" class="px-4 py-3 {{ $alignClass }} text-xs font-semibold text-muted uppercase tracking-wider whitespace-nowrap">
                         {{ $label }}
                     </th>
                 @endforeach
@@ -22,8 +24,13 @@
             @forelse($rows as $i => $row)
                 <tr class="{{ $striped && $i % 2 !== 0 ? 'bg-background' : '' }} hover:bg-background transition-colors">
                     @if(is_array($row))
-                        @foreach($row as $cell)
-                            <td class="px-4 py-3 text-text-main whitespace-nowrap">{!! $cell !!}</td>
+                        @foreach($row as $cellIndex => $cell)
+                            @php
+                                $header = $headers[$cellIndex] ?? null;
+                                $align = is_array($header) && isset($header['align']) ? $header['align'] : 'left';
+                                $alignClass = $align === 'center' ? 'text-center' : ($align === 'right' ? 'text-right' : 'text-left');
+                            @endphp
+                            <td class="px-4 py-3 text-text-main {{ $alignClass }} whitespace-nowrap">{!! $cell !!}</td>
                         @endforeach
                     @endif
                 </tr>

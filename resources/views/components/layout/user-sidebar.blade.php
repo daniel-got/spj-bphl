@@ -1,8 +1,7 @@
 <x-layout.sidebar :items="[
     [
         'label' => 'Dashboard',
-        'url' => '#',
-        {{--'url' => route('user.dashboard'),--}}
+        'url' => route('user.dashboard'),
         'icon' => 'home',
         'active' => request()->routeIs('user.dashboard'),
     ],

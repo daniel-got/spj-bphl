@@ -108,4 +108,14 @@ class SpdController extends Controller
             $this->spdService->getSptAjax($id)
         );
     }
+
+    /**
+     * Print the specified SPD resource.
+     */
+    public function print(string $id)
+    {
+        $spd = $this->spdService->getSpdById($id);
+
+        return view('pages.spd.print', compact('spd'));
+    }
 }
