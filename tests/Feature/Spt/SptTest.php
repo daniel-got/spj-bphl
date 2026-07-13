@@ -146,4 +146,20 @@ class SptTest extends TestCase
         $response->assertRedirect(route('user.spt.index'));
         $this->assertDatabaseMissing('data_spt', ['id' => $spt->id]);
     }
+
+    // -------------------------------------------------------------------------
+    // PDF - Cetak SPT
+    // -------------------------------------------------------------------------
+
+    public function test_admin_dapat_mencetak_pdf_spt(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $spt = Spt::factory()->create(['pembuat_id' => $admin->id]);
+
+        $response = $this->actingAs($admin)
+            ->get(route('admin.spt.pdf', $spt->id));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/pdf');
+    }
 }

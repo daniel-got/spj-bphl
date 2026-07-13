@@ -17,4 +17,9 @@ Route::middleware(['auth'])->group(function () {
     // Semua user yang sudah login bisa melihat daftar (index) dan detail (show) SPT
     Route::get('user/spt', [SptController::class, 'index'])->name('user.spt.index');
     Route::get('user/spt/{spt}', [SptController::class, 'show'])->name('user.spt.show');
+
+    // =========================================================================
+    // TAMBAHKAN BARIS INI: Rute untuk Generate PDF / Print Preview SPT
+    // =========================================================================
+    Route::get('user/spt/{spt}/generate-pdf', [SptController::class, 'generatePdf'])->name('user.spt.generatePdf');
 });

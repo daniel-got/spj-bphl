@@ -25,9 +25,18 @@ class StoreSptRequest extends FormRequest
             'tgl_spt' => 'required|date',
             'pegawai_ditugaskan' => 'required|string',
 
+            // Tambahan validasi Kategori dan Surat Dasar Baru
+            'jenis_tugas' => 'required|in:pelatihan,keuangan,administrasi',
+            'surat_dasar' => 'nullable|string',
+
             // Tambahan validasi untuk Penanggung Jawab dan Anggota (Instruksi Rifka No. 2)
             'penanggung_jawab' => 'nullable|string',
             'anggota' => 'nullable|string',
+
+            // Tambahan validasi untuk keperluan generate PDF Surat Tugas
+            'menimbang' => 'nullable|string',
+            'dasar' => 'nullable|string',
+            'biaya' => 'nullable|string',
 
             'tujuan_kegiatan' => 'required|string',
             'tempat_tujuan' => 'required|string|max:255',

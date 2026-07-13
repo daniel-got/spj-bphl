@@ -125,6 +125,53 @@
                             :error="$errors->first('tgl_spt')" />
                     </div>
 
+                    {{-- Kategori & Surat Dasar --}}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-border-custom pt-6">
+                        <div class="flex flex-col">
+                            <label for="jenis_tugas" class="text-sm font-medium text-text-main mb-2 block">
+                                Jenis Kategori SPT <span class="text-danger">*</span>
+                            </label>
+                            <select name="jenis_tugas" id="jenis_tugas" required 
+                                class="w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background border-border-custom focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                <option value="">-- Pilih Kategori Tugas --</option>
+                                <option value="pelatihan" {{ old('jenis_tugas', $spt->jenis_tugas) == 'pelatihan' ? 'selected' : '' }}>Pelatihan</option>
+                                <option value="keuangan" {{ old('jenis_tugas', $spt->jenis_tugas) == 'keuangan' ? 'selected' : '' }}>Keuangan</option>
+                                <option value="administrasi" {{ old('jenis_tugas', $spt->jenis_tugas) == 'administrasi' ? 'selected' : '' }}>Administrasi</option>
+                            </select>
+                            @if ($errors->has('jenis_tugas'))
+                                <p class="text-xs text-danger mt-1">{{ $errors->first('jenis_tugas') }}</p>
+                            @endif
+                        </div>
+
+                        <div class="md:col-span-2 flex flex-col">
+                            <label for="surat_dasar" class="text-sm font-medium text-text-main mb-2 block">
+                                Surat Dasar / Acuan Poin 3 <span class="text-muted text-xs">(Opsional)</span>
+                            </label>
+                            <textarea name="surat_dasar" id="surat_dasar" rows="2" 
+                                placeholder="Contoh: Nota Dinas Kepala Pusat Diklat SDM Lingkungan Hidup dan Kehutanan Nomor: ND.385/XI-3/2026 tanggal 10 Juli 2026"
+                                class="w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background border-border-custom focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">{{ old('surat_dasar', $spt->surat_dasar) }}</textarea>
+                            
+                            {{-- PERBAIKAN NEW: KOTAK RIWAYAT KLIK CEPAT --}}
+                            @if(isset($riwayatSuratDasar) && $riwayatSuratDasar->count() > 0)
+                                <div class="mt-2 text-muted" style="font-size: 11px;">
+                                    <span class="d-block mb-1"><strong>Klik Cepat Riwayat:</strong></span>
+                                    <div class="flex flex-wrap gap-1 mt-1">
+                                        @foreach($riwayatSuratDasar as $riwayat)
+                                            <button type="button" class="btn-riwayat border border-border-custom bg-background/80 hover:bg-background rounded px-2 py-0.5 text-left text-text-main transition duration-150 max-w-full truncate" title="{{ $riwayat }}">
+                                                {{ $riwayat }}
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            <small class="text-xs text-muted mt-1">Kosongkan jika surat jenis Administrasi atau tidak memerlukan dasar surat tambahan.</small>
+                            @if ($errors->has('surat_dasar'))
+                                <p class="text-xs text-danger mt-1">{{ $errors->first('surat_dasar') }}</p>
+                            @endif
+                        </div>
+                    </div>
+
                     {{-- Pegawai yang Ditugaskan (Dinamis) --}}
                     <div class="border-t border-border-custom pt-6">
                         <label class="text-sm font-medium text-text-main mb-2 block">
@@ -271,6 +318,19 @@
             const tglBerangkat = document.getElementById('tgl_berangkat');
             const tglKembali = document.getElementById('tgl_kembali');
             const lamaKegiatan = document.getElementById('lama_kegiatan');
+            
+            // PERBAIKAN NEW: Element handler untuk Klik Cepat Riwayat Surat Dasar
+            const textareaSuratDasar = document.getElementById('surat_dasar');
+            const tombolRiwayat = document.querySelectorAll('.btn-riwayat');
+
+            if (tombolRiwayat.length > 0 && textareaSuratDasar) {
+                tombolRiwayat.forEach(button => {
+                    button.addEventListener('click', function() {
+                        textareaSuratDasar.value = this.innerText.trim();
+                        textareaSuratDasar.focus();
+                    });
+                });
+            }
 
             // Menyimpan daftar option mentah dari database (diambil dari select baris pertama)
             const firstSelect = container.querySelector('.pegawai-select');
@@ -351,8 +411,7 @@
                 syncAllDropdowns();
             }
 
-            // Fungsi Inisialisasi Tom Select. Untuk halaman Edit, select bisa sudah punya
-            // <option selected> dari data lama -> Tom Select otomatis membaca itu sebagai nilai awal.
+            // Fungsi Inisialisasi Tom Select.
             function initPegawaiRow(item) {
                 const select = item.querySelector('.pegawai-select');
 
@@ -431,82 +490,82 @@
                 });
             }
 
-             addBtn.addEventListener('click', function() {
-                 const newItem = document.createElement('div');
-                 newItem.className = 'pegawai-item border border-border-custom rounded-lg p-4 bg-background/50';
- 
-                 let selectOptionsHTML = '<option value="">Pilih Pegawai</option>';
-                 masterOptions.forEach(opt => {
-                     selectOptionsHTML += `<option value="${opt.id}">${opt.text}</option>`;
-                 });
- 
-                 newItem.innerHTML = `
-                     <div class="flex items-end gap-2">
-                         <div class="grid grid-cols-1 md:grid-cols-5 gap-4 grow">
-                             <div class="flex flex-col">
-                                 <label class="text-xs font-medium text-text-main mb-1">Nama Pegawai</label>
-                                 <select required class="pegawai-select w-full">
-                                     ${selectOptionsHTML}
-                                 </select>
-                             </div>
-                             <div class="flex flex-col">
-                                 <label class="text-xs font-medium text-text-main mb-1">Peran SPT</label>
-                                 <select required class="pegawai-peran w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background border-border-custom focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
-                                     <option value="Anggota">Anggota</option>
-                                     <option value="Penanggung Jawab">Penanggung Jawab</option>
-                                 </select>
-                             </div>
-                             <div class="flex flex-col">
-                                 <label class="text-xs font-medium text-text-main mb-1">NIP</label>
-                                 <input type="text" readonly tabindex="-1"
-                                     class="pegawai-nip w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
-                             </div>
-                             <div class="flex flex-col">
-                                 <label class="text-xs font-medium text-text-main mb-1">Pangkat/Golongan</label>
-                                 <input type="text" readonly tabindex="-1"
-                                     class="pegawai-pangkat w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
-                             </div>
-                             <div class="flex flex-col">
-                                 <label class="text-xs font-medium text-text-main mb-1">Jabatan</label>
-                                 <input type="text" readonly tabindex="-1"
-                                     class="pegawai-jabatan w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
-                             </div>
-                         </div>
-                     </div>
-                 `;
-                 container.appendChild(newItem);
-                 initPegawaiRow(newItem);
-                 updateRemoveButtons();
-                 syncAllDropdowns();
-             });
- 
-             // Inisialisasi semua baris yang sudah ada (termasuk baris hasil data lama dari server)
-             container.querySelectorAll('.pegawai-item').forEach(initPegawaiRow);
-             updateRemoveButtons();
-             syncAllDropdowns();
- 
-             // Interseptor form submit untuk membundel data pegawai ke input JSON hidden
-             form.addEventListener('submit', function(e) {
-                 const items = container.querySelectorAll('.pegawai-item');
-                 const pegawaiData = [];
- 
-                 items.forEach((item) => {
-                     const select = item.querySelector('.pegawai-select');
-                     const peranSelect = item.querySelector('.pegawai-peran');
-                     if (select && select.value) {
-                         const dataPegawai = cacheOptions[select.value];
-                         if (dataPegawai) {
-                             pegawaiData.push({
-                                 pegawai_id: select.value,
-                                 nama_pegawai: dataPegawai.text,
-                                 nip: dataPegawai.nip,
-                                 pangkat: dataPegawai.pangkat,
-                                 jabatan: dataPegawai.jabatan,
-                                 peran: peranSelect ? peranSelect.value : 'Anggota',
-                             });
-                         }
-                     }
-                 });
+            addBtn.addEventListener('click', function() {
+                const newItem = document.createElement('div');
+                newItem.className = 'pegawai-item border border-border-custom rounded-lg p-4 bg-background/50';
+
+                let selectOptionsHTML = '<option value="">Pilih Pegawai</option>';
+                masterOptions.forEach(opt => {
+                    selectOptionsHTML += `<option value="${opt.id}">${opt.text}</option>`;
+                });
+
+                newItem.innerHTML = `
+                    <div class="flex items-end gap-2">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 grow">
+                            <div class="flex flex-col">
+                                <label class="text-xs font-medium text-text-main mb-1">Nama Pegawai</label>
+                                <select required class="pegawai-select w-full">
+                                    ${selectOptionsHTML}
+                                </select>
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-xs font-medium text-text-main mb-1">Peran SPT</label>
+                                <select required class="pegawai-peran w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background border-border-custom focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                    <option value="Anggota">Anggota</option>
+                                    <option value="Penanggung Jawab">Penanggung Jawab</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-xs font-medium text-text-main mb-1">NIP</label>
+                                <input type="text" readonly tabindex="-1"
+                                    class="pegawai-nip w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-xs font-medium text-text-main mb-1">Pangkat/Golongan</label>
+                                <input type="text" readonly tabindex="-1"
+                                    class="pegawai-pangkat w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-xs font-medium text-text-main mb-1">Jabatan</label>
+                                <input type="text" readonly tabindex="-1"
+                                    class="pegawai-jabatan w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background text-muted border-border-custom cursor-not-allowed" />
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(newItem);
+                initPegawaiRow(newItem);
+                updateRemoveButtons();
+                syncAllDropdowns();
+            });
+
+            // Inisialisasi awal
+            container.querySelectorAll('.pegawai-item').forEach(initPegawaiRow);
+            updateRemoveButtons();
+            syncAllDropdowns();
+
+            // Interseptor form submit
+            form.addEventListener('submit', function(e) {
+                const items = container.querySelectorAll('.pegawai-item');
+                const pegawaiData = [];
+
+                items.forEach((item) => {
+                    const select = item.querySelector('.pegawai-select');
+                    const peranSelect = item.querySelector('.pegawai-peran');
+                    if (select && select.value) {
+                        const dataPegawai = cacheOptions[select.value];
+                        if (dataPegawai) {
+                            pegawaiData.push({
+                                pegawai_id: select.value,
+                                nama_pegawai: dataPegawai.text,
+                                nip: dataPegawai.nip,
+                                pangkat: dataPegawai.pangkat,
+                                jabatan: dataPegawai.jabatan,
+                                peran: peranSelect ? peranSelect.value : 'Anggota',
+                            });
+                        }
+                    }
+                });
 
                 if (pegawaiData.length === 0) {
                     e.preventDefault();

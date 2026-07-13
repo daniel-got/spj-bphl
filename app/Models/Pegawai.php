@@ -35,6 +35,14 @@ class Pegawai extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    /**
+     * Relasi dummy ke diri sendiri untuk menghindari error eager loading.
+     */
+    public function pegawai()
+    {
+        return $this->belongsTo(Pegawai::class, 'id', 'id');
+    }
+
     // -------------------------------------------------------------------------
     // Query Scopes
     // -------------------------------------------------------------------------
@@ -45,14 +53,14 @@ class Pegawai extends Model
      */
     public function scopeSearch($query, ?string $keyword)
     {
-        if (!$keyword) {
+        if (! $keyword) {
             return $query;
         }
 
         return $query->where(function ($q) use ($keyword) {
             $q->where('nama_pegawai', 'like', "%{$keyword}%")
-              ->orWhere('nip', 'like', "%{$keyword}%")
-              ->orWhere('sub_seksi', 'like', "%{$keyword}%");
+                ->orWhere('nip', 'like', "%{$keyword}%")
+                ->orWhere('sub_seksi', 'like', "%{$keyword}%");
         });
     }
 }

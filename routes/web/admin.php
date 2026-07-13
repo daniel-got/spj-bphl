@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaPegawaiController;
+use App\Http\Controllers\Spt\SptController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,9 @@ Route::middleware(['auth', 'role:admin'])
 
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // PDF Generate SPT
+        Route::get('/spt/{id}/pdf', [SptController::class, 'generatePdf'])->name('spt.pdf');
 
         // Kelola Pegawai
         Route::get('/kelolaPegawai', [KelolaPegawaiController::class, 'index'])->name('kelolaPegawai');

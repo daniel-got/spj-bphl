@@ -190,8 +190,20 @@
                                     $badgeClass  = $statusBadgeMap[$status] ?? 'bg-gray-100 text-gray-600';
                                     $statusBadge = '<span class="inline-flex items-center px-2 py-0.5 text-xs font-bold uppercase tracking-wider rounded-full ' . $badgeClass . '">' . e($status) . '</span>';
 
-                                    // Edit link (eksklusif di halaman ini)
-                                    $editLink = '<a href="' . route('user.spt.edit', $spt->id) . '" class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover" title="Edit SPT">Edit</a>';
+                                    // Tombol Aksi Gabungan (Edit + Cetak) yang telah diperbarui
+                                    $actionsCombo = '
+                                        <div class="flex items-center gap-3">
+                                            <a href="' . route('user.spt.edit', $spt->id) . '" class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover" title="Edit SPT">
+                                                Edit
+                                            </a>
+                                            <a href="' . route('user.spt.generatePdf', $spt->id) . '" target="_blank" class="inline-flex items-center gap-1 text-xs font-semibold text-green-600 hover:text-green-800" title="Cetak Surat Tugas">
+                                                <svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                                                </svg>
+                                                Cetak
+                                            </a>
+                                        </div>
+                                    ';
 
                                     return [
                                         $iteration++,
@@ -208,7 +220,7 @@
                                         e($spt->lama_kegiatan ?? '') . ' Hari',
                                         e($spt->kode_mak ?? '-'),
                                         $statusBadge,
-                                        $editLink,
+                                        $actionsCombo,
                                     ];
                                 })->filter()->toArray();
                             @endphp

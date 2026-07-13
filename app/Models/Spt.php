@@ -9,27 +9,38 @@ class Spt extends Model
 {
     use HasFactory;
 
-    // Nama tabel sesuai acuan dokumen 
+    // Menghubungkan ke nama tabel hasil migration Anda
     protected $table = 'data_spt';
 
-    // Kolom fillable berdasarkan properti SPT di dokumen 
     protected $fillable = [
-        'nomor_spt',           // Nomor SPT 
-        'tgl_spt',             // Tgl SPT 
-        'pegawai_ditugaskan',  // Wadah data pegawai dinamis (Nama, NIP, Pangkat, Jabatan) 
-        'tujuan_kegiatan',     // Tujuan Kegiatan 
-        'tempat_tujuan',       // Tempat Tujuan 
-        'tgl_berangkat',       // Tgl. Berangkat 
-        'tgl_kembali',         // Tgl. Kembali 
-        'lama_kegiatan',       // Lama Kegiatan 
-        'kode_mak',            // Kode MAK 
-        'pembuat_id',          // ID user yang membuat SPT (kolom NOT NULL, wajib ada di fillable)
-        'status',              // Status SPT (draft/disetujui/direvisi/ditolak)
+        'nomor_spt',
+        'status',
+        'tgl_spt',
+        'pegawai_ditugaskan',
+        
+        // Wajib dimasukkan ke fillable
+        'jenis_tugas',
+        'surat_dasar',
+
+        'penanggung_jawab',
+        'anggota',
+        'menimbang',
+        'dasar',
+        'biaya',
+        'tujuan_kegiatan',
+        'tempat_tujuan',
+        'tgl_berangkat',
+        'tgl_kembali',
+        'lama_kegiatan',
+        'kode_mak',
+        'pembuat_id', // Tracking pembuat data
     ];
 
-    // Konversi otomatis data JSON dari PostgreSQL menjadi array PHP 
+    /**
+     * Konversi otomatis tipe data dari database ke format PHP.
+     */
     protected $casts = [
-        'pegawai_ditugaskan' => 'array', // Mendukung penugasan pegawai dinamis 
+        'pegawai_ditugaskan' => 'array', // Supaya data JSON pegawai otomatis menjadi Array saat diakses
         'tgl_spt' => 'date',
         'tgl_berangkat' => 'date',
         'tgl_kembali' => 'date',

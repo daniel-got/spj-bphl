@@ -113,10 +113,6 @@
                                 $iteration = 1;
 
                                 // PENTING: $spts adalah objek Paginator, BUKAN array/collection biasa.
-                                // Jika collect() dipanggil langsung ke Paginator, Laravel memanggil toArray()
-                                // bawaan Paginator yang isinya metadata (current_page, total, data, dll),
-                                // bukan daftar item SPT-nya langsung. Ini yang membuat tabel selalu kosong.
-                                // Solusinya: ambil dulu isi datanya lewat ->items().
                                 $sptItems = ($spts ?? null) && method_exists($spts, 'items') ? $spts->items() : ($spts ?? []);
 
                                 $rows = collect($sptItems)->map(function ($spt) use (&$iteration) {
@@ -141,9 +137,6 @@
                                     $tglKembali = $spt->tgl_kembali ? \Carbon\Carbon::parse($spt->tgl_kembali)->format('d/m/Y') : '-';
 
                                     // Ambil snapshot data pegawai dari kolom JSON 'pegawai_ditugaskan'.
-                                    // Kolom ini berisi ARRAY DAFTAR pegawai (bisa lebih dari satu orang),
-                                    // masing-masing item punya key 'nama_pegawai', 'nip', 'pangkat', 'jabatan'
-                                    // (bukan key 'nama' seperti sebelumnya).
                                     $pegawaiData = $spt->pegawai_ditugaskan;
                                     if (is_string($pegawaiData)) {
                                         $pegawaiData = json_decode($pegawaiData, true);
@@ -174,12 +167,28 @@
                                     // Link Detail pada Nomor SPT
                                     $nomorSptLink = '<a href="' . route('user.spt.show', $spt->id) . '" class="text-primary hover:underline font-semibold" title="Lihat Rincian">' . e($spt->nomor_spt ?? '') . '</a>';
                                     
-                                    // Edit hanya untuk admin — pembuat_spt punya tombol Edit di dashboard-nya sendiri
-                                    $hasAccess = Auth::user()->role === 'admin';
-                                    $editLink = $hasAccess
-                                        ? '<a href="' . route('user.spt.edit', $spt->id) . '" class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover" title="Edit SPT">Edit</a>'
-                                        : '<span class="text-muted text-xs">-</span>';
+                                    // -----------------------------------------------------------------
+                                    // LOGIKA BARU UNTUK HAK AKSES DAN RUTE CETAK PROYEK
+                                    // -----------------------------------------------------------------
+                                    $userRole = Auth::user()->role;
+                                    $canEdit = in_array($userRole, ['admin', 'pembuat_spt']);
 
+                                    // Tombol Edit (Hanya muncul jika punya akses edit DAN statusnya BELUM disetujui)
+                                    $editLink = ($canEdit && ($spt->status ?? '') !== 'disetujui')
+                                        ? '<a href="' . route('user.spt.edit', $spt->id) . '" class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover" title="Edit SPT">Edit</a>'
+                                        : '';
+
+                                    // Tombol Cetak (semua user boleh cetak, tapi hanya jika statusnya sudah disetujui)
+                                    //$printLink = ($spt->status ?? '') === 'disetujui'
+                                      //  ? '<a href="' . route('user.spt.generatePdf', $spt->id) . '" target="_blank" class="inline-flex items-center gap-1 text-xs font-semibold text-green-600 hover:text-green-900 ' . ($canEdit ? 'ml-3' : '') . '" title="Cetak Surat Tugas"><svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg> Cetak</a>'
+                                      //  : '';
+
+                                    // --- KODE TESTING (AKTIF) ---
+                                    $printLink = '<a href="' . route('user.spt.generatePdf', $spt->id) . '" target="_blank" class="inline-flex items-center gap-1 text-xs font-semibold text-green-600 hover:text-green-900 ' . ($editLink ? 'ml-3' : '') . '" title="Cetak Surat Tugas"><svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg> Cetak</a>';  
+
+                                    // jika tidak ada tombol yang aktif (misal staff biasa melihat dokumen draft), tampilkan tanda strip (-)
+                                    $actionButtons = ($editLink || $printLink) ? ($editLink . $printLink) : '<span class="text-muted text-xs">-</span>';
+                                   
                                     return [
                                         $iteration++,
                                         $nomorSptLink,
@@ -194,7 +203,7 @@
                                         $tglKembali,
                                         e($spt->lama_kegiatan ?? '') . ' Hari',
                                         e($spt->kode_mak ?? '-'),
-                                        $editLink
+                                        $actionButtons
                                     ];
                                 })->filter()->toArray();
                             @endphp
