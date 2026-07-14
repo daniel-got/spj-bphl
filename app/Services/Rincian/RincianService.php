@@ -322,7 +322,7 @@ class RincianService
             if (! $uangPenginapan) {
                 foreach ($tempatTujuans as $tujuan) {
                     // Cek apakah string tempat tujuan mengandung nama provinsi (misal: "Kota Jambi" mengandung "Jambi")
-                    $uangPenginapan = UangPenginapan::whereRaw('? LIKE CONCAT("%", provinsi, "%")', [trim($tujuan)])->first();
+                    $uangPenginapan = UangPenginapan::whereRaw('? LIKE CONCAT(\'%\', provinsi, \'%\')', [trim($tujuan)])->first();
                     if ($uangPenginapan) {
                         break;
                     }
@@ -359,7 +359,7 @@ class RincianService
 
             if (! $uangHarian) {
                 foreach ($tempatTujuans as $tujuan) {
-                    $uangHarian = UangHarian::whereRaw('? LIKE CONCAT("%", provinsi, "%")', [trim($tujuan)])->first();
+                    $uangHarian = UangHarian::whereRaw('? LIKE CONCAT(\'%\', provinsi, \'%\')', [trim($tujuan)])->first();
                     if ($uangHarian) {
                         break;
                     }
