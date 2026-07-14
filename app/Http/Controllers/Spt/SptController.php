@@ -64,11 +64,11 @@ class SptController extends Controller
      */
     public function store(StoreSptRequest $request)
     {
-        $this->sptService->createSpt($request->validated(), auth()->id());
+        $spt = $this->sptService->createSpt($request->validated(), auth()->id());
 
         return redirect()
-            ->route('user.spt.index')
-            ->with('success', 'SPT berhasil ditambahkan.');
+            ->route('user.spt.show', $spt->id)
+            ->with('success', 'SPT berhasil dibuat. Silakan periksa detail dan ajukan jika sudah benar.');
     }
 
     /**
@@ -111,7 +111,7 @@ class SptController extends Controller
         $this->sptService->updateSpt($spt, $request->validated());
 
         return redirect()
-            ->route('user.spt.index')
+            ->route('user.spt.show', $spt->id)
             ->with('success', 'SPT berhasil diperbarui.');
     }
 

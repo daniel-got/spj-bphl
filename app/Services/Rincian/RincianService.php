@@ -125,6 +125,12 @@ class RincianService
                 }
             }
 
+            // Pastikan belum ada rincian untuk SPD ini
+            $existingRincian = Rincian::where('spd_id', $data['spd_id'])->exists();
+            if ($existingRincian) {
+                throw new \Exception('Rincian untuk SPD ini sudah ada.');
+            }
+
             // Jika ada file lampiran
             $lampiranPath = null;
             if (isset($data['lampiran']) && $data['lampiran'] instanceof UploadedFile) {

@@ -84,6 +84,7 @@ class SpdService
                 $nip = $pegawai?->nip;
 
                 $isValidSpt = Spt::where('id', $data['spt_id'])
+                    ->whereIn('status', [Spt::STATUS_APPROVED, 'selesai'])
                     ->where(function ($q) use ($user, $pegawai) {
                         $q->where('pembuat_id', $user->id);
                         if ($pegawai) {
@@ -104,6 +105,12 @@ class SpdService
             $myPegawai = Pegawai::where('user_id', auth()->id())->first();
             if ($myPegawai) {
                 $data['nip_pegawai'] = $myPegawai->nip;
+
+                // Pastikan belum ada SPD untuk SPT ini dengan pegawai yang sama
+                $existingSpd = Spd::where('spt_id', $data['spt_id'])->where('nip_pegawai', $myPegawai->nip)->exists();
+                if ($existingSpd) {
+                    throw new \Exception('Anda sudah membuat SPD untuk SPT ini.');
+                }
             }
 
             $spd = Spd::create($data);
@@ -175,6 +182,7 @@ class SpdService
         }
 
         return $query
+            ->whereIn('status', [Spt::STATUS_APPROVED, 'selesai'])
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('nomor_spt', 'like', "%{$search}%")
@@ -210,7 +218,7 @@ class SpdService
             });
         }
 
-        $spt = $query->findOrFail($id);
+        $spt = $query->whereIn('status', [Spt::STATUS_APPROVED, 'selesai'])->findOrFail($id);
 
         return [
             'id' => $spt->id,

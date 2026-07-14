@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Spd;
 
+use App\Models\Pegawai;
+use App\Models\Spd;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateSpdRequest extends FormRequest
@@ -36,7 +38,22 @@ class UpdateSpdRequest extends FormRequest
             'ppk' => 'required|string|in:Pejabat Pembuat Komitmen 1,Pejabat Pembuat Komitmen 2,Pejabat Pembuat Komitmen 3,Bendahara Pengeluaran',
             'nama_ppk' => 'required|string|max:255',
             'nip_ppk' => 'required|string|max:50',
-            'spt_id' => 'required|exists:data_spt,id',
+            'spt_id' => [
+                'required',
+                'exists:data_spt,id',
+                function ($attribute, $value, $fail) use ($spdId) {
+                    $pegawai = Pegawai::where('user_id', auth()->id())->first();
+                    if ($pegawai) {
+                        $exists = Spd::where('spt_id', $value)
+                            ->where('nip_pegawai', $pegawai->nip)
+                            ->where('id', '!=', $spdId)
+                            ->exists();
+                        if ($exists) {
+                            $fail('Anda sudah membuat SPD untuk SPT ini.');
+                        }
+                    }
+                },
+            ],
         ];
     }
 }

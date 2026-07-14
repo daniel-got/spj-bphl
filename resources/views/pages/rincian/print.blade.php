@@ -3,8 +3,12 @@
         @media print {
             .no-print { display: none !important; }
         }
-        body.paper-a4 @page { size: A4; margin: 15mm; }
-        body.paper-f4 @page { size: 215.9mm 330.2mm; margin: 15mm; }
+        @page {
+            margin: 15mm;
+        }
+        .signature-space {
+            height: 75px;
+        }
     </style>
 
     <div class="no-print" style="margin-bottom: 20px; text-align: center; padding: 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
@@ -207,7 +211,7 @@
                     <td width="50%"></td>
                     <td width="50%">
                         Pejabat Pembuat Komitmen 3,<br />
-                        <div style="height: 80px"></div>
+                        <div style="height: 75px"></div>
                         <span class="bold-name">{{ $rincian->nama_ppk }}</span><br />
                         NIP. {{ $rincian->nip_ppk }}
                     </td>

@@ -99,10 +99,6 @@
                     width: 100%;
                     max-width: none;
                 }
-                @page {
-                    size: auto;
-                    margin: 1.5cm;
-                }
             }
         </style>
     </head>

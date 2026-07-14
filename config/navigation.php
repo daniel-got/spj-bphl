@@ -31,19 +31,13 @@ return [
             'roles' => ['admin', 'pembuat_spt', 'user', 'ppk_1', 'ppk_2', 'ppk_3', 'bendahara_pengeluaran', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
-            'label' => 'Dashboard',
+            'label' => 'Dashboard Admin',
             'url' => '/admin/dashboard',
             'icon' => 'home',
             'roles' => ['admin'],
         ],
         [
-            'label' => 'Dashboard',
-            'url' => '/user/pembuat-spt',
-            'icon' => 'home',
-            'roles' => ['pembuat_spt'],
-        ],
-        [
-            'label' => 'Dashboard',
+            'label' => 'Dashboard Pegawai',
             'url' => '/user/dashboard',
             'icon' => 'home',
             'roles' => ['user', 'ppk_1', 'ppk_2', 'ppk_3', 'bendahara_pengeluaran', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
@@ -77,6 +71,12 @@ return [
         [
             'header' => 'Operasional',
             'roles' => ['admin', 'pembuat_spt', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
+        ],
+        [
+            'label' => 'Dashboard SPT',
+            'url' => '/user/pembuat-spt',
+            'icon' => 'home',
+            'roles' => ['pembuat_spt'],
         ],
         [
             'label' => 'Kelola SPT Pegawai',

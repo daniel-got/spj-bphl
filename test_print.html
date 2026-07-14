@@ -1,0 +1,432 @@
+ <warning> WARNING </warning> foreach() argument must be of type array|object, null given in storage/framework/views/e26ea6a2cde1f3a4eab35916cb538ae3.php on line 335.
+<!doctype html>
+<html lang="id">
+ <head>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>Surat Perintah Tugas (SPT)</title>
+ <style>
+ * {
+ box-sizing: border-box;
+ word-wrap: break-word;
+ overflow-wrap: break-word;
+ word-break: break-word;
+ }
+ body {
+ font-family: "Calibri", "Arial", sans-serif;
+ font-size: 14px;
+ color: #000;
+ background-color: #fff;
+ padding: 20px;
+ line-height: 1.3;
+ }
+ .container {
+ max-width: 800px;
+ margin: 0 auto;
+ }
+ .header-title {
+ text-align: center;
+ font-weight: bold;
+ font-size: 16px;
+ text-decoration: underline;
+ margin-bottom: 20px;
+ }
+ .meta-info {
+ margin-bottom: 20px;
+ }
+ .meta-info table {
+ border: none;
+ width: auto;
+ }
+ .meta-info td {
+ padding: 2px 5px 2px 0;
+ vertical-align: top;
+ }
+ .main-table {
+ width: 100%;
+ border-collapse: collapse;
+ margin-bottom: 10px;
+ }
+ .main-table th,
+ .main-table td {
+ border: 1px solid #000;
+ padding: 6px 10px;
+ vertical-align: top;
+ }
+ .main-table th {
+ text-align: center;
+ font-weight: bold;
+ }
+ .text-center {
+ text-align: center;
+ }
+ .text-right {
+ text-align: right;
+ }
+ .terbilang {
+ font-style: italic;
+ margin-bottom: 30px;
+ }
+ .signature-section {
+ width: 100%;
+ border: none;
+ margin-top: 10px;
+ }
+ .signature-section td {
+ width: 50%;
+ border: none;
+ padding: 0 5px;
+ vertical-align: top;
+ }
+ .signature-space {
+ height: 70px;
+ }
+ .bold-name {
+ font-weight: bold;
+ text-decoration: underline;
+ }
+ .divider {
+ border-bottom: 2px solid #000;
+ margin: 30px 0 20px 0;
+ }
+ .rampung-section {
+ margin-top: 20px;
+ }
+ .rampung-table td {
+ padding: 4px 0;
+ vertical-align: top;
+ border: none;
+ }
+ @media print {
+ body {
+ padding: 0;
+ }
+ .container {
+ width: 100%;
+ max-width: none;
+ }
+ }
+ </style>
+ </head>
+ <body>
+ <style>
+ * {
+ box-sizing: border-box;
+ }
+ @media print {
+ .no-print { display: none !important; }
+ }
+ body.paper-a4 @page {
+ size: A4 portrait;
+ margin: 1cm;
+ }
+ body.paper-f4 @page {
+ size: 215.9mm 330.2mm;
+ margin: 1cm;
+ }
+ .spt-container {
+ font-family: Arial, Helvetica, sans-serif;
+ font-size: 10pt; /* Default */
+ color: #000;
+ line-height: 1.25;
+ padding: 0;
+ position: relative;
+ word-wrap: break-word;
+ overflow-wrap: break-word;
+ word-break: break-word;
+ }
+ body.paper-a4 .spt-container {
+ font-size: 10pt;
+ line-height: 1.25;
+ }
+ body.paper-f4 .spt-container {
+ font-size: 11pt;
+ line-height: 1.4;
+ }
+ .footer-bssn {
+ margin-top: 10px;
+ width: 100%;
+ text-align: center;
+ font-size: 8pt;
+ line-height: 1.2;
+ color: #333;
+ padding-top: 8px;
+ page-break-inside: avoid;
+ }
+ /* Kop Surat Resmi Dinas */
+ .header-table {
+ width: 100%;
+ border-collapse: collapse;
+ margin-bottom: 5px;
+ }
+ .logo-col {
+ width: 120px;
+ text-align: center;
+ vertical-align: middle;
+ }
+ .logo-col img {
+ width: 110px;
+ height: auto;
+ display: block;
+ margin: 0 auto;
+ }
+ .kop-col {
+ text-align: center;
+ vertical-align: middle;
+ padding-left: 10px;
+ }
+ .kop1 {
+ font-size: 13pt;
+ font-weight: bold;
+ }
+ .kop2 {
+ font-size: 10pt;
+ font-weight: bold;
+ margin-top: 1px;
+ }
+ .kop3 {
+ font-size: 11pt;
+ font-weight: bold;
+ margin-top: 1px;
+ }
+ .alamat {
+ font-size: 8pt;
+ margin-top: 4px;
+ line-height: 1.2;
+ }
+ .garis1 {
+ border-top: 3px solid black;
+ margin-top: 6px;
+ }
+ .garis2 {
+ border-top: 1px solid black;
+ margin-top: 1.5px;
+ margin-bottom: 10px;
+ }
+ /* Judul Dokumen */
+ .judul-blok {
+ text-align: center;
+ margin-bottom: 10px;
+ }
+ .judul-blok h2 {
+ font-size: 13pt;
+ text-decoration: underline;
+ font-weight: bold;
+ margin: 0;
+ }
+ .nomor-surat {
+ margin-top: 4px;
+ font-size: 10pt;
+ text-align: center;
+ }
+ .kepala {
+ font-weight: bold;
+ font-size: 10pt;
+ margin-top: 8px;
+ }
+ /* Tabel Utama */
+ .surat-table {
+ width: 100%;
+ border-collapse: collapse;
+ table-layout: fixed;
+ margin-bottom: 5px;
+ }
+ .surat-table td {
+ vertical-align: top;
+ padding: 5px 0;
+ }
+ .lbl {
+ width: 85px;
+ font-weight: bold;
+ }
+ .ttk {
+ width: 20px;
+ text-align: center;
+ }
+ .cnt {
+ width: auto;
+ }
+ ol {
+ padding-left: 15px;
+ margin: 0;
+ width: 100%;
+ }
+ ol li {
+ margin-bottom: 5px;
+ text-align: justify;
+ }
+ .memberi {
+ text-align: center;
+ font-weight: bold;
+ font-size: 11pt;
+ margin: 6px 0;
+ letter-spacing: 1px;
+ }
+ /* Sub Tabel Looping Pegawai */
+ .pegawai-item-box {
+ margin-bottom: 8px;
+ }
+ .sub-table {
+ width: 100%;
+ border-collapse: collapse;
+ }
+ .sub-table td {
+ padding: 2px 0;
+ vertical-align: top;
+ }
+ .sub-lbl {
+ width: 120px;
+ }
+ .sub-ttk {
+ width: 20px;
+ text-align: center;
+ }
+ .sub-cnt {
+ width: auto;
+ }
+ .penutup {
+ margin-top: 10px;
+ text-align: justify;
+ }
+ .ttd-table {
+ margin-top: 15px;
+ width: 100%;
+ border-collapse: collapse;
+ page-break-inside: avoid;
+ }
+ .ttd-space {
+ height: 35px;
+ }
+ .tembusan {
+ clear: both;
+ margin-top: 15px;
+ page-break-inside: avoid;
+ }
+ </style>
+ <div class="no-print" style="margin-bottom: 20px; text-align: center; padding: 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+ <button type="button" onclick="document.body.classList.remove('paper-f4'); document.body.classList.add('paper-a4'); window.print();" style="padding: 8px 16px; background-color: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold;">🖨️ Cetak (A4)</button>
+ <button type="button" onclick="document.body.classList.remove('paper-a4'); document.body.classList.add('paper-f4'); window.print();" style="padding: 8px 16px; background-color: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🖨️ Cetak (F4)</button>
+ <p style="font-size: 12px; color: #64748b; margin-top: 8px;">Pilih ukuran kertas sebelum mencetak. Jendela cetak akan otomatis terbuka dengan skala yang sesuai.</p>
+ </div>
+ <div class="spt-container">
+ <table class="header-table">
+ <tr>
+ <td class="logo-col">
+ <img src="http://localhost/LOGO.bphl.png" alt="Logo BPHL">
+ </td>
+ <td class="kop-col">
+ <div class="kop1">KEMENTERIAN KEHUTANAN</div>
+ <div class="kop2">DIREKTORAT JENDERAL PENGELOLAAN HUTAN LESTARI</div>
+ <div class="kop3">BALAI PENGELOLAAN HUTAN LESTARI WILAYAH IV JAMBI</div>
+ <div class="alamat">
+ Jl. Arif Rahman Hakim No.10 Telanaipura Kota Jambi 36124<br>
+ Telepon (0741) 60415
+ </div>
+ </td>
+ </tr>
+ </table>
+ <div class="garis1"></div>
+ <div class="garis2"></div>
+ <div class="judul-blok">
+ <h2>SURAT TUGAS</h2>
+ <div class="nomor-surat">
+ <span>Nomor : 123/123/JBI/spt/2026</span>
+ </div>
+ <div class="kepala">KEPALA BALAI</div>
+ </div>
+ <table class="surat-table">
+ <tr>
+ <td class="lbl">Menimbang</td>
+ <td class="ttk">:</td>
+ <td class="cnt" style="text-align: justify;">
+ bahwa dalam rangka Main, sehingga perlu ditugaskan pegawai untuk
+ mengikuti acara dimaksud dengan surat tugas.
+ </td>
+ </tr>
+ <tr>
+ <td class="lbl">Dasar</td>
+ <td class="ttk">:</td>
+ <td class="cnt">
+ <ol>
+ <li>Peraturan Menteri Kehutanan Republik Indonesia Nomor 6 Tahun 2025 Tentang Organisasi dan
+ Tata Kerja Balai Pengelolaan Hutan Lestari tanggal 19 Maret 2025;</li>
+ <li>Surat Pengesahan Daftar Isian Pelaksanaan Anggaran (DIPA) Balai 143.06.2.693523/2026
+ Rev-6 tanggal 25 Mei 2026;</li>
+ <li>Main main cantik</li>
+ </ol>
+ </td>
+ </tr>
+ </table>
+ <div class="memberi">MEMBERI TUGAS</div>
+ <table class="surat-table">
+ <tr>
+ <td class="lbl">Kepada</td>
+ <td class="ttk">:</td>
+ <td class="cnt">
+ <div>Tidak ada pejabat/pegawai yang ditugaskan.</div>
+ </td>
+ </tr>
+ <tr>
+ <td class="lbl">Untuk</td>
+ <td class="ttk">:</td>
+ <td class="cnt">
+ <ol>
+ <li>Mengikuti Main secara online menggunakan learning management
+ system LKPP;</li>
+ <li>Melaksanakan perjalanan dinas dalam rangka mengikuti fase klasikal (tatap muka)
+ Main ke Jambi;</li>
+ <li>Setelah selesai melaksanakan tugas, segera membuat laporan kepada Kepala Balai.</li>
+ </ol>
+ </td>
+ </tr>
+ <tr>
+ <td class="lbl">Waktu</td>
+ <td class="ttk">:</td>
+ <td class="cnt">
+ <div>Selama <strong>2 hari</strong> pada tanggal
+ 16 s.d
+ 17 July 2026.</div>
+ </td>
+ </tr>
+ <tr>
+ <td class="lbl">Biaya</td>
+ <td class="ttk">:</td>
+ <td class="cnt">
+ <div>
+ Biaya yang timbul akibat kegiatan ini dibebankan pada dana DIPA BPHL Wilayah IV Jambi Tahun
+ Anggaran 2026.
+ </div>
+ </td>
+ </tr>
+ </table>
+ <p class="penutup">
+ Demikian Surat Tugas ini dibuat untuk dapat dilaksanakan dengan penuh tanggung jawab.
+ </p>
+ <table class="ttd-table">
+ <tr>
+ <td style="width: 50%;"></td>
+ <td style="width: 50%; padding-left: 30px;">
+ <div>Jambi, 14 July 2026</div>
+ <div style="margin-top: 4px;">Kepala Balai,</div>
+ <div class="ttd-space"></div>
+ <div style="font-weight: bold; text-decoration: underline;">Andi Rohaendi, M.Si.</div>
+ <div>NIP. 19720302199403 1 003</div>
+ </td>
+ </tr>
+ </table>
+ <div class="tembusan">
+ <strong>Tembusan :</strong>
+ <ol style="padding-left: 15px; margin-top: 4px;">
+ <li>Sekretaris Direktorat Jenderal PHL</li>
+ </ol>
+ </div>
+ <div class="footer-bssn">
+ Dokumen ini telah ditandatangani secara elektronik menggunakan sertifikat elektronik<br>
+ yang diterbitkan oleh Balai Besar Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara (BSSN).
+ </div>
+ </div>
+ <script>
+ // Cetak dikendalikan oleh tombol di dalam halaman (A4/F4)
+ </script>
+ </body>
+</html>

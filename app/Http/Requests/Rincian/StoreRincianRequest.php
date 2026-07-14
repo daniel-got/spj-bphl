@@ -20,7 +20,7 @@ class StoreRincianRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'spd_id' => 'required|exists:data_spd,id',
+            'spd_id' => 'required|exists:data_spd,id|unique:data_rincian,spd_id',
             'rincian_biaya' => 'required|array|min:1',
             // Kunci mengikuti skema form & tampilan: biaya_transport, penginapan (%), hotel_ril.
             'rincian_biaya.*.biaya_transport' => 'required|numeric|min:0',

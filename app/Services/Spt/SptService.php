@@ -72,33 +72,54 @@ class SptService
     }
 
     /**
-     * Terapkan filter berdasarkan role agar pegawai biasa (dan pembuat_spt di menu umum)
-     * hanya bisa melihat SPT di mana mereka ditugaskan.
+     * Terapkan filter berdasarkan role.
+     *
+     * Menu "SPT Saya" (strictPersonal=true) hanya menampilkan SPT di mana
+     * user terdaftar di dalam JSON pegawai_ditugaskan — TIDAK berdasarkan pembuat_id.
+     * Ini mencegah pembuat_spt melihat SPT yang ia buat (tapi tidak ditugaskan padanya)
+     * di menu umum. Pembuat dapat melihat SPT buatannya via menu "Kelola SPT Pegawai".
+     *
+     * Admin dan role monitoring selalu melihat semua data (tidak difilter).
      */
     protected function applyRoleFilter($query, bool $strictPersonal = false): void
     {
         $user = auth()->user();
 
-        // Jika strictPersonal tidak aktif dan user adalah admin atau role monitoring, mereka bisa melihat semua
+        // Bypass filter untuk admin dan monitoring, kecuali jika dalam mode "SPT Saya" (strictPersonal)
         if (! $strictPersonal && (! $user || $user->isAdmin() || $user->isMonitoring())) {
             return;
         }
 
-        // Filter berdasarkan pegawai_id mereka di json pegawai_ditugaskan atau pembuat_id
         $pegawaiId = (int) Pegawai::where('user_id', $user->id)->value('id');
 
-        $query->where(function ($q) use ($user, $pegawaiId) {
-            $q->where('pembuat_id', $user->id);
-
+        if ($strictPersonal) {
+            // Mode "SPT Saya": hanya tampilkan SPT yang user ini DITUGASKAN padanya.
+            // Pegawai yang baru ditugaskan hanya melihat SPT yang sudah disetujui/selesai.
             if ($pegawaiId) {
-                $q->orWhere(function ($subQ) use ($pegawaiId) {
-                    $subQ->where(function ($jsonQ) use ($pegawaiId) {
-                        $jsonQ->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                            ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
-                    })->whereIn('status', ['disetujui', 'selesai']);
-                });
+                $query->where(function ($q) use ($pegawaiId) {
+                    $q->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
+                        ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                })->whereIn('status', ['disetujui', 'selesai']);
+            } else {
+                // Tidak punya profil pegawai — tidak bisa melihat SPT siapapun
+                $query->whereRaw('1 = 0');
             }
-        });
+        } else {
+            // Mode non-strict (misal: pembuat_spt di halaman umum):
+            // Tampilkan SPT miliknya sendiri (pembuat_id) OR ditugaskan padanya (disetujui/selesai).
+            $query->where(function ($q) use ($user, $pegawaiId) {
+                $q->where('pembuat_id', $user->id);
+
+                if ($pegawaiId) {
+                    $q->orWhere(function ($subQ) use ($pegawaiId) {
+                        $subQ->where(function ($jsonQ) use ($pegawaiId) {
+                            $jsonQ->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
+                                ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                        })->whereIn('status', ['disetujui', 'selesai']);
+                    });
+                }
+            });
+        }
     }
 
     /**
@@ -150,14 +171,16 @@ class SptService
     public function updateSpt(Spt $spt, array $data)
     {
         return DB::transaction(function () use ($spt, $data) {
-            // Mengantisipasi jika input dari form dikirim dalam bentuk array (sudah di-handle Request)
-            $pegawaiData = $data['pegawai_ditugaskan'] ?? [];
-
-            // Ekstrak peran Penanggung Jawab & Anggota
-            $processed = SptHelper::extractRoles($pegawaiData);
-            $data['penanggung_jawab'] = $processed['penanggung_jawab'];
-            $data['anggota'] = $processed['anggota'];
-            $data['pegawai_ditugaskan'] = $pegawaiData;
+            // Hanya proses dan timpa data pegawai jika key 'pegawai_ditugaskan' memang dikirimkan.
+            // Ini mencegah operasi lain seperti submit() (yang hanya mengirim ['status'=>...])
+            // menghapus data pegawai yang sudah tersimpan.
+            if (array_key_exists('pegawai_ditugaskan', $data)) {
+                $pegawaiData = $data['pegawai_ditugaskan'] ?? [];
+                $processed = SptHelper::extractRoles($pegawaiData);
+                $data['penanggung_jawab'] = $processed['penanggung_jawab'];
+                $data['anggota'] = $processed['anggota'];
+                $data['pegawai_ditugaskan'] = $pegawaiData;
+            }
 
             // Jika status berubah menjadi disetujui, beri notifikasi khusus
             if (isset($data['status']) && $data['status'] === Spt::STATUS_APPROVED && $spt->status !== Spt::STATUS_APPROVED) {

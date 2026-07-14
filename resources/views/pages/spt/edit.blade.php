@@ -564,15 +564,20 @@
                      const pangkatInput = item.querySelector('.pegawai-pangkat');
                      const jabatanInput = item.querySelector('.pegawai-jabatan');
 
-                     if (select && select.value) {
-                         const dataPegawai = cacheOptions[select.value];
+                     // Baca nilai dari instance TomSelect (bukan native select.value yang bisa stale)
+                     const selectedId = select && select.tomselect
+                         ? select.tomselect.getValue()
+                         : (select ? select.value : null);
+
+                     if (selectedId) {
+                         const dataPegawai = cacheOptions[selectedId];
                          if (dataPegawai) {
                              pegawaiData.push({
-                                 pegawai_id: select.value,
+                                 pegawai_id: selectedId,
                                  nama_pegawai: dataPegawai.text,
-                                 nip: nipInput ? nipInput.value : dataPegawai.nip,
-                                 pangkat: pangkatInput ? pangkatInput.value : dataPegawai.pangkat,
-                                 jabatan: jabatanInput ? jabatanInput.value : dataPegawai.jabatan,
+                                 nip: nipInput && nipInput.value ? nipInput.value : dataPegawai.nip,
+                                 pangkat: pangkatInput && pangkatInput.value ? pangkatInput.value : dataPegawai.pangkat,
+                                 jabatan: jabatanInput && jabatanInput.value ? jabatanInput.value : dataPegawai.jabatan,
                                  peran: peranSelect ? peranSelect.value : 'Anggota',
                              });
                          }

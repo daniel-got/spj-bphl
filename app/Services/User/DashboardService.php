@@ -15,21 +15,26 @@ class DashboardService
         $pegawai = $user->pegawai;
         $nip = $pegawai ? $pegawai->nip : null;
 
+        $pegawaiId = $pegawai ? $pegawai->id : null;
+
         return [
-            'stats' => $this->getStatCards($user->id, $nip),
-            'recentSpt' => $this->getRecentSpt($user->id, $nip),
-            'documentSummary' => $this->getDocumentSummary($user->id, $nip),
+            'stats' => $this->getStatCards($user->id, $nip, $pegawaiId),
+            'recentSpt' => $this->getRecentSpt($user->id, $pegawaiId),
+            'documentSummary' => $this->getDocumentSummary($user->id, $pegawaiId),
         ];
     }
 
-    private function getStatCards(int $userId, ?string $nip): array
+    private function getStatCards(int $userId, ?string $nip, ?int $pegawaiId): array
     {
         // 1. Ditugaskan (Assigned): SPT yang statusnya disetujui tapi belum ada SPD
         $assignedCount = Spt::where('status', Spt::STATUS_APPROVED)
-            ->where(function ($query) use ($userId, $nip) {
+            ->where(function ($query) use ($userId, $pegawaiId) {
                 $query->where('pembuat_id', $userId);
-                if ($nip) {
-                    $query->orWhere('pegawai_ditugaskan', 'like', '%'.$nip.'%');
+                if ($pegawaiId) {
+                    $query->orWhere(function ($q) use ($pegawaiId) {
+                        $q->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
+                          ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                    });
                 }
             })
             ->whereDoesntHave('spds')
@@ -101,14 +106,16 @@ class DashboardService
         ];
     }
 
-    private function getRecentSpt(int $userId, ?string $nip)
+    private function getRecentSpt(int $userId, ?int $pegawaiId)
     {
-        return Spt::where(function ($query) use ($userId, $nip) {
+        return Spt::where(function ($query) use ($userId, $pegawaiId) {
             $query->where('pembuat_id', $userId);
-            if ($nip) {
-                $query->orWhere(function ($subQ) use ($nip) {
-                    $subQ->where('pegawai_ditugaskan', 'like', '%'.$nip.'%')
-                        ->whereIn('status', [Spt::STATUS_APPROVED, 'selesai']);
+            if ($pegawaiId) {
+                $query->orWhere(function ($subQ) use ($pegawaiId) {
+                    $subQ->where(function ($q) use ($pegawaiId) {
+                        $q->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
+                          ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                    })->whereIn('status', [Spt::STATUS_APPROVED, 'selesai']);
                 });
             }
         })
@@ -117,7 +124,7 @@ class DashboardService
             ->get();
     }
 
-    private function getDocumentSummary(int $userId, ?string $nip): array
+    private function getDocumentSummary(int $userId, ?int $pegawaiId): array
     {
         $statuses = ['draft', 'diajukan', 'direvisi', 'disetujui', 'ditolak'];
         $summary = [];
@@ -126,10 +133,13 @@ class DashboardService
             $summary[] = [
                 'status' => $status,
                 'jumlah' => Spt::where('status', $status)
-                    ->where(function ($query) use ($userId, $nip, $status) {
+                    ->where(function ($query) use ($userId, $pegawaiId, $status) {
                         $query->where('pembuat_id', $userId);
-                        if ($nip && in_array($status, [Spt::STATUS_APPROVED, 'selesai'])) {
-                            $query->orWhere('pegawai_ditugaskan', 'like', '%'.$nip.'%');
+                        if ($pegawaiId && in_array($status, [Spt::STATUS_APPROVED, 'selesai'])) {
+                            $query->orWhere(function ($q) use ($pegawaiId) {
+                                $q->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
+                                  ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                            });
                         }
                     })->count(),
             ];
