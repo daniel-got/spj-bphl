@@ -61,4 +61,39 @@ class Spt extends Model
     {
         return $this->hasMany(Spd::class, 'spt_id');
     }
+
+    /**
+     * Hitung status progress dinamis untuk alur SPT -> SPD -> Rincian -> SPJ.
+     */
+    public function getStatusProgressAttribute(): string
+    {
+        if ($this->status !== 'disetujui' && $this->status !== 'selesai') {
+            return $this->status;
+        }
+
+        $totalTravelers = count($this->pegawai_ditugaskan ?? []);
+        if ($totalTravelers === 0) {
+            return $this->status;
+        }
+
+        // 1. Check SPD creation
+        $createdSpds = $this->spds->count();
+        if ($createdSpds < $totalTravelers) {
+            return 'dalam_pembuatan_spd';
+        }
+
+        // 2. Check Rincian (SPJ draft) creation
+        $createdSpjs = $this->spds->filter(fn($spd) => $spd->rincian !== null)->count();
+        if ($createdSpjs < $totalTravelers) {
+            return 'dalam_pembuatan_rincian';
+        }
+
+        // 3. Check SPJ approval
+        $approvedSpjs = $this->spds->filter(fn($spd) => $spd->rincian?->status === 'disetujui')->count();
+        if ($approvedSpjs < $totalTravelers) {
+            return 'pengajuan_spj';
+        }
+
+        return 'selesai';
+    }
 }

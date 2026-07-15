@@ -17,6 +17,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Semua user yang sudah login bisa melihat daftar (index) dan detail (show) SPT
     Route::get('user/spt', [SptController::class, 'index'])->name('user.spt.index');
+    Route::get('user/spt/monitoring', [SptController::class, 'monitoring'])->name('user.spt.monitoring');
     Route::get('user/spt/{spt}', [SptController::class, 'show'])->name('user.spt.show');
 
     // =========================================================================

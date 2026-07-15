@@ -321,8 +321,11 @@ class RincianService
             // If not found, try fuzzy match (e.g., destination is "Kota Jambi", province is "Jambi")
             if (! $uangPenginapan) {
                 foreach ($tempatTujuans as $tujuan) {
-                    // Cek apakah string tempat tujuan mengandung nama provinsi (misal: "Kota Jambi" mengandung "Jambi")
-                    $uangPenginapan = UangPenginapan::whereRaw('? LIKE CONCAT(\'%\', provinsi, \'%\')', [trim($tujuan)])->first();
+                    if (config('database.default') === 'sqlite') {
+                        $uangPenginapan = UangPenginapan::whereRaw('INSTR(LOWER(?), LOWER(provinsi)) > 0', [trim($tujuan)])->first();
+                    } else {
+                        $uangPenginapan = UangPenginapan::whereRaw('? LIKE CONCAT(\'%\', provinsi, \'%\')', [trim($tujuan)])->first();
+                    }
                     if ($uangPenginapan) {
                         break;
                     }
@@ -359,7 +362,11 @@ class RincianService
 
             if (! $uangHarian) {
                 foreach ($tempatTujuans as $tujuan) {
-                    $uangHarian = UangHarian::whereRaw('? LIKE CONCAT(\'%\', provinsi, \'%\')', [trim($tujuan)])->first();
+                    if (config('database.default') === 'sqlite') {
+                        $uangHarian = UangHarian::whereRaw('INSTR(LOWER(?), LOWER(provinsi)) > 0', [trim($tujuan)])->first();
+                    } else {
+                        $uangHarian = UangHarian::whereRaw('? LIKE CONCAT(\'%\', provinsi, \'%\')', [trim($tujuan)])->first();
+                    }
                     if ($uangHarian) {
                         break;
                     }

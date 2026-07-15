@@ -149,4 +149,46 @@ class SptController extends Controller
 
         return back()->with('success', 'SPT berhasil diajukan untuk diverifikasi.');
     }
+
+    /**
+     * Pantau progress SPT (Persetujuan, Pembuatan SPD, Pembuatan SPJ/Rincian).
+     */
+    public function monitoring(Request $request)
+    {
+        $user = auth()->user();
+        if (! ($user->isAdmin() || $user->isPembuatSpt() || $user->hasRole('kepala_tu'))) {
+            abort(403, 'Anda tidak memiliki akses ke halaman monitoring progress SPT.');
+        }
+
+        $search = $request->input('search');
+        $status = $request->input('status');
+
+        $query = Spt::with(['spds.rincian']);
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nomor_spt', 'like', '%'.$search.'%')
+                  ->orWhere('tujuan_kegiatan', 'like', '%'.$search.'%')
+                  ->orWhere('tempat_tujuan', 'like', '%'.$search.'%')
+                  ->orWhere('penanggung_jawab', 'like', '%'.$search.'%');
+            });
+        }
+
+        if (!empty($status)) {
+            if (in_array($status, ['dalam_pembuatan_spd', 'dalam_pembuatan_rincian', 'pengajuan_spj', 'selesai'])) {
+                $sptIds = Spt::with(['spds.rincian'])
+                    ->whereIn('status', ['disetujui', 'selesai'])
+                    ->get()
+                    ->filter(fn($s) => $s->status_progress === $status)
+                    ->pluck('id');
+                $query->whereIn('id', $sptIds);
+            } else {
+                $query->where('status', $status);
+            }
+        }
+
+        $spts = $query->latest()->paginate(10);
+
+        return view('pages.spt.monitoring', compact('spts', 'search', 'status'));
+    }
 }

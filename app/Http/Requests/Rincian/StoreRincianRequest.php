@@ -24,8 +24,8 @@ class StoreRincianRequest extends FormRequest
             'rincian_biaya' => 'required|array|min:1',
             // Kunci mengikuti skema form & tampilan: biaya_transport, penginapan (%), hotel_ril.
             'rincian_biaya.*.biaya_transport' => 'required|numeric|min:0',
-            'rincian_biaya.*.penginapan' => 'required|numeric|min:0',
-            'rincian_biaya.*.hotel_ril' => 'required|numeric|min:0',
+            'rincian_biaya.*.penginapan' => 'nullable|numeric|min:0',
+            'rincian_biaya.*.hotel_ril' => 'nullable|numeric|min:0',
             'lampiran' => 'nullable|file|mimes:pdf|max:5120', // Max 5MB PDF
         ];
     }

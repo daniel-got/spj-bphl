@@ -43,4 +43,24 @@ class SptHelper
 
         return $total;
     }
+
+    /**
+     * Driver-aware query filter for pegawai_ditugaskan JSON column.
+     */
+    public static function queryPegawaiDitugaskan($query, $pegawaiId, $boolean = 'and')
+    {
+        $callback = function($q) use ($pegawaiId) {
+            if (config('database.default') === 'sqlite') {
+                $q->where('pegawai_ditugaskan', 'like', '%"pegawai_id":"' . $pegawaiId . '"%')
+                  ->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id": "' . $pegawaiId . '"%')
+                  ->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id":' . $pegawaiId . '%')
+                  ->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id": ' . $pegawaiId . '%');
+            } else {
+                $q->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
+                  ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (int) $pegawaiId]]);
+            }
+        };
+
+        return $boolean === 'or' ? $query->orWhere($callback) : $query->where($callback);
+    }
 }

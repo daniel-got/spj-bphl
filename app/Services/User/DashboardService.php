@@ -31,10 +31,7 @@ class DashboardService
             ->where(function ($query) use ($userId, $pegawaiId) {
                 $query->where('pembuat_id', $userId);
                 if ($pegawaiId) {
-                    $query->orWhere(function ($q) use ($pegawaiId) {
-                        $q->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                          ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
-                    });
+                    \App\Helpers\SptHelper::queryPegawaiDitugaskan($query, $pegawaiId, 'or');
                 }
             })
             ->whereDoesntHave('spds')
@@ -112,10 +109,8 @@ class DashboardService
             $query->where('pembuat_id', $userId);
             if ($pegawaiId) {
                 $query->orWhere(function ($subQ) use ($pegawaiId) {
-                    $subQ->where(function ($q) use ($pegawaiId) {
-                        $q->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                          ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
-                    })->whereIn('status', [Spt::STATUS_APPROVED, 'selesai']);
+                    \App\Helpers\SptHelper::queryPegawaiDitugaskan($subQ, $pegawaiId)
+                        ->whereIn('status', [Spt::STATUS_APPROVED, 'selesai']);
                 });
             }
         })
@@ -136,10 +131,7 @@ class DashboardService
                     ->where(function ($query) use ($userId, $pegawaiId, $status) {
                         $query->where('pembuat_id', $userId);
                         if ($pegawaiId && in_array($status, [Spt::STATUS_APPROVED, 'selesai'])) {
-                            $query->orWhere(function ($q) use ($pegawaiId) {
-                                $q->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                                  ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
-                            });
+                            \App\Helpers\SptHelper::queryPegawaiDitugaskan($query, $pegawaiId, 'or');
                         }
                     })->count(),
             ];

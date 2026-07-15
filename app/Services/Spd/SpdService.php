@@ -88,8 +88,7 @@ class SpdService
                     ->where(function ($q) use ($user, $pegawai) {
                         $q->where('pembuat_id', $user->id);
                         if ($pegawai) {
-                            $q->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawai->id]])
-                                ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawai->id]]);
+                            \App\Helpers\SptHelper::queryPegawaiDitugaskan($q, $pegawai->id, 'or');
                         }
                     })->exists();
 
@@ -168,8 +167,7 @@ class SpdService
             $query->where(function ($q) use ($user, $pegawai) {
                 $q->where('pembuat_id', $user->id);
                 if ($pegawai) {
-                    $q->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawai->id]])
-                        ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawai->id]]);
+                    \App\Helpers\SptHelper::queryPegawaiDitugaskan($q, $pegawai->id, 'or');
                 }
             });
         }
@@ -212,8 +210,7 @@ class SpdService
             $query->where(function ($q) use ($user, $pegawai) {
                 $q->where('pembuat_id', $user->id);
                 if ($pegawai) {
-                    $q->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawai->id]])
-                        ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawai->id]]);
+                    \App\Helpers\SptHelper::queryPegawaiDitugaskan($q, $pegawai->id, 'or');
                 }
             });
         }

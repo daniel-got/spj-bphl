@@ -96,6 +96,12 @@ return [
             'icon' => 'shield-check',
             'roles' => ['verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
+        [
+            'label' => 'Pantau Progress SPT',
+            'url' => '/user/spt/monitoring',
+            'icon' => 'chart-bar',
+            'roles' => ['admin', 'pembuat_spt', 'kepala_tu'],
+        ],
 
         // --- GRUP: ADMINISTRATOR ---
         [

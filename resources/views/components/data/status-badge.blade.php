@@ -2,6 +2,18 @@
 
 @php
 $map = [
+    // Database statuses (Indonesian)
+    'diajukan'  => ['label' => 'Diajukan',    'color' => 'info'],
+    'disetujui' => ['label' => 'Disetujui',   'color' => 'success'],
+    'direvisi'  => ['label' => 'Direvisi',    'color' => 'warning'],
+    'ditolak'   => ['label' => 'Ditolak',     'color' => 'danger'],
+    'selesai'   => ['label' => 'Selesai',     'color' => 'success'],
+
+    // Dynamic progress statuses
+    'dalam_pembuatan_spd'     => ['label' => 'Dalam Pembuatan SPD',     'color' => 'primary'],
+    'dalam_pembuatan_rincian' => ['label' => 'Dalam Pembuatan Rincian', 'color' => 'info'],
+    'pengajuan_spj'           => ['label' => 'Pengajuan SPJ',           'color' => 'warning'],
+    
     // SPT/SPD statuses
     'draft'     => ['label' => 'Draft',       'color' => 'gray'],
     'pending'   => ['label' => 'Menunggu',    'color' => 'warning'],

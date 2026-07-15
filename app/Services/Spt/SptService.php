@@ -96,10 +96,8 @@ class SptService
             // Mode "SPT Saya": hanya tampilkan SPT yang user ini DITUGASKAN padanya.
             // Pegawai yang baru ditugaskan hanya melihat SPT yang sudah disetujui/selesai.
             if ($pegawaiId) {
-                $query->where(function ($q) use ($pegawaiId) {
-                    $q->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                        ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
-                })->whereIn('status', ['disetujui', 'selesai']);
+                \App\Helpers\SptHelper::queryPegawaiDitugaskan($query, $pegawaiId)
+                    ->whereIn('status', ['disetujui', 'selesai']);
             } else {
                 // Tidak punya profil pegawai — tidak bisa melihat SPT siapapun
                 $query->whereRaw('1 = 0');
@@ -112,10 +110,8 @@ class SptService
 
                 if ($pegawaiId) {
                     $q->orWhere(function ($subQ) use ($pegawaiId) {
-                        $subQ->where(function ($jsonQ) use ($pegawaiId) {
-                            $jsonQ->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                                ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
-                        })->whereIn('status', ['disetujui', 'selesai']);
+                        \App\Helpers\SptHelper::queryPegawaiDitugaskan($subQ, $pegawaiId)
+                            ->whereIn('status', ['disetujui', 'selesai']);
                     });
                 }
             });
