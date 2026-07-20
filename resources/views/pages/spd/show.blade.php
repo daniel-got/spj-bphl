@@ -1,7 +1,5 @@
 <x-layout.app title="Detail SPD - SPJ BPHL 4">
 
-    <x-layout.navbar />
-
     <main class="grow flex flex-col px-6 py-10">
 
         <div class="max-w-5xl mx-auto w-full">
@@ -21,16 +19,17 @@
                         <p class="text-xs text-muted mt-0.5">Detail parameter dan status surat perjalanan dinas secara rinci</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 flex-wrap">
                     <a href="{{ route('user.spd.print', $spd->id) }}" target="_blank"
-                        class="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors duration-150 shadow-sm gap-1" title="Cetak SPD">
-                        <x-utility.icon name="printer" class="w-3.5 h-3.5" />
+                        class="inline-flex items-center gap-1.5 border border-border-custom bg-surface hover:bg-background text-text-main text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition-colors duration-150" title="Cetak SPD">
+                        <x-utility.icon name="printer" class="w-4 h-4 text-muted" />
                         Cetak SPD
                     </a>
                     @can('update', $spd)
                         @if(!$spd->rincian || in_array($spd->rincian->status, [\App\Models\Rincian::STATUS_DRAFT, \App\Models\Rincian::STATUS_REVISED]))
                             <a href="{{ route('user.spd.edit', $spd->id) }}"
-                                class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors duration-150">
+                                class="inline-flex items-center gap-1.5 border border-primary text-primary hover:bg-primary-light text-xs font-semibold px-4 py-2 rounded-lg transition-colors duration-150">
+                                <x-utility.icon name="pencil" class="w-4 h-4" />
                                 Edit SPD
                             </a>
                             <x-feedback.confirm-dialog
@@ -44,9 +43,10 @@
                             />
                             <x-action.button
                                 onclick="openModal('confirm-hapus-{{ $spd->id }}')"
-                                class="bg-danger hover:bg-red-700 text-white px-4 py-2 text-xs font-semibold rounded-lg transition-colors duration-150"
+                                class="text-danger border-danger hover:bg-danger/10 px-4 py-2 text-xs font-semibold"
                             >
-                                Hapus SPD
+                                <x-utility.icon name="trash" class="w-4 h-4" />
+                                Hapus
                             </x-action.button>
                         @endif
                     @endcan

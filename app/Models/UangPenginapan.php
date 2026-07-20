@@ -27,7 +27,17 @@ class UangPenginapan extends Model
      */
     public static function getCachedAll(): Collection
     {
-        return Cache::rememberForever(self::CACHE_KEY, fn () => static::all());
+        $data = Cache::rememberForever(self::CACHE_KEY, fn () => static::all()->toArray());
+
+        // Rebuild Eloquent Collection from plain array to avoid unserialize issues
+        // with the database cache driver (which PHP-serializes the stored value).
+        if ($data instanceof Collection) {
+            return $data;
+        }
+
+        return (new static)->newCollection(
+            array_map(fn (array $row) => (new static)->forceFill($row)->syncOriginal(), $data)
+        );
     }
 
     /**

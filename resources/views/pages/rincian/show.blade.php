@@ -1,7 +1,5 @@
 <x-layout.app title="Detail Rincian Biaya - SPJ BPHL 4">
 
-    <x-layout.navbar />
-
     <main class="grow flex flex-col px-6 py-10">
 
         <div class="max-w-5xl mx-auto w-full">
@@ -21,16 +19,24 @@
                         <p class="text-xs text-muted mt-0.5">Detail informasi Rincian Biaya Perjalanan Dinas</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <a href="{{ route('user.rincian.print', $rincian->id) }}" target="_blank"
+                       class="inline-flex items-center gap-1.5 border border-border-custom bg-surface hover:bg-background text-text-main text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition-colors duration-150"
+                       title="Cetak Rincian">
+                        <x-utility.icon name="printer" class="w-4 h-4 text-muted" />
+                        Cetak Rincian
+                    </a>
                     @can('update', $rincian)
                         @if(in_array($rincian->status, [\App\Models\Rincian::STATUS_DRAFT, \App\Models\Rincian::STATUS_REVISED]))
                             <a href="{{ route('user.rincian.edit', $rincian->id) }}"
-                                class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors duration-150">
+                                class="inline-flex items-center gap-1.5 border border-primary text-primary hover:bg-primary-light text-xs font-semibold px-4 py-2 rounded-lg transition-colors duration-150">
+                                <x-utility.icon name="pencil" class="w-4 h-4" />
                                 Edit SPJ
                             </a>
                             <form action="{{ route('user.rincian.submit', $rincian->id) }}" method="POST" class="inline-block">
                                 @csrf
                                 <x-action.button-primary type="submit" onclick="return confirm('Apakah Anda yakin ingin mengajukan SPJ ini untuk diverifikasi?')">
+                                    <x-utility.icon name="paper-airplane" class="w-4 h-4" />
                                     Ajukan SPJ
                                 </x-action.button-primary>
                             </form>
@@ -45,18 +51,13 @@
                             />
                             <x-action.button
                                 onclick="openModal('confirm-hapus-{{ $rincian->id }}')"
-                                class="bg-danger hover:bg-red-700 text-white px-4 py-2 text-xs font-semibold rounded-lg transition-colors duration-150"
+                                class="text-danger border-danger hover:bg-danger/10 px-4 py-2 text-xs font-semibold"
                             >
-                                Hapus SPJ
+                                <x-utility.icon name="trash" class="w-4 h-4" />
+                                Hapus
                             </x-action.button>
                         @endif
                     @endcan
-                    <a href="{{ route('user.rincian.print', $rincian->id) }}" target="_blank"
-                       class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-150 shadow-sm"
-                       title="Cetak Rincian">
-                        <x-utility.icon name="printer" class="w-4 h-4" />
-                        Cetak Rincian
-                    </a>
                     <x-data.status-badge status="{{ $rincian->status ?? 'draft' }}" class="text-xs px-3 py-1" />
                 </div>
             </div>

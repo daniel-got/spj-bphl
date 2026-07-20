@@ -121,6 +121,13 @@ class SpdService
                 }
             }
 
+            // Nomor SPD di-shared antar pegawai dalam 1 SPT.
+            // Jika sudah ada SPD lain dari SPT yang sama, gunakan nomor_spd-nya (abaikan input user).
+            $firstSpd = Spd::where('spt_id', $data['spt_id'])->first();
+            if ($firstSpd) {
+                $data['nomor_spd'] = $firstSpd->nomor_spd;
+            }
+
             $spd = Spd::create($data);
 
             session()->flash('success', 'SPD berhasil dibuat sebagai Draft.');
@@ -244,6 +251,9 @@ class SpdService
             'lama_kegiatan' => $spt->lama_kegiatan,
             'kode_mak' => $spt->kode_mak,
             'pegawai_list' => $spt->pegawai_ditugaskan,
+            // Nomor SPD dari SPD pertama yang sudah ada untuk SPT ini (null jika belum ada).
+            // Frontend menggunakan nilai ini untuk prefill & mengunci field nomor_spd.
+            'nomor_spd_existing' => Spd::where('spt_id', $spt->id)->value('nomor_spd'),
         ];
     }
 
