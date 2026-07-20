@@ -9,22 +9,23 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        
+
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          port: 2221
           script: |
             cd /var/www/spj-bphl4.dniel.my.id/spj-bphl
             git pull origin main
-            
+
             # Restart podman containers dengan build ulang
-            # (Karena kita menggunakan multi-stage build, container akan membaca file statis 
+            # (Karena kita menggunakan multi-stage build, container akan membaca file statis
             #  yang baru saja di-pull dan mem-build ulang image)
             podman-compose -f docker-compose.prod.yml up -d --build
