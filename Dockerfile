@@ -1,7 +1,12 @@
 # ==========================================
+# STAGE 0: COMPOSER
+# ==========================================
+FROM composer:latest AS composer
+
+# ==========================================
 # STAGE 1: BASE (Dependencies & Extensions)
 # ==========================================
-FROM php:8.5-fpm AS base
+FROM php:8.3-fpm AS base
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -22,7 +27,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd zip
 
 # Get latest Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 # Install Node.js (for frontend build)
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
