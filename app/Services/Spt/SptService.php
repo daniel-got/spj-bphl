@@ -71,22 +71,12 @@ class SptService
         return $query->latest()->paginate($perPage);
     }
 
-    /**
-     * Terapkan filter berdasarkan role.
-     *
-     * Menu "SPT Saya" (strictPersonal=true) hanya menampilkan SPT di mana
-     * user terdaftar di dalam JSON pegawai_ditugaskan — TIDAK berdasarkan pembuat_id.
-     * Ini mencegah pembuat_spt melihat SPT yang ia buat (tapi tidak ditugaskan padanya)
-     * di menu umum. Pembuat dapat melihat SPT buatannya via menu "Kelola SPT Pegawai".
-     *
-     * Admin dan role monitoring selalu melihat semua data (tidak difilter).
-     */
     protected function applyRoleFilter($query, bool $strictPersonal = false): void
     {
         $user = auth()->user();
 
-        // Bypass filter untuk admin dan monitoring, kecuali jika dalam mode "SPT Saya" (strictPersonal)
-        if (! $strictPersonal && (! $user || $user->isAdmin() || $user->isMonitoring())) {
+        // Bypass filter untuk admin, monitoring, dan verifikator, kecuali jika dalam mode "SPT Saya" (strictPersonal)
+        if (! $strictPersonal && (! $user || $user->isAdmin() || $user->isMonitoring() || $user->isVerifikator())) {
             return;
         }
 
@@ -97,8 +87,8 @@ class SptService
             // Pegawai yang baru ditugaskan hanya melihat SPT yang sudah disetujui/selesai.
             if ($pegawaiId) {
                 $query->where(function ($q) use ($pegawaiId) {
-                    $q->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                        ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                    $q->whereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawaiId])
+                        ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawaiId]);
                 })->whereIn('status', ['disetujui', 'selesai']);
             } else {
                 // Tidak punya profil pegawai — tidak bisa melihat SPT siapapun
@@ -113,8 +103,8 @@ class SptService
                 if ($pegawaiId) {
                     $q->orWhere(function ($subQ) use ($pegawaiId) {
                         $subQ->where(function ($jsonQ) use ($pegawaiId) {
-                            $jsonQ->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                                ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                            $jsonQ->whereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawaiId])
+                                ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawaiId]);
                         })->whereIn('status', ['disetujui', 'selesai']);
                     });
                 }

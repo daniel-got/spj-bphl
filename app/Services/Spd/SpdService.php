@@ -8,6 +8,7 @@ use App\Models\Spd;
 use App\Models\Spt;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class SpdService
 {
@@ -88,13 +89,15 @@ class SpdService
                     ->where(function ($q) use ($user, $pegawai) {
                         $q->where('pembuat_id', $user->id);
                         if ($pegawai) {
-                            $q->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawai->id]])
-                                ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawai->id]]);
+                            $q->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawai->id])
+                                ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawai->id]);
                         }
                     })->exists();
 
                 if (! $isValidSpt) {
-                    throw new \Exception('Anda tidak memiliki akses untuk membuat SPD dari SPT ini.');
+                    throw ValidationException::withMessages([
+                        'spt_id' => 'Anda tidak memiliki akses untuk membuat SPD dari SPT ini.',
+                    ]);
                 }
             }
 
@@ -109,7 +112,9 @@ class SpdService
                 // Pastikan belum ada SPD untuk SPT ini dengan pegawai yang sama
                 $existingSpd = Spd::where('spt_id', $data['spt_id'])->where('nip_pegawai', $myPegawai->nip)->exists();
                 if ($existingSpd) {
-                    throw new \Exception('Anda sudah membuat SPD untuk SPT ini.');
+                    throw ValidationException::withMessages([
+                        'spt_id' => 'Anda sudah membuat SPD untuk SPT ini.',
+                    ]);
                 }
             }
 
@@ -168,8 +173,8 @@ class SpdService
             $query->where(function ($q) use ($user, $pegawai) {
                 $q->where('pembuat_id', $user->id);
                 if ($pegawai) {
-                    $q->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawai->id]])
-                        ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawai->id]]);
+                    $q->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawai->id])
+                        ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawai->id]);
                 }
             });
         }
@@ -212,8 +217,8 @@ class SpdService
             $query->where(function ($q) use ($user, $pegawai) {
                 $q->where('pembuat_id', $user->id);
                 if ($pegawai) {
-                    $q->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawai->id]])
-                        ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawai->id]]);
+                    $q->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawai->id])
+                        ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawai->id]);
                 }
             });
         }

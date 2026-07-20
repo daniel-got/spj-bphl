@@ -18,11 +18,15 @@
                             Detail SPT
                         </h1>
                         @php
-                            $isPembuat = auth()->id() === (int) $spt->pembuat_id || auth()->user()->isAdmin();
+                            $isPembuatAsli = auth()->id() === (int) $spt->pembuat_id;
+                            $isAdmin = auth()->user()->isAdmin();
+                            $isPembuat = $isPembuatAsli || $isAdmin;
                             $isEditable = in_array($spt->status, [\App\Models\Spt::STATUS_DRAFT, \App\Models\Spt::STATUS_REVISED]);
                         @endphp
-                        @if($isPembuat)
+                        @if($isPembuatAsli)
                             <p class="text-xs text-primary mt-0.5 font-medium">Anda adalah pembuat SPT ini</p>
+                        @elseif($isAdmin)
+                            <p class="text-xs text-primary mt-0.5 font-medium">Anda login sebagai Admin (Hak Akses Penuh)</p>
                         @else
                             <p class="text-xs text-muted mt-0.5">SPT yang ditugaskan kepada Anda</p>
                         @endif

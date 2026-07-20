@@ -45,6 +45,27 @@
                 @endforeach
             </div>
 
+            @if(isset($tuStats))
+                <div class="mt-6">
+                    <x-layout.card title="Statistik Verifikasi (TU)">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                            <div class="p-4 bg-primary/10 border border-primary/20 rounded-xl text-center">
+                                <p class="text-sm font-medium text-primary">Total Dokumen Masuk</p>
+                                <p class="text-2xl font-bold text-text-main mt-1">{{ $tuStats['total'] }}</p>
+                            </div>
+                            <div class="p-4 bg-green-100 border border-green-200 rounded-xl text-center">
+                                <p class="text-sm font-medium text-green-700">Disetujui</p>
+                                <p class="text-2xl font-bold text-text-main mt-1">{{ $tuStats['disetujui'] }}</p>
+                            </div>
+                            <div class="p-4 bg-red-100 border border-red-200 rounded-xl text-center">
+                                <p class="text-sm font-medium text-red-700">Ditolak</p>
+                                <p class="text-2xl font-bold text-text-main mt-1">{{ $tuStats['ditolak'] }}</p>
+                            </div>
+                        </div>
+                    </x-layout.card>
+                </div>
+            @endif
+
             {{-- ===========================================================
                  ROW 2 — SPT Terbaru & Ringkasan Status
             ============================================================ --}}

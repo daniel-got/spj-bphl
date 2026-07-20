@@ -10,6 +10,7 @@ use App\Models\UangPenginapan;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class RincianService
 {
@@ -121,14 +122,18 @@ class RincianService
                     })->exists();
 
                 if (! $isValidSpd) {
-                    throw new \Exception('Anda tidak memiliki akses untuk membuat Rincian dari SPD ini.');
+                    throw ValidationException::withMessages([
+                        'spd_id' => 'Anda tidak memiliki akses untuk membuat Rincian dari SPD ini.',
+                    ]);
                 }
             }
 
             // Pastikan belum ada rincian untuk SPD ini
             $existingRincian = Rincian::where('spd_id', $data['spd_id'])->exists();
             if ($existingRincian) {
-                throw new \Exception('Rincian untuk SPD ini sudah ada.');
+                throw ValidationException::withMessages([
+                    'spd_id' => 'Rincian untuk SPD ini sudah ada.',
+                ]);
             }
 
             // Jika ada file lampiran
@@ -322,14 +327,14 @@ class RincianService
             if (! $uangPenginapan) {
                 foreach ($tempatTujuans as $tujuan) {
                     // Cek apakah string tempat tujuan mengandung nama provinsi (misal: "Kota Jambi" mengandung "Jambi")
-                    $uangPenginapan = UangPenginapan::whereRaw('? LIKE CONCAT(\'%\', provinsi, \'%\')', [trim($tujuan)])->first();
+                    $uangPenginapan = UangPenginapan::whereRaw('LOWER(?) LIKE LOWER(CONCAT(\'%\', provinsi, \'%\'))', [trim($tujuan)])->first();
                     if ($uangPenginapan) {
                         break;
                     }
 
                     // Fallback cek sebaliknya
                     if (! $uangPenginapan) {
-                        $uangPenginapan = UangPenginapan::where('provinsi', 'LIKE', '%'.trim($tujuan).'%')->first();
+                        $uangPenginapan = UangPenginapan::whereRaw('LOWER(provinsi) LIKE LOWER(?)', ['%'.trim($tujuan).'%'])->first();
                         if ($uangPenginapan) {
                             break;
                         }
@@ -359,13 +364,13 @@ class RincianService
 
             if (! $uangHarian) {
                 foreach ($tempatTujuans as $tujuan) {
-                    $uangHarian = UangHarian::whereRaw('? LIKE CONCAT(\'%\', provinsi, \'%\')', [trim($tujuan)])->first();
+                    $uangHarian = UangHarian::whereRaw('LOWER(?) LIKE LOWER(CONCAT(\'%\', provinsi, \'%\'))', [trim($tujuan)])->first();
                     if ($uangHarian) {
                         break;
                     }
 
                     if (! $uangHarian) {
-                        $uangHarian = UangHarian::where('provinsi', 'LIKE', '%'.trim($tujuan).'%')->first();
+                        $uangHarian = UangHarian::whereRaw('LOWER(provinsi) LIKE LOWER(?)', ['%'.trim($tujuan).'%'])->first();
                         if ($uangHarian) {
                             break;
                         }

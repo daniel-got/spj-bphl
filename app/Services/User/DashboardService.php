@@ -17,10 +17,31 @@ class DashboardService
 
         $pegawaiId = $pegawai ? $pegawai->id : null;
 
-        return [
+        $data = [
             'stats' => $this->getStatCards($user->id, $nip, $pegawaiId),
             'recentSpt' => $this->getRecentSpt($user->id, $pegawaiId),
             'documentSummary' => $this->getDocumentSummary($user->id, $pegawaiId),
+        ];
+
+        if ($user->hasRole('kepala_tu')) {
+            $data['tuStats'] = $this->getTuStats($user->id);
+        }
+
+        return $data;
+    }
+
+    private function getTuStats(int $userId): array
+    {
+        return [
+            'total' => Spt::where('status', Spt::STATUS_WAITING_TU)
+                ->orWhere('verifikator_id', $userId)
+                ->count(),
+            'disetujui' => Spt::where('verifikator_id', $userId)
+                ->where('status', Spt::STATUS_APPROVED)
+                ->count(),
+            'ditolak' => Spt::where('verifikator_id', $userId)
+                ->where('status', Spt::STATUS_REJECTED)
+                ->count(),
         ];
     }
 
@@ -32,8 +53,8 @@ class DashboardService
                 $query->where('pembuat_id', $userId);
                 if ($pegawaiId) {
                     $query->orWhere(function ($q) use ($pegawaiId) {
-                        $q->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                          ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                        $q->whereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawaiId])
+                            ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawaiId]);
                     });
                 }
             })
@@ -113,8 +134,8 @@ class DashboardService
             if ($pegawaiId) {
                 $query->orWhere(function ($subQ) use ($pegawaiId) {
                     $subQ->where(function ($q) use ($pegawaiId) {
-                        $q->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                          ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                        $q->whereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawaiId])
+                            ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawaiId]);
                     })->whereIn('status', [Spt::STATUS_APPROVED, 'selesai']);
                 });
             }
@@ -137,8 +158,8 @@ class DashboardService
                         $query->where('pembuat_id', $userId);
                         if ($pegawaiId && in_array($status, [Spt::STATUS_APPROVED, 'selesai'])) {
                             $query->orWhere(function ($q) use ($pegawaiId) {
-                                $q->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                                  ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                                $q->whereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawaiId])
+                                    ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawaiId]);
                             });
                         }
                     })->count(),

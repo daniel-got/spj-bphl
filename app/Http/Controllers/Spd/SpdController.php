@@ -39,6 +39,8 @@ class SpdController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Spd::class);
+
         // SPD dibuat per akun: identitas pegawai otomatis dari akun yang login.
         $myPegawai = Pegawai::where('user_id', auth()->id())->first();
         $ppkData = $this->getPpkData();
@@ -51,6 +53,8 @@ class SpdController extends Controller
      */
     public function store(StoreSpdRequest $request)
     {
+        $this->authorize('create', Spd::class);
+
         $this->spdService->createSpd($request->validated());
 
         return redirect()->route('user.spd.index')->with('success', 'Data SPD berhasil ditambahkan');
