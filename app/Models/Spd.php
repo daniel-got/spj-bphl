@@ -27,6 +27,12 @@ class Spd extends Model
         'pejabat_ditugaskan',  // Kolom tambahan untuk pejabat dinamis
         'spt_id',              // Referensi SPT
         'pembuat_id',          // Pembuat SPD
+        'kepala_seksi_jabatan',
+        'kepala_seksi_nama',
+        'kepala_seksi_nip',
+        'pejabat_instansi_perusahaan',
+        'pejabat_instansi_perusahaan_nama',
+        'pejabat_instansi_perusahaan_nip',
     ];
 
     protected $casts = [

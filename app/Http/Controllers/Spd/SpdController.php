@@ -44,8 +44,9 @@ class SpdController extends Controller
         // SPD dibuat per akun: identitas pegawai otomatis dari akun yang login.
         $myPegawai = Pegawai::where('user_id', auth()->id())->first();
         $ppkData = $this->getPpkData();
+        $pegawaiData = Pegawai::select('id', 'nama_pegawai', 'nip', 'jabatan')->get();
 
-        return view('pages.spd.create', compact('myPegawai', 'ppkData'));
+        return view('pages.spd.create', compact('myPegawai', 'ppkData', 'pegawaiData'));
     }
 
     /**
@@ -84,8 +85,9 @@ class SpdController extends Controller
         // Identitas pegawai pada SPD tetap mengikuti akun pemilik (tidak dapat diubah).
         $spd->load('pegawai');
         $ppkData = $this->getPpkData();
+        $pegawaiData = Pegawai::select('id', 'nama_pegawai', 'nip', 'jabatan')->get();
 
-        return view('pages.spd.edit', compact('spd', 'ppkData'));
+        return view('pages.spd.edit', compact('spd', 'ppkData', 'pegawaiData'));
     }
 
     /**
@@ -141,6 +143,12 @@ class SpdController extends Controller
     /**
      * Print the specified SPD resource.
      */
+    public function printBlank()
+    {
+        $spd = new \App\Models\Spd();
+        return view('pages.spd.print', compact('spd'));
+    }
+
     public function print(string $id)
     {
         $spd = $this->spdService->getSpdById($id);

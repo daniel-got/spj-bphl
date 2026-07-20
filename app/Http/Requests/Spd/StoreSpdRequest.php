@@ -50,6 +50,12 @@ class StoreSpdRequest extends FormRequest
                     }
                 },
             ],
+            'kepala_seksi_jabatan' => 'nullable|string|max:255',
+            'kepala_seksi_nama' => 'nullable|string|max:255',
+            'kepala_seksi_nip' => 'nullable|string|max:255',
+            'pejabat_instansi_perusahaan' => 'nullable|string|max:255',
+            'pejabat_instansi_perusahaan_nama' => 'nullable|string|max:255',
+            'pejabat_instansi_perusahaan_nip' => 'nullable|string|max:255',
         ];
     }
 }

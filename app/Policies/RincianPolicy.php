@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Enums\UserRole;
 use App\Models\Pegawai;
 use App\Models\Rincian;
 use App\Models\User;

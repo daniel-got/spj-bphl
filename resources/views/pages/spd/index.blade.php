@@ -20,6 +20,10 @@
             {{-- Header --}}
             <x-layout.page-header title="Data SPD" subtitle="Daftar Surat Perjalanan Dinas">
                 <x-slot:actions>
+                    <a href="{{ route('user.spd.print-blank') }}" target="_blank"
+                        class="inline-flex items-center justify-center bg-gray-500 hover:bg-gray-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-150 mr-2">
+                        🖨️ Cetak SPD Kosong
+                    </a>
                     <a href="{{ route('user.spd.create') }}"
                         class="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-150 ">
                         + Tambah Baru

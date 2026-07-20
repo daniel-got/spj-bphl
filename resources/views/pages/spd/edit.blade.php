@@ -246,8 +246,51 @@
                             :required="true" :error="$errors->first('ppk')" placeholder="Pilih Pejabat Pembuat" />
                         <x-form.input name="nama_ppk" label="Nama Pejabat PPK" placeholder="Nama Pejabat"
                             :value="old('nama_ppk', $spd->nama_ppk)" :required="true" :error="$errors->first('nama_ppk')" />
-                        <x-form.input name="nip_ppk" label="NIP Pejabat PPK" placeholder="NIP Pejabat"
+                        <x-form.input name="nip_ppk" label="NIP Pejabat PPK" placeholder="NIP Pejabat" id="nip_ppk"
                             :value="old('nip_ppk', $spd->nip_ppk)" :required="true" :error="$errors->first('nip_ppk')" />
+                    </div>
+
+                    {{-- Pejabat Instansi/Perusahaan (Tujuan) --}}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-border-custom pt-6">
+                        <x-form.input name="pejabat_instansi_perusahaan" label="Jabatan Pejabat Tujuan" placeholder="Contoh: Kepala Desa"
+                            :value="old('pejabat_instansi_perusahaan', $spd->pejabat_instansi_perusahaan)" :error="$errors->first('pejabat_instansi_perusahaan')" />
+                        <x-form.input name="pejabat_instansi_perusahaan_nama" label="Nama Pejabat Tujuan" placeholder="Contoh: Budi Santoso"
+                            :value="old('pejabat_instansi_perusahaan_nama', $spd->pejabat_instansi_perusahaan_nama)" :error="$errors->first('pejabat_instansi_perusahaan_nama')" />
+                        <x-form.input name="pejabat_instansi_perusahaan_nip" label="NIP Pejabat Tujuan" placeholder="Opsional"
+                            :value="old('pejabat_instansi_perusahaan_nip', $spd->pejabat_instansi_perusahaan_nip)" :error="$errors->first('pejabat_instansi_perusahaan_nip')" />
+                    </div>
+
+                    {{-- Kepala Seksi --}}
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 border-t border-border-custom pt-6">
+                        <div class="md:col-span-1">
+                            <label for="kepala_seksi_select" class="text-sm font-semibold text-text-main mb-2 block">
+                                Pilih Kepala Seksi
+                            </label>
+                            <select id="kepala_seksi_select" class="w-full">
+                                <option value="">Pilih Pegawai...</option>
+                                @foreach($pegawaiData as $pegawai)
+                                    <option value="{{ $pegawai->id }}" 
+                                        data-nama="{{ $pegawai->nama_pegawai }}" 
+                                        data-nip="{{ $pegawai->nip }}" 
+                                        data-jabatan="{{ $pegawai->jabatan }}"
+                                        {{ old('kepala_seksi_nip', $spd->kepala_seksi_nip) == $pegawai->nip ? 'selected' : '' }}>
+                                        {{ $pegawai->nama_pegawai }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="md:col-span-1">
+                            <x-form.input name="kepala_seksi_jabatan" id="kepala_seksi_jabatan" label="Jabatan Kepala Seksi" placeholder="Jabatan"
+                                :value="old('kepala_seksi_jabatan', $spd->kepala_seksi_jabatan)" :error="$errors->first('kepala_seksi_jabatan')" readonly class="bg-background text-muted cursor-not-allowed" />
+                        </div>
+                        <div class="md:col-span-1">
+                            <x-form.input name="kepala_seksi_nama" id="kepala_seksi_nama" label="Nama Kepala Seksi" placeholder="Nama"
+                                :value="old('kepala_seksi_nama', $spd->kepala_seksi_nama)" :error="$errors->first('kepala_seksi_nama')" readonly class="bg-background text-muted cursor-not-allowed" />
+                        </div>
+                        <div class="md:col-span-1">
+                            <x-form.input name="kepala_seksi_nip" id="kepala_seksi_nip" label="NIP Kepala Seksi" placeholder="NIP"
+                                :value="old('kepala_seksi_nip', $spd->kepala_seksi_nip)" :error="$errors->first('kepala_seksi_nip')" readonly class="bg-background text-muted cursor-not-allowed" />
+                        </div>
                     </div>
 
                 </div>
@@ -330,6 +373,25 @@
             });
 
             updateDestRemoveButtons();
+
+            // --- Kepala Seksi Autofill ---
+            $('#kepala_seksi_select').select2({
+                placeholder: 'Pilih Pegawai...',
+                allowClear: true
+            });
+
+            $('#kepala_seksi_select').on('select2:select', function(e) {
+                const data = e.params.data.element.dataset;
+                document.getElementById('kepala_seksi_jabatan').value = data.jabatan || '';
+                document.getElementById('kepala_seksi_nama').value = data.nama || '';
+                document.getElementById('kepala_seksi_nip').value = data.nip || '';
+            });
+
+            $('#kepala_seksi_select').on('select2:clear', function() {
+                document.getElementById('kepala_seksi_jabatan').value = '';
+                document.getElementById('kepala_seksi_nama').value = '';
+                document.getElementById('kepala_seksi_nip').value = '';
+            });
 
             // Initialize Select2 for existing alat_angkut fields with tags: true to allow manual typing
             $('select[name="alat_angkut[]"]').select2({

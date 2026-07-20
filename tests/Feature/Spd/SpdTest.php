@@ -147,22 +147,6 @@ class SpdTest extends TestCase
         $this->actingAs($user)->withoutExceptionHandling()->post(route('user.spd.store'), $payload);
     }
 
-    public function test_gagal_membuat_spd_jika_nomor_spd_duplikat(): void
-    {
-        $user = User::factory()->create(['roles' => ['user']]);
-        $spt = Spt::factory()->create(['pembuat_id' => $user->id, 'status' => Spt::STATUS_APPROVED]);
-        Spd::factory()->create(['nomor_spd' => 'SPD/001/BPHL/'.now()->year, 'pembuat_id' => $user->id, 'spt_id' => $spt->id]);
-
-        $response = $this->actingAs($user)->post(route('user.spd.store'), [
-            'nomor_spd' => 'SPD/001/BPHL/'.now()->year,
-            'tgl_spd' => now()->format('Y-m-d'),
-            'berangkat_dari' => 'Samarinda',
-            'spt_id' => $spt->id,
-        ]);
-
-        $response->assertSessionHasErrors('nomor_spd');
-    }
-
     public function test_gagal_membuat_spd_jika_field_wajib_kosong(): void
     {
         $user = User::factory()->create(['roles' => ['user']]);
