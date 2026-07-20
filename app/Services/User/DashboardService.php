@@ -19,10 +19,10 @@ class DashboardService
 
         $cacheKey = 'dashboard_stats_user_'.$user->id;
 
-        return Cache::remember($cacheKey, now()->addMinutes(15), function () use ($user, $nip, $pegawaiId) {
+        $data = Cache::remember($cacheKey, now()->addMinutes(15), function () use ($user, $nip, $pegawaiId) {
             $data = [
                 'stats' => $this->getStatCards($user->id, $nip, $pegawaiId),
-                'recentSpt' => $this->getRecentSpt($user->id, $pegawaiId),
+                'recentSpt' => $this->getRecentSpt($user->id, $pegawaiId), // ini array
                 'documentSummary' => $this->getDocumentSummary($user->id, $pegawaiId),
             ];
 
@@ -32,6 +32,14 @@ class DashboardService
 
             return $data;
         });
+
+        // Rebuild Eloquent Collection dari plain array agar view (Blade) bisa
+        // menggunakan property object dan Carbon dates ($spt->id, $spt->created_at).
+        if (isset($data['recentSpt']) && is_array($data['recentSpt'])) {
+            $data['recentSpt'] = Spt::hydrate($data['recentSpt']);
+        }
+
+        return $data;
     }
 
     /**
