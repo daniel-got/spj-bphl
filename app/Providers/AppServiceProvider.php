@@ -24,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (env('APP_ENV') === 'production') {
+            URL::forceScheme('https');
+        }
+
         Event::listen(function (Failed $event) {
             Log::warning('[SECURITY: FAILED LOGIN] Failed login attempt', [
                 'user' => $event->credentials['email'] ?? 'unknown',
