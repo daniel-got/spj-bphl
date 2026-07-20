@@ -20,7 +20,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: 2221
+          port: ${{ secrets.VPS_PORT }}
           script: |
             cd /var/www/spj-bphl4.dniel.my.id/spj-bphl
             git pull origin main
