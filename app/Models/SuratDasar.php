@@ -34,7 +34,15 @@ class SuratDasar extends Model
      */
     public static function getCachedAktif(): Collection
     {
-        return Cache::rememberForever(self::CACHE_KEY, fn () => static::aktif()->get());
+        $data = Cache::rememberForever(self::CACHE_KEY, fn () => static::aktif()->get()->toArray());
+
+        if ($data instanceof Collection) {
+            return $data;
+        }
+
+        return (new static)->newCollection(
+            array_map(fn (array $row) => (new static)->forceFill($row)->syncOriginal(), $data)
+        );
     }
 
     /**

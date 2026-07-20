@@ -36,7 +36,15 @@ class Pegawai extends Model
      */
     public static function getCachedAll(): Collection
     {
-        return Cache::rememberForever(self::CACHE_KEY, fn () => static::all());
+        $data = Cache::rememberForever(self::CACHE_KEY, fn () => static::all()->toArray());
+
+        if ($data instanceof Collection) {
+            return $data;
+        }
+
+        return (new static)->newCollection(
+            array_map(fn (array $row) => (new static)->forceFill($row)->syncOriginal(), $data)
+        );
     }
 
     /**
