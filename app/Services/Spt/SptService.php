@@ -85,8 +85,8 @@ class SptService
     {
         $user = auth()->user();
 
-        // Bypass filter untuk admin dan monitoring, kecuali jika dalam mode "SPT Saya" (strictPersonal)
-        if (! $strictPersonal && (! $user || $user->isAdmin() || $user->isMonitoring())) {
+        // Bypass filter untuk admin, monitoring, dan verifikator, kecuali jika dalam mode "SPT Saya" (strictPersonal)
+        if (! $strictPersonal && (! $user || $user->isAdmin() || $user->isMonitoring() || $user->isVerifikator())) {
             return;
         }
 
@@ -97,8 +97,8 @@ class SptService
             // Pegawai yang baru ditugaskan hanya melihat SPT yang sudah disetujui/selesai.
             if ($pegawaiId) {
                 $query->where(function ($q) use ($pegawaiId) {
-                    $q->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                        ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                    $q->whereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawaiId])
+                        ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawaiId]);
                 })->whereIn('status', ['disetujui', 'selesai']);
             } else {
                 // Tidak punya profil pegawai — tidak bisa melihat SPT siapapun
@@ -113,8 +113,8 @@ class SptService
                 if ($pegawaiId) {
                     $q->orWhere(function ($subQ) use ($pegawaiId) {
                         $subQ->where(function ($jsonQ) use ($pegawaiId) {
-                            $jsonQ->whereJsonContains('pegawai_ditugaskan', [['pegawai_id' => (string) $pegawaiId]])
-                                ->orWhereJsonContains('pegawai_ditugaskan', [['pegawai_id' => $pegawaiId]]);
+                            $jsonQ->whereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawaiId])
+                                ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawaiId]);
                         })->whereIn('status', ['disetujui', 'selesai']);
                     });
                 }

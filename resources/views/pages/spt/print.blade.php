@@ -240,7 +240,7 @@
         <table class="header-table">
             <tr>
                 <td class="logo-col">
-                    <img src="{{ asset('LOGO.bphl.png') }}" alt="Logo BPHL">
+                    <img src="{{ asset('logo.bphl.png') }}" alt="Logo BPHL">
                 </td>
                 <td class="kop-col">
                     <div class="kop1">KEMENTERIAN KEHUTANAN</div>
@@ -320,22 +320,26 @@
                 <td class="lbl">Kepada</td>
                 <td class="ttk">:</td>
                 <td class="cnt">
-                    @forelse($spt->pegawais as $index => $pegawai)
+                    @php
+                        $pegawais = is_string($spt->pegawai_ditugaskan) ? json_decode($spt->pegawai_ditugaskan, true) : $spt->pegawai_ditugaskan;
+                        $pegawais = is_array($pegawais) ? $pegawais : [];
+                    @endphp
+                    @forelse($pegawais as $index => $pegawai)
                         <div class="pegawai-item-box">
                             <table class="sub-table">
                                 <tr>
                                     <td class="sub-lbl">
-                                        @if (count($spt->pegawais) > 1)
+                                        @if (count($pegawais) > 1)
                                             {{ $index + 1 }}.
                                         @endif Nama/NIP
                                     </td>
                                     <td class="sub-ttk">:</td>
-                                    <td class="sub-cnt">{{ $pegawai->nama_pegawai }} / {{ $pegawai->nip ?? '-' }}</td>
+                                    <td class="sub-cnt">{{ $pegawai['nama_pegawai'] ?? '-' }} / {{ $pegawai['nip'] ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td class="sub-lbl">&nbsp;&nbsp;&nbsp;&nbsp;Jabatan</td>
                                     <td class="sub-ttk">:</td>
-                                    <td class="sub-cnt">{{ $pegawai->jabatan }}</td>
+                                    <td class="sub-cnt">{{ $pegawai['jabatan'] ?? '-' }}</td>
                                 </tr>
                             </table>
                         </div>

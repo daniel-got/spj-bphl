@@ -11,7 +11,7 @@ class UpdateSptRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return auth()->check() && auth()->user()->can('update', $this->route('spt'));
     }
 
     /**

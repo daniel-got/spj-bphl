@@ -40,7 +40,7 @@ class SptTest extends TestCase
 
     public function test_user_dapat_membuka_halaman_tambah_spt(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['roles' => ['pembuat_spt']]);
 
         // Kita hanya mematikan middleware kustom pengunci rute saja,
         // sehingga middleware session web (termasuk variabel $errors) tetap hidup aman!
@@ -57,7 +57,7 @@ class SptTest extends TestCase
 
     public function test_user_dapat_mengajukan_spt_baru(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['roles' => ['pembuat_spt']]);
 
         $payload = [
             'nomor_spt' => 'SPT/001/BPHL/'.now()->year,
@@ -81,13 +81,14 @@ class SptTest extends TestCase
             ->actingAs($user)
             ->post(route('user.spt.store'), $payload);
 
-        $response->assertRedirect(route('user.spt.index'));
+        $spt = Spt::where('nomor_spt', 'SPT/001/BPHL/'.now()->year)->first();
+        $response->assertRedirect(route('user.spt.show', $spt->id));
         $this->assertDatabaseHas('data_spt', ['nomor_spt' => 'SPT/001/BPHL/'.now()->year]);
     }
 
     public function test_gagal_membuat_spt_jika_nomor_spt_sudah_ada(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['roles' => ['pembuat_spt']]);
         Spt::factory()->create(['nomor_spt' => 'SPT/001/BPHL/'.now()->year, 'pembuat_id' => $user->id]);
 
         $payload = [
@@ -111,7 +112,7 @@ class SptTest extends TestCase
 
     public function test_gagal_membuat_spt_jika_field_wajib_kosong(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['roles' => ['pembuat_spt']]);
 
         $response = $this->withoutMiddleware([EnsurePembuatSpt::class])
             ->actingAs($user)
@@ -141,7 +142,7 @@ class SptTest extends TestCase
 
     public function test_user_dapat_menghapus_spt_miliknya(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['roles' => ['pembuat_spt']]);
         $spt = Spt::factory()->create(['pembuat_id' => $user->id]);
 
         $response = $this->withoutMiddleware([EnsurePembuatSpt::class])
@@ -154,7 +155,7 @@ class SptTest extends TestCase
 
     public function test_user_dapat_mengajukan_spt_baru_dengan_banyak_pegawai(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['roles' => ['pembuat_spt']]);
 
         Pegawai::factory()->create(['id' => 1, 'nama_pegawai' => 'Budi Santoso', 'nip' => '198501012010011001', 'pangkat' => 'Penata', 'jabatan' => 'Analis']);
         Pegawai::factory()->create(['id' => 2, 'nama_pegawai' => 'Ani Wijaya', 'nip' => '199002022015012002', 'pangkat' => 'Pengatur', 'jabatan' => 'Administrasi']);
@@ -193,9 +194,9 @@ class SptTest extends TestCase
             ->actingAs($user)
             ->post(route('user.spt.store'), $payload);
 
-        $response->assertRedirect(route('user.spt.index'));
-
         $spt = Spt::where('nomor_spt', 'SPT/MULTI/001/'.now()->year)->first();
+        $response->assertRedirect(route('user.spt.show', $spt->id));
+
         $this->assertNotNull($spt);
         $this->assertCount(2, $spt->pegawai_ditugaskan);
         $this->assertEquals('Budi Santoso', $spt->penanggung_jawab);

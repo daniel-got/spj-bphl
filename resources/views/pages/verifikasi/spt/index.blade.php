@@ -27,7 +27,7 @@
                             $isStatusDetailView = in_array(request('status'), ['disetujui', 'ditolak', 'direvisi']);
                             $activeFilters = 0;
                             if (request()->filled('search')) $activeFilters++;
-                            if (request()->filled('status') && request('status') !== 'menunggu_tu') $activeFilters++;
+                            if (request()->filled('status') && request('status') !== 'diajukan') $activeFilters++;
                         @endphp
 
                         <x-layout.card>
@@ -59,12 +59,11 @@
                                         </div>
                                         <div class="col-span-6 md:col-span-3 flex flex-col gap-1">
                                             <x-form.select name="status" label="Status Dokumen" :options="[
-                                                'menunggu_tu' => 'Menunggu TU',
-                                                'menunggu_balai' => 'Menunggu Balai',
+                                                'diajukan' => 'Menunggu Verifikasi',
                                                 'disetujui' => 'Telah Disetujui',
                                                 'direvisi' => 'Direvisi (Dikembalikan)',
                                                 'ditolak' => 'Ditolak'
-                                            ]" :selected="request('status', 'menunggu_tu')" onchange="this.form.submit()" />
+                                            ]" :selected="$status" onchange="this.form.submit()" />
                                         </div>
                                         <div class="col-span-6 md:col-span-2 flex flex-col gap-1">
                                             <x-form.select name="per_page" label="Tampilkan" :options="[
