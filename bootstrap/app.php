@@ -17,6 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Percayai semua Reverse Proxy agar Laravel otomatis mendeteksi HTTPS
+        $middleware->trustProxies(at: '*');
+
         // Daftarkan alias middleware 'role' untuk digunakan di route group
         // Contoh pemakaian: Route::middleware(['auth', 'role:admin'])->...
         $middleware->alias([
