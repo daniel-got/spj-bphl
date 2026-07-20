@@ -71,16 +71,6 @@ class SptService
         return $query->latest()->paginate($perPage);
     }
 
-    /**
-     * Terapkan filter berdasarkan role.
-     *
-     * Menu "SPT Saya" (strictPersonal=true) hanya menampilkan SPT di mana
-     * user terdaftar di dalam JSON pegawai_ditugaskan — TIDAK berdasarkan pembuat_id.
-     * Ini mencegah pembuat_spt melihat SPT yang ia buat (tapi tidak ditugaskan padanya)
-     * di menu umum. Pembuat dapat melihat SPT buatannya via menu "Kelola SPT Pegawai".
-     *
-     * Admin dan role monitoring selalu melihat semua data (tidak difilter).
-     */
     protected function applyRoleFilter($query, bool $strictPersonal = false): void
     {
         $user = auth()->user();
