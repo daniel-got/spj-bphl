@@ -6,6 +6,7 @@ use App\Models\Rincian;
 use App\Models\Spd;
 use App\Models\Spt;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardService
 {
@@ -14,20 +15,23 @@ class DashboardService
         $user = Auth::user();
         $pegawai = $user->pegawai;
         $nip = $pegawai ? $pegawai->nip : null;
-
         $pegawaiId = $pegawai ? $pegawai->id : null;
 
-        $data = [
-            'stats' => $this->getStatCards($user->id, $nip, $pegawaiId),
-            'recentSpt' => $this->getRecentSpt($user->id, $pegawaiId),
-            'documentSummary' => $this->getDocumentSummary($user->id, $pegawaiId),
-        ];
+        $cacheKey = 'dashboard_stats_user_'.$user->id;
 
-        if ($user->hasRole('kepala_tu')) {
-            $data['tuStats'] = $this->getTuStats($user->id);
-        }
+        return Cache::remember($cacheKey, now()->addMinutes(15), function () use ($user, $nip, $pegawaiId) {
+            $data = [
+                'stats' => $this->getStatCards($user->id, $nip, $pegawaiId),
+                'recentSpt' => $this->getRecentSpt($user->id, $pegawaiId),
+                'documentSummary' => $this->getDocumentSummary($user->id, $pegawaiId),
+            ];
 
-        return $data;
+            if ($user->hasRole('kepala_tu')) {
+                $data['tuStats'] = $this->getTuStats($user->id);
+            }
+
+            return $data;
+        });
     }
 
     private function getTuStats(int $userId): array
