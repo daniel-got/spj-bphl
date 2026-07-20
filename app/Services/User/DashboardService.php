@@ -34,6 +34,15 @@ class DashboardService
         });
     }
 
+    /**
+     * Invalidate cache dashboard user tertentu.
+     * Dipanggil saat data berubah (submit SPJ, dll.)
+     */
+    public static function clearCache(int $userId): void
+    {
+        Cache::forget('dashboard_stats_user_'.$userId);
+    }
+
     private function getTuStats(int $userId): array
     {
         return [
@@ -131,7 +140,7 @@ class DashboardService
         ];
     }
 
-    private function getRecentSpt(int $userId, ?int $pegawaiId)
+    private function getRecentSpt(int $userId, ?int $pegawaiId): array
     {
         return Spt::where(function ($query) use ($userId, $pegawaiId) {
             $query->where('pembuat_id', $userId);
@@ -146,7 +155,8 @@ class DashboardService
         })
             ->latest()
             ->limit(5)
-            ->get();
+            ->get()
+            ->toArray();
     }
 
     private function getDocumentSummary(int $userId, ?int $pegawaiId): array
