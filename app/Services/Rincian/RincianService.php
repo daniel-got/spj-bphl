@@ -320,24 +320,25 @@ class RincianService
             $golongan = $spd->pegawai->golongan;
             $tempatTujuans = is_array($spd->tempat_tujuan) ? $spd->tempat_tujuan : [$spd->tempat_tujuan];
 
-            // Try to find the matching province
-            $uangPenginapan = UangPenginapan::whereIn('provinsi', $tempatTujuans)->first();
+            // Ambil seluruh data dari cache, lalu cari kecocokan in-memory (tanpa query DB)
+            $allPenginapan = UangPenginapan::getCachedAll();
 
-            // If not found, try fuzzy match (e.g., destination is "Kota Jambi", province is "Jambi")
+            // Cari exact match berdasarkan provinsi
+            $uangPenginapan = $allPenginapan->whereIn('provinsi', $tempatTujuans)->first();
+
+            // Jika tidak ditemukan, coba fuzzy match
             if (! $uangPenginapan) {
                 foreach ($tempatTujuans as $tujuan) {
-                    // Cek apakah string tempat tujuan mengandung nama provinsi (misal: "Kota Jambi" mengandung "Jambi")
-                    $uangPenginapan = UangPenginapan::whereRaw('LOWER(?) LIKE LOWER(CONCAT(\'%\', provinsi, \'%\'))', [trim($tujuan)])->first();
+                    $tujuanLower = strtolower(trim($tujuan));
+
+                    $uangPenginapan = $allPenginapan->first(function ($item) use ($tujuanLower) {
+                        $provinsiLower = strtolower($item->provinsi);
+
+                        return str_contains($tujuanLower, $provinsiLower) || str_contains($provinsiLower, $tujuanLower);
+                    });
+
                     if ($uangPenginapan) {
                         break;
-                    }
-
-                    // Fallback cek sebaliknya
-                    if (! $uangPenginapan) {
-                        $uangPenginapan = UangPenginapan::whereRaw('LOWER(provinsi) LIKE LOWER(?)', ['%'.trim($tujuan).'%'])->first();
-                        if ($uangPenginapan) {
-                            break;
-                        }
                     }
                 }
             }
@@ -360,20 +361,23 @@ class RincianService
         if ($spd->tempat_tujuan) {
             $tempatTujuans = is_array($spd->tempat_tujuan) ? $spd->tempat_tujuan : [$spd->tempat_tujuan];
 
-            $uangHarian = UangHarian::whereIn('provinsi', $tempatTujuans)->first();
+            // Ambil seluruh data dari cache, lalu cari kecocokan in-memory
+            $allUangHarian = UangHarian::getCachedAll();
+
+            $uangHarian = $allUangHarian->whereIn('provinsi', $tempatTujuans)->first();
 
             if (! $uangHarian) {
                 foreach ($tempatTujuans as $tujuan) {
-                    $uangHarian = UangHarian::whereRaw('LOWER(?) LIKE LOWER(CONCAT(\'%\', provinsi, \'%\'))', [trim($tujuan)])->first();
+                    $tujuanLower = strtolower(trim($tujuan));
+
+                    $uangHarian = $allUangHarian->first(function ($item) use ($tujuanLower) {
+                        $provinsiLower = strtolower($item->provinsi);
+
+                        return str_contains($tujuanLower, $provinsiLower) || str_contains($provinsiLower, $tujuanLower);
+                    });
+
                     if ($uangHarian) {
                         break;
-                    }
-
-                    if (! $uangHarian) {
-                        $uangHarian = UangHarian::whereRaw('LOWER(provinsi) LIKE LOWER(?)', ['%'.trim($tujuan).'%'])->first();
-                        if ($uangHarian) {
-                            break;
-                        }
                     }
                 }
             }

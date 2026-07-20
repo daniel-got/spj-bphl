@@ -51,8 +51,8 @@ class VerifikasiSptController extends Controller
 
         $this->sptService->verifySpt(
             $spt,
-            $request->validated('status'),
-            $request->validated('catatan_verifikator'),
+            $request->input('status'),
+            $request->input('catatan_verifikator'),
             auth()->id()
         );
 
