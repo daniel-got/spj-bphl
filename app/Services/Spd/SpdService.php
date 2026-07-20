@@ -8,6 +8,7 @@ use App\Models\Spd;
 use App\Models\Spt;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class SpdService
 {
@@ -88,12 +89,18 @@ class SpdService
                     ->where(function ($q) use ($user, $pegawai) {
                         $q->where('pembuat_id', $user->id);
                         if ($pegawai) {
-                            \App\Helpers\SptHelper::queryPegawaiDitugaskan($q, $pegawai->id, 'or');
+                            $pegawaiId = $pegawai->id;
+                            $q->orWhere(function ($jsonQ) use ($pegawaiId) {
+                                $jsonQ->where('pegawai_ditugaskan', 'like', '%"pegawai_id":'.$pegawaiId.'%')
+                                    ->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id":"'.$pegawaiId.'"%');
+                            });
                         }
                     })->exists();
 
                 if (! $isValidSpt) {
-                    throw new \Exception('Anda tidak memiliki akses untuk membuat SPD dari SPT ini.');
+                    throw ValidationException::withMessages([
+                        'spt_id' => 'Anda tidak memiliki akses untuk membuat SPD dari SPT ini.',
+                    ]);
                 }
             }
 
@@ -108,8 +115,17 @@ class SpdService
                 // Pastikan belum ada SPD untuk SPT ini dengan pegawai yang sama
                 $existingSpd = Spd::where('spt_id', $data['spt_id'])->where('nip_pegawai', $myPegawai->nip)->exists();
                 if ($existingSpd) {
-                    throw new \Exception('Anda sudah membuat SPD untuk SPT ini.');
+                    throw ValidationException::withMessages([
+                        'spt_id' => 'Anda sudah membuat SPD untuk SPT ini.',
+                    ]);
                 }
+            }
+
+            // Nomor SPD di-shared antar pegawai dalam 1 SPT.
+            // Jika sudah ada SPD lain dari SPT yang sama, gunakan nomor_spd-nya (abaikan input user).
+            $firstSpd = Spd::where('spt_id', $data['spt_id'])->first();
+            if ($firstSpd) {
+                $data['nomor_spd'] = $firstSpd->nomor_spd;
             }
 
             $spd = Spd::create($data);
@@ -167,7 +183,11 @@ class SpdService
             $query->where(function ($q) use ($user, $pegawai) {
                 $q->where('pembuat_id', $user->id);
                 if ($pegawai) {
-                    \App\Helpers\SptHelper::queryPegawaiDitugaskan($q, $pegawai->id, 'or');
+                    $pegawaiId = $pegawai->id;
+                    $q->orWhere(function ($jsonQ) use ($pegawaiId) {
+                        $jsonQ->where('pegawai_ditugaskan', 'like', '%"pegawai_id":'.$pegawaiId.'%')
+                            ->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id":"'.$pegawaiId.'"%');
+                    });
                 }
             });
         }
@@ -210,7 +230,11 @@ class SpdService
             $query->where(function ($q) use ($user, $pegawai) {
                 $q->where('pembuat_id', $user->id);
                 if ($pegawai) {
-                    \App\Helpers\SptHelper::queryPegawaiDitugaskan($q, $pegawai->id, 'or');
+                    $pegawaiId = $pegawai->id;
+                    $q->orWhere(function ($jsonQ) use ($pegawaiId) {
+                        $jsonQ->where('pegawai_ditugaskan', 'like', '%"pegawai_id":'.$pegawaiId.'%')
+                            ->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id":"'.$pegawaiId.'"%');
+                    });
                 }
             });
         }
@@ -227,6 +251,9 @@ class SpdService
             'lama_kegiatan' => $spt->lama_kegiatan,
             'kode_mak' => $spt->kode_mak,
             'pegawai_list' => $spt->pegawai_ditugaskan,
+            // Nomor SPD dari SPD pertama yang sudah ada untuk SPT ini (null jika belum ada).
+            // Frontend menggunakan nilai ini untuk prefill & mengunci field nomor_spd.
+            'nomor_spd_existing' => Spd::where('spt_id', $spt->id)->value('nomor_spd'),
         ];
     }
 

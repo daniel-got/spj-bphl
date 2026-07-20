@@ -33,7 +33,7 @@ class CheckRole
         }
 
         // Pastikan role user ada di dalam array $roles yang diizinkan
-        $userRoles = $user->roles ?? [];
+        $userRoles = (array) ($user->roles ?? []);
         $hasAllowedRole = count(array_intersect($userRoles, $roles)) > 0;
 
         if (! $hasAllowedRole) {

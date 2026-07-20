@@ -6,6 +6,7 @@ use App\Models\Rincian;
 use App\Models\Spd;
 use App\Models\Spt;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardService
 {
@@ -14,13 +15,54 @@ class DashboardService
         $user = Auth::user();
         $pegawai = $user->pegawai;
         $nip = $pegawai ? $pegawai->nip : null;
-
         $pegawaiId = $pegawai ? $pegawai->id : null;
 
+        $cacheKey = 'dashboard_stats_user_'.$user->id;
+
+        $data = Cache::remember($cacheKey, now()->addMinutes(15), function () use ($user, $nip, $pegawaiId) {
+            $data = [
+                'stats' => $this->getStatCards($user->id, $nip, $pegawaiId),
+                'recentSpt' => $this->getRecentSpt($user->id, $pegawaiId), // ini array
+                'documentSummary' => $this->getDocumentSummary($user->id, $pegawaiId),
+            ];
+
+            if ($user->hasRole('kepala_tu')) {
+                $data['tuStats'] = $this->getTuStats($user->id);
+            }
+
+            return $data;
+        });
+
+        // Rebuild Eloquent Collection dari plain array agar view (Blade) bisa
+        // menggunakan property object dan Carbon dates ($spt->id, $spt->created_at).
+        if (isset($data['recentSpt']) && is_array($data['recentSpt'])) {
+            $data['recentSpt'] = Spt::hydrate($data['recentSpt']);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Invalidate cache dashboard user tertentu.
+     * Dipanggil saat data berubah (submit SPJ, dll.)
+     */
+    public static function clearCache(int $userId): void
+    {
+        Cache::forget('dashboard_stats_user_'.$userId);
+    }
+
+    private function getTuStats(int $userId): array
+    {
         return [
-            'stats' => $this->getStatCards($user->id, $nip, $pegawaiId),
-            'recentSpt' => $this->getRecentSpt($user->id, $pegawaiId),
-            'documentSummary' => $this->getDocumentSummary($user->id, $pegawaiId),
+            'total' => Spt::where('status', Spt::STATUS_WAITING_TU)
+                ->orWhere('verifikator_id', $userId)
+                ->count(),
+            'disetujui' => Spt::where('verifikator_id', $userId)
+                ->where('status', Spt::STATUS_APPROVED)
+                ->count(),
+            'ditolak' => Spt::where('verifikator_id', $userId)
+                ->where('status', Spt::STATUS_REJECTED)
+                ->count(),
         ];
     }
 
@@ -31,7 +73,10 @@ class DashboardService
             ->where(function ($query) use ($userId, $pegawaiId) {
                 $query->where('pembuat_id', $userId);
                 if ($pegawaiId) {
-                    \App\Helpers\SptHelper::queryPegawaiDitugaskan($query, $pegawaiId, 'or');
+                    $query->orWhere(function ($q) use ($pegawaiId) {
+                        $q->whereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawaiId])
+                            ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawaiId]);
+                    });
                 }
             })
             ->whereDoesntHave('spds')
@@ -103,20 +148,23 @@ class DashboardService
         ];
     }
 
-    private function getRecentSpt(int $userId, ?int $pegawaiId)
+    private function getRecentSpt(int $userId, ?int $pegawaiId): array
     {
         return Spt::where(function ($query) use ($userId, $pegawaiId) {
             $query->where('pembuat_id', $userId);
             if ($pegawaiId) {
                 $query->orWhere(function ($subQ) use ($pegawaiId) {
-                    \App\Helpers\SptHelper::queryPegawaiDitugaskan($subQ, $pegawaiId)
-                        ->whereIn('status', [Spt::STATUS_APPROVED, 'selesai']);
+                    $subQ->where(function ($q) use ($pegawaiId) {
+                        $q->whereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawaiId])
+                            ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawaiId]);
+                    })->whereIn('status', [Spt::STATUS_APPROVED, 'selesai']);
                 });
             }
         })
             ->latest()
             ->limit(5)
-            ->get();
+            ->get()
+            ->toArray();
     }
 
     private function getDocumentSummary(int $userId, ?int $pegawaiId): array
@@ -131,7 +179,10 @@ class DashboardService
                     ->where(function ($query) use ($userId, $pegawaiId, $status) {
                         $query->where('pembuat_id', $userId);
                         if ($pegawaiId && in_array($status, [Spt::STATUS_APPROVED, 'selesai'])) {
-                            \App\Helpers\SptHelper::queryPegawaiDitugaskan($query, $pegawaiId, 'or');
+                            $query->orWhere(function ($q) use ($pegawaiId) {
+                                $q->whereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawaiId])
+                                    ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawaiId]);
+                            });
                         }
                     })->count(),
             ];

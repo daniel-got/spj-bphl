@@ -71,22 +71,12 @@ class SptService
         return $query->latest()->paginate($perPage);
     }
 
-    /**
-     * Terapkan filter berdasarkan role.
-     *
-     * Menu "SPT Saya" (strictPersonal=true) hanya menampilkan SPT di mana
-     * user terdaftar di dalam JSON pegawai_ditugaskan — TIDAK berdasarkan pembuat_id.
-     * Ini mencegah pembuat_spt melihat SPT yang ia buat (tapi tidak ditugaskan padanya)
-     * di menu umum. Pembuat dapat melihat SPT buatannya via menu "Kelola SPT Pegawai".
-     *
-     * Admin dan role monitoring selalu melihat semua data (tidak difilter).
-     */
     protected function applyRoleFilter($query, bool $strictPersonal = false): void
     {
         $user = auth()->user();
 
-        // Bypass filter untuk admin dan monitoring, kecuali jika dalam mode "SPT Saya" (strictPersonal)
-        if (! $strictPersonal && (! $user || $user->isAdmin() || $user->isMonitoring())) {
+        // Bypass filter untuk admin, monitoring, dan verifikator, kecuali jika dalam mode "SPT Saya" (strictPersonal)
+        if (! $strictPersonal && (! $user || $user->isAdmin() || $user->isMonitoring() || $user->isVerifikator())) {
             return;
         }
 
@@ -94,10 +84,13 @@ class SptService
 
         if ($strictPersonal) {
             // Mode "SPT Saya": hanya tampilkan SPT yang user ini DITUGASKAN padanya.
-            // Pegawai yang baru ditugaskan hanya melihat SPT yang sudah disetujui/selesai.
             if ($pegawaiId) {
-                \App\Helpers\SptHelper::queryPegawaiDitugaskan($query, $pegawaiId)
-                    ->whereIn('status', ['disetujui', 'selesai']);
+                $query->where(function ($q) use ($pegawaiId) {
+                    // Gunakan LIKE sebagai pencocokan universal untuk menghindari masalah tipe data
+                    // integer vs string pada kolom jsonb di PostgreSQL
+                    $q->where('pegawai_ditugaskan', 'like', '%"pegawai_id":'.$pegawaiId.'%')
+                        ->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id":"'.$pegawaiId.'"%');
+                })->whereIn('status', ['disetujui', 'selesai']);
             } else {
                 // Tidak punya profil pegawai — tidak bisa melihat SPT siapapun
                 $query->whereRaw('1 = 0');
@@ -110,8 +103,10 @@ class SptService
 
                 if ($pegawaiId) {
                     $q->orWhere(function ($subQ) use ($pegawaiId) {
-                        \App\Helpers\SptHelper::queryPegawaiDitugaskan($subQ, $pegawaiId)
-                            ->whereIn('status', ['disetujui', 'selesai']);
+                        $subQ->where(function ($jsonQ) use ($pegawaiId) {
+                            $jsonQ->where('pegawai_ditugaskan', 'like', '%"pegawai_id":'.$pegawaiId.'%')
+                                ->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id":"'.$pegawaiId.'"%');
+                        })->whereIn('status', ['disetujui', 'selesai']);
                     });
                 }
             });

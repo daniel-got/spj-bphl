@@ -54,8 +54,11 @@
 
                     {{-- Nomor & Tanggal --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <x-form.input name="nomor_spd" label="Nomor SPD" placeholder="Contoh: 094/01/SPD/2026"
-                            :value="old('nomor_spd')" :required="true" :error="$errors->first('nomor_spd')" />
+                        <div>
+                            <x-form.input name="nomor_spd" label="Nomor SPD" placeholder="Contoh: 094/01/SPD/2026"
+                                :value="old('nomor_spd')" :required="true" :error="$errors->first('nomor_spd')" />
+                            <p id="nomor-spd-hint" class="hidden text-xs text-primary mt-1 font-medium"></p>
+                        </div>
                         <x-form.date-picker name="tgl_spd" label="Tanggal SPD" :value="old('tgl_spd')" :required="true"
                             :error="$errors->first('tgl_spd')" />
                     </div>
@@ -337,8 +340,39 @@
                                 document.getElementById('spt-info-badge').classList.add('hidden');
                                 document.getElementById('assigned-pegawai-list').classList.add('hidden');
                             }
+
+                            // Nomor SPD di-shared per SPT.
+                            // Jika sudah ada SPD dari SPT ini, prefill & kunci field nomor_spd.
+                            const nomorSpdInput = document.getElementById('nomor_spd');
+                            const nomorSpdHint = document.getElementById('nomor-spd-hint');
+                            if (data.nomor_spd_existing) {
+                                nomorSpdInput.value = data.nomor_spd_existing;
+                                nomorSpdInput.setAttribute('readonly', 'readonly');
+                                nomorSpdInput.classList.add('bg-background', 'text-muted', 'cursor-not-allowed');
+                                if (nomorSpdHint) {
+                                    nomorSpdHint.textContent = 'Nomor SPD diambil otomatis dari SPD yang sudah ada dalam SPT ini.';
+                                    nomorSpdHint.classList.remove('hidden');
+                                }
+                            } else {
+                                nomorSpdInput.removeAttribute('readonly');
+                                nomorSpdInput.classList.remove('bg-background', 'text-muted', 'cursor-not-allowed');
+                                if (nomorSpdHint) {
+                                    nomorSpdHint.classList.add('hidden');
+                                }
+                            }
                         }
                     });
+                }
+            });
+
+            // Reset nomor_spd field jika SPT di-clear
+            $('#spt_id').on('select2:clear', function() {
+                const nomorSpdInput = document.getElementById('nomor_spd');
+                const nomorSpdHint = document.getElementById('nomor-spd-hint');
+                nomorSpdInput.removeAttribute('readonly');
+                nomorSpdInput.classList.remove('bg-background', 'text-muted', 'cursor-not-allowed');
+                if (nomorSpdHint) {
+                    nomorSpdHint.classList.add('hidden');
                 }
             });
 

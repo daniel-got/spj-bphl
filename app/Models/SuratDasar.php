@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class SuratDasar extends Model
 {
+    const CACHE_KEY = 'surat_dasar_aktif';
+
     use HasFactory;
 
     protected $table = 'data_surat_dasar';
@@ -19,6 +23,44 @@ class SuratDasar extends Model
     protected $casts = [
         'aktif' => 'boolean',
     ];
+
+    // -------------------------------------------------------------------------
+    // Caching
+    // -------------------------------------------------------------------------
+
+    /**
+     * Ambil daftar Surat Dasar yang aktif dari cache.
+     * Dipakai untuk mengisi pilihan dropdown pada form pembuatan SPT.
+     */
+    public static function getCachedAktif(): Collection
+    {
+        $data = Cache::rememberForever(self::CACHE_KEY, fn () => static::aktif()->get()->toArray());
+
+        if ($data instanceof Collection) {
+            return $data;
+        }
+
+        return (new static)->newCollection(
+            array_map(fn (array $row) => (new static)->forceFill($row)->syncOriginal(), $data)
+        );
+    }
+
+    /**
+     * Hapus cache surat dasar.
+     */
+    public static function clearCache(): void
+    {
+        Cache::forget(self::CACHE_KEY);
+    }
+
+    /**
+     * Daftarkan event listener untuk cache invalidation secara otomatis.
+     */
+    protected static function booted(): void
+    {
+        static::saved(fn () => static::clearCache());
+        static::deleted(fn () => static::clearCache());
+    }
 
     // -------------------------------------------------------------------------
     // Query Scopes

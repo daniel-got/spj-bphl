@@ -48,8 +48,10 @@ class PembuatSptService
             $q->where('pembuat_id', $userId);
             if ($pegawaiId) {
                 $q->orWhere(function ($subQ) use ($pegawaiId) {
-                    \App\Helpers\SptHelper::queryPegawaiDitugaskan($subQ, $pegawaiId)
-                        ->whereIn('status', ['disetujui', 'selesai']);
+                    $subQ->where(function ($jsonQ) use ($pegawaiId) {
+                        $jsonQ->whereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawaiId])
+                            ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawaiId]);
+                    })->whereIn('status', ['disetujui', 'selesai']);
                 });
             }
         });
@@ -78,8 +80,10 @@ class PembuatSptService
             $q->where('pembuat_id', $userId);
             if ($pegawaiId) {
                 $q->orWhere(function ($subQ) use ($pegawaiId) {
-                    \App\Helpers\SptHelper::queryPegawaiDitugaskan($subQ, $pegawaiId)
-                        ->whereIn('status', ['disetujui', 'selesai']);
+                    $subQ->where(function ($jsonQ) use ($pegawaiId) {
+                        $jsonQ->whereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawaiId])
+                            ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawaiId]);
+                    })->whereIn('status', ['disetujui', 'selesai']);
                 });
             }
         });

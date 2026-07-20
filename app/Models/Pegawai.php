@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Cache;
 
 class Pegawai extends Model
 {
+    const CACHE_KEY = 'pegawai_all';
+
     use HasFactory;
 
     protected $table = 'data_pegawai';
@@ -21,6 +25,44 @@ class Pegawai extends Model
         'jabatan',
         'sub_seksi',
     ];
+
+    // -------------------------------------------------------------------------
+    // Caching
+    // -------------------------------------------------------------------------
+
+    /**
+     * Ambil seluruh data pegawai dari cache. Jika belum ada, query ke database
+     * dan simpan selamanya. Cache otomatis di-clear saat ada perubahan data.
+     */
+    public static function getCachedAll(): Collection
+    {
+        $data = Cache::rememberForever(self::CACHE_KEY, fn () => static::all()->toArray());
+
+        if ($data instanceof Collection) {
+            return $data;
+        }
+
+        return (new static)->newCollection(
+            array_map(fn (array $row) => (new static)->forceFill($row)->syncOriginal(), $data)
+        );
+    }
+
+    /**
+     * Hapus cache pegawai. Dipanggil otomatis saat data berubah.
+     */
+    public static function clearCache(): void
+    {
+        Cache::forget(self::CACHE_KEY);
+    }
+
+    /**
+     * Daftarkan event listener untuk cache invalidation secara otomatis.
+     */
+    protected static function booted(): void
+    {
+        static::saved(fn () => static::clearCache());
+        static::deleted(fn () => static::clearCache());
+    }
 
     // -------------------------------------------------------------------------
     // Relationships

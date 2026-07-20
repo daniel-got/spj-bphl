@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Spt;
 
+use App\Models\Spt;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateSptRequest extends FormRequest
@@ -11,7 +12,18 @@ class UpdateSptRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        if (! auth()->check()) {
+            return false;
+        }
+
+        $sptId = $this->route('spt');
+        $spt = is_object($sptId) ? $sptId : Spt::find($sptId);
+
+        if (! $spt) {
+            return false;
+        }
+
+        return auth()->user()->can('update', $spt);
     }
 
     /**

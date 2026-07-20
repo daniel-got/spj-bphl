@@ -161,18 +161,26 @@
                     </div>
                 </x-layout.card>
 
-                {{-- Card 3: Action Form untuk Verifikasi (Hanya Tampil Jika Belum Disetujui/Ditolak) --}}
-                <x-layout.card title="Aksi Verifikasi SPT">
-                    <p class="text-sm text-muted mt-2 mb-4">
-                        Silakan pilih tindakan untuk dokumen ini. Berikan catatan jika Anda menolak atau mengembalikan (revisi) dokumen.
-                    </p>
+                {{-- Card 3: Action Form untuk Verifikasi (Hanya Tampil Jika Status Masih Diajukan) --}}
+                @if($spt->status === 'diajukan')
+                    <x-layout.card title="Aksi Verifikasi SPT">
+                        <p class="text-sm text-muted mt-2 mb-4">
+                            Silakan pilih tindakan untuk dokumen ini. Berikan catatan jika Anda menolak atau mengembalikan (revisi) dokumen.
+                        </p>
 
-                    <x-form.verification-actions 
-                        actionUrl="{{ route('verifikasi.spt.update-status', $spt->id) }}" 
-                        currentStatus="{{ $spt->status }}"
-                        catatan="{{ $spt->catatan_verifikator }}" 
-                    />
-                </x-layout.card>
+                        <x-form.verification-actions 
+                            actionUrl="{{ route('verifikasi.spt.update-status', $spt->id) }}" 
+                            currentStatus="{{ $spt->status }}"
+                            catatan="{{ $spt->catatan_verifikator }}" 
+                        />
+                    </x-layout.card>
+                @else
+                    <x-layout.card title="Aksi Verifikasi SPT">
+                        <p class="text-sm text-muted mt-2">
+                            Dokumen ini sudah selesai diproses. Tidak ada tindakan lebih lanjut yang tersedia.
+                        </p>
+                    </x-layout.card>
+                @endif
 
             </div>
         </div>

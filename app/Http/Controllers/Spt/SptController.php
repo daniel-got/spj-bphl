@@ -34,6 +34,8 @@ class SptController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Spt::class);
+
         $pegawaiList = Pegawai::orderBy('nama_pegawai')->get();
 
         // Delegasikan ke Service
@@ -64,6 +66,8 @@ class SptController extends Controller
      */
     public function store(StoreSptRequest $request)
     {
+        $this->authorize('create', Spt::class);
+
         $spt = $this->sptService->createSpt($request->validated(), auth()->id());
 
         return redirect()

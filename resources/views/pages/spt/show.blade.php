@@ -18,22 +18,58 @@
                             Detail SPT
                         </h1>
                         @php
-                            $isPembuat = auth()->id() === (int) $spt->pembuat_id || auth()->user()->isAdmin();
+                            $isPembuatAsli = auth()->id() === (int) $spt->pembuat_id;
+                            $isAdmin = auth()->user()->isAdmin();
+                            $isPembuat = $isPembuatAsli || $isAdmin;
                             $isEditable = in_array($spt->status, [\App\Models\Spt::STATUS_DRAFT, \App\Models\Spt::STATUS_REVISED]);
                         @endphp
-                        @if($isPembuat)
+                        @if($isPembuatAsli)
                             <p class="text-xs text-primary mt-0.5 font-medium">Anda adalah pembuat SPT ini</p>
+                        @elseif($isAdmin)
+                            <p class="text-xs text-primary mt-0.5 font-medium">Anda login sebagai Admin (Hak Akses Penuh)</p>
                         @else
                             <p class="text-xs text-muted mt-0.5">SPT yang ditugaskan kepada Anda</p>
                         @endif
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 flex-wrap">
                     <a href="{{ route('user.spt.generatePdf', $spt->id) }}" target="_blank"
                         class="inline-flex items-center gap-1.5 border border-border-custom bg-surface hover:bg-background text-text-main text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition-colors duration-150">
                         <x-utility.icon name="printer" class="w-4 h-4 text-muted" />
                         Print SPT
                     </a>
+                    @if($isPembuat && $isEditable)
+                        {{-- Konfirmasi Hapus --}}
+                        <x-feedback.confirm-dialog
+                            id="confirm-hapus-spt-{{ $spt->id }}"
+                            title="Hapus SPT?"
+                            message="Data SPT yang dihapus tidak dapat dikembalikan."
+                            confirm-label="Ya, Hapus"
+                            cancel-label="Batal"
+                            action="{{ route('user.spt.destroy', $spt->id) }}"
+                            method="DELETE"
+                        />
+                        <x-action.button
+                            onclick="openModal('confirm-hapus-spt-{{ $spt->id }}')"
+                            class="text-danger border-danger hover:bg-danger/10 px-4 py-2 text-xs font-semibold">
+                            <x-utility.icon name="trash" class="w-4 h-4" />
+                            Hapus
+                        </x-action.button>
+                        <a href="{{ route('user.spt.edit', $spt->id) }}"
+                            class="inline-flex items-center gap-1.5 border border-primary text-primary hover:bg-primary-light text-xs font-semibold px-4 py-2 rounded-lg transition-colors duration-150">
+                            <x-utility.icon name="pencil" class="w-4 h-4" />
+                            Edit SPT
+                        </a>
+                        <form action="{{ route('user.spt.submit', $spt->id) }}" method="POST" class="inline-block">
+                            @csrf
+                            <x-action.button-primary
+                                type="submit"
+                                onclick="return confirm('Yakin ingin mengajukan SPT ini ke verifikator?')">
+                                <x-utility.icon name="paper-airplane" class="w-4 h-4" />
+                                Ajukan
+                            </x-action.button-primary>
+                        </form>
+                    @endif
                     <x-data.status-badge status="{{ $spt->status ?? 'draft' }}" class="text-xs px-3 py-1" />
                 </div>
             </div>
@@ -206,54 +242,6 @@
                     </div>
                 </x-layout.card>
 
-                {{-- Tombol Aksi Operasional — hanya untuk Pembuat & Admin, selama status masih dapat diubah --}}
-                @if($isPembuat && $isEditable)
-                    <x-layout.card>
-                        {{-- Konfirmasi Hapus --}}
-                        <x-feedback.confirm-dialog
-                            id="confirm-hapus-spt-{{ $spt->id }}"
-                            title="Hapus SPT?"
-                            message="Data SPT yang dihapus tidak dapat dikembalikan."
-                            confirm-label="Ya, Hapus"
-                            cancel-label="Batal"
-                            action="{{ route('user.spt.destroy', $spt->id) }}"
-                            method="DELETE"
-                        />
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                            <div>
-                                <p class="text-sm font-bold text-text-main">Aksi Operasional</p>
-                                <p class="text-xs text-muted mt-0.5">Pilih tindakan untuk SPT ini sebelum diajukan ke verifikator.</p>
-                            </div>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                {{-- Hapus --}}
-                                <x-action.button
-                                    onclick="openModal('confirm-hapus-spt-{{ $spt->id }}')"
-                                    class="text-danger border-danger hover:bg-danger/10 px-4 py-2 text-xs font-semibold">
-                                    <x-utility.icon name="trash" class="w-4 h-4" />
-                                    Hapus SPT
-                                </x-action.button>
-
-                                {{-- Edit --}}
-                                <a href="{{ route('user.spt.edit', $spt->id) }}"
-                                    class="inline-flex items-center gap-1.5 border border-primary text-primary hover:bg-primary-light text-xs font-semibold px-4 py-2 rounded-lg transition-colors duration-150">
-                                    <x-utility.icon name="pencil" class="w-4 h-4" />
-                                    Edit SPT
-                                </a>
-
-                                {{-- Ajukan --}}
-                                <form action="{{ route('user.spt.submit', $spt->id) }}" method="POST" class="inline-block">
-                                    @csrf
-                                    <x-action.button-primary
-                                        type="submit"
-                                        onclick="return confirm('Yakin ingin mengajukan SPT ini ke verifikator?')">
-                                        <x-utility.icon name="paper-airplane" class="w-4 h-4" />
-                                        Ajukan SPT
-                                    </x-action.button-primary>
-                                </form>
-                            </div>
-                        </div>
-                    </x-layout.card>
-                @endif
 
             </div>
 

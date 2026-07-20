@@ -75,7 +75,11 @@ class KelolaPegawaiService
             $user = $pegawai->user;
             $user->name = $data['nama_pegawai'];
             $user->email = $data['email'];
-            $user->roles = $data['roles'] ?? ['user'];
+
+            if (isset($data['roles'])) {
+                abort_if(! auth()->user()->isAdmin(), 403, 'Unauthorized to update roles.');
+                $user->roles = $data['roles'];
+            }
 
             if (! empty($data['password'])) {
                 $user->password = Hash::make($data['password']);
@@ -134,7 +138,6 @@ class KelolaPegawaiService
                     continue;
                 }
 
-                // Pastikan jumlah kolom sama
                 if (count($row) !== count($header)) {
                     $errors[] = "Baris $rowNum: Jumlah kolom tidak sesuai.";
                     $gagal++;
@@ -142,6 +145,14 @@ class KelolaPegawaiService
 
                     continue;
                 }
+
+                // Sanitize CSV Injection
+                foreach ($row as &$cell) {
+                    if (preg_match('/^[\=\+\-\@]/', $cell)) {
+                        $cell = "'".$cell;
+                    }
+                }
+                unset($cell);
 
                 $data = array_combine($header, $row);
 
@@ -356,7 +367,8 @@ class KelolaPegawaiService
         $token = null;
         if ($berhasil > 0) {
             $token = Str::random(40);
-            $file->storeAs('tmp/csv-import', $token.'.csv', 'local');
+            $userId = auth()->id();
+            $file->storeAs('tmp/csv-import', $userId.'_'.$token.'.csv', 'local');
         }
 
         return [
@@ -375,8 +387,9 @@ class KelolaPegawaiService
      */
     public function importFromToken(string $token): array
     {
+        $userId = auth()->id();
         // Pada Laravel versi terbaru, disk 'local' default menunjuk ke storage/app/private
-        $path = storage_path('app/private/tmp/csv-import/'.$token.'.csv');
+        $path = storage_path('app/private/tmp/csv-import/'.$userId.'_'.$token.'.csv');
 
         if (! file_exists($path)) {
             throw new Exception('Token tidak valid atau sudah kadaluarsa. Silakan upload ulang.');

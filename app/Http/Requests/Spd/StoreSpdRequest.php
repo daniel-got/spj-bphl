@@ -13,7 +13,7 @@ class StoreSpdRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return auth()->check() && auth()->user()->can('create', Spd::class);
     }
 
     /**
@@ -22,7 +22,7 @@ class StoreSpdRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nomor_spd' => 'required|string|unique:data_spd,nomor_spd',
+            'nomor_spd' => 'required|string|max:255',
             'tgl_spd' => 'required|date',
             'nip_pegawai' => 'required|string|max:50',
             // Catatan: tujuan_kegiatan, tempat_tujuan, tgl_berangkat, tgl_kembali,

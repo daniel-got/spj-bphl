@@ -53,7 +53,7 @@ class SpdTest extends TestCase
     public function test_user_dapat_membuat_spd_baru(): void
     {
         $user = User::factory()->create(['roles' => ['user']]);
-        $spt = Spt::factory()->create(['pembuat_id' => $user->id]);
+        $spt = Spt::factory()->create(['pembuat_id' => $user->id, 'status' => Spt::STATUS_APPROVED]);
 
         $payload = [
             'nomor_spd' => 'SPD/001/BPHL/'.now()->year,
@@ -78,7 +78,7 @@ class SpdTest extends TestCase
     {
         $user = User::factory()->create(['roles' => ['user']]);
         $pegawai = Pegawai::factory()->create(['user_id' => $user->id]);
-        $spt = Spt::factory()->create(['pembuat_id' => $user->id]);
+        $spt = Spt::factory()->create(['pembuat_id' => $user->id, 'status' => Spt::STATUS_APPROVED]);
 
         $payload = [
             'nomor_spd' => 'SPD/010/BPHL/'.now()->year,
@@ -126,7 +126,7 @@ class SpdTest extends TestCase
     {
         $user = User::factory()->create(['roles' => ['user']]);
         $otherUser = User::factory()->create(['roles' => ['user']]);
-        $spt = Spt::factory()->create(['pembuat_id' => $otherUser->id]);
+        $spt = Spt::factory()->create(['pembuat_id' => $otherUser->id, 'status' => Spt::STATUS_APPROVED]);
 
         $payload = [
             'nomor_spd' => 'SPD/001/BPHL/'.now()->year,
@@ -150,7 +150,7 @@ class SpdTest extends TestCase
     public function test_gagal_membuat_spd_jika_nomor_spd_duplikat(): void
     {
         $user = User::factory()->create(['roles' => ['user']]);
-        $spt = Spt::factory()->create(['pembuat_id' => $user->id]);
+        $spt = Spt::factory()->create(['pembuat_id' => $user->id, 'status' => Spt::STATUS_APPROVED]);
         Spd::factory()->create(['nomor_spd' => 'SPD/001/BPHL/'.now()->year, 'pembuat_id' => $user->id, 'spt_id' => $spt->id]);
 
         $response = $this->actingAs($user)->post(route('user.spd.store'), [
@@ -195,6 +195,7 @@ class SpdTest extends TestCase
         $user = User::factory()->create(['roles' => ['user']]);
         $spt = Spt::factory()->create([
             'pembuat_id' => $user->id,
+            'status' => Spt::STATUS_APPROVED,
             'tgl_berangkat' => '2026-08-10',
             'tgl_kembali' => '2026-08-15',
         ]);
@@ -213,7 +214,7 @@ class SpdTest extends TestCase
     public function test_user_dapat_mengedit_spd(): void
     {
         $user = User::factory()->create(['roles' => ['user']]);
-        $spt = Spt::factory()->create();
+        $spt = Spt::factory()->create(['status' => Spt::STATUS_APPROVED]);
         $spd = Spd::factory()->create([
             'pembuat_id' => $user->id,
             'spt_id' => $spt->id,
