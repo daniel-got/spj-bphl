@@ -1,58 +1,116 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Dokumentasi Deployment & Development SPJ BPHL
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Dokumen ini berisi panduan teknis lengkap mengenai siklus pengembangan (development) hingga peluncuran (production) untuk aplikasi SPJ BPHL. Aplikasi ini menggunakan arsitektur container (Podman/Docker) dengan strategi Multi-Stage Build dan terintegrasi dengan GitHub Actions CI/CD.
 
-## About Laravel
+## Arsitektur Infrastruktur
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Aplikasi Utama:** Laravel 11 (PHP 8.3 FPM)
+- **Database:** PostgreSQL (Host-based, diakses via Gateway Podman)
+- **Web Server Internal:** Nginx (Alpine) di dalam container untuk melayani file statis dan proxy ke PHP-FPM.
+- **Web Server Eksternal (Reverse Proxy):** Nginx (Host-based VPS) untuk terminasi SSL (HTTPS) dan traffic forwarding.
+- **Orkestrasi:** Podman Compose (kompatibel penuh dengan Docker Compose).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 1. Lingkungan Development (Lokal)
 
-## Learning Laravel
+Pada lingkungan lokal (Windows, Mac, Linux), pengembangan dilakukan menggunakan `docker-compose.yml`. Konfigurasi ini akan melakukan *volume mount* direktori aktif ke dalam container sehingga setiap perubahan kode akan langsung terlihat (hot-reload) tanpa perlu melakukan *build* ulang.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Prasyarat Lokal
+- Docker Desktop atau Podman Desktop terinstal.
+- Node.js (opsional, jika ingin mem-build aset secara lokal di luar container).
+- Composer (opsional).
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Langkah Menjalankan di Lokal
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+1. Duplikasi file konfigurasi environment:
+   ```bash
+   cp .env.example .env
+   ```
+2. Sesuaikan konfigurasi `.env` untuk lokal (misal: koneksi database mengarah ke container database lokal jika ada).
+3. Jalankan container di latar belakang:
+   ```bash
+   docker-compose up -d
+   ```
+4. Masuk ke dalam container `app` untuk menginstal dependensi:
+   ```bash
+   docker-compose exec app bash
+   composer install
+   npm install
+   npm run dev
+   php artisan key:generate
+   php artisan migrate
+   ```
 
-## Agentic Development
+Aplikasi dapat diakses melalui `http://localhost:8000`.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
 
-```bash
-composer require laravel/boost --dev
+## 2. Lingkungan Production (VPS)
 
-php artisan boost:install
-```
+Pada lingkungan Production, kita menggunakan `docker-compose.prod.yml` yang dikombinasikan dengan arsitektur **Multi-Stage Build** di `Dockerfile`. Pada tahap ini, seluruh *source code* akan dikunci (baked-in) ke dalam *image*, dependensi development dihapus, dan aset frontend dikompilasi secara otomatis.
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Konfigurasi VPS (Satu Kali Setup)
 
-## Contributing
+1. **Persiapan Database (PostgreSQL Host)**
+   Pastikan PostgreSQL di VPS mengizinkan koneksi dari jaringan Podman (biasanya `10.89.0.0/16` atau `172.22.0.0/16`).
+   - Edit `/etc/postgresql/*/main/postgresql.conf`:
+     ```ini
+     listen_addresses = '*'
+     ```
+   - Edit `/etc/postgresql/*/main/pg_hba.conf`:
+     ```text
+     host    all             all             172.22.0.0/16           md5
+     ```
+   - Izinkan port di UFW:
+     ```bash
+     sudo ufw allow from 172.22.0.0/16 to any port 5432
+     ```
+   - Restart layanan: `sudo systemctl restart postgresql`.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2. **Penyesuaian File .env**
+   Pastikan file `.env` di VPS memiliki konfigurasi yang mutlak diperlukan untuk lingkungan Reverse Proxy:
+   ```env
+   APP_ENV=production
+   APP_DEBUG=false
+   APP_URL=https://spj-bphl4.dniel.my.id
+   
+   # Gunakan host.containers.internal agar container dapat menghubungi database di Host VPS
+   DB_HOST=host.containers.internal
+   ```
 
-## Code of Conduct
+3. **Konfigurasi Reverse Proxy Nginx Utama**
+   Edit blok server Nginx pada VPS (`/etc/nginx/sites-available/spj-bphl4.dniel.my.id`) untuk melempar traffic ke port `8000`:
+   ```nginx
+   location / {
+       proxy_pass http://127.0.0.1:8000;
+       proxy_set_header Host $host;
+       proxy_set_header X-Real-IP $remote_addr;
+       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+       proxy_set_header X-Forwarded-Proto $scheme;
+   }
+   ```
+   Restart Nginx: `sudo systemctl restart nginx`.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 3. Deployment Otomatis (CI/CD GitHub Actions)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Sistem telah dilengkapi dengan alur otomatisasi deployment. Setiap kali ada perubahan kode yang di-push atau di-merge ke branch `main`, GitHub Actions akan mengambil alih.
 
-## License
+### Cara Kerja CI/CD
+1. GitHub Actions terhubung ke VPS secara aman menggunakan protokol SSH.
+2. Melakukan `git pull origin main` di direktori proyek VPS.
+3. Menjalankan perintah `podman-compose -f docker-compose.prod.yml up -d --build`.
+4. Berkat teknik *Multi-Stage Build*, Podman akan mendeteksi perubahan pada file sumber, menjalankan `composer install --no-dev`, mengeksekusi `npm run build`, dan membangun ulang *image* Nginx yang berisi file statis terbaru.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Konfigurasi GitHub Secrets
+Agar otomatisasi ini berjalan, repositori GitHub harus memiliki variabel *Secrets* berikut:
+- `VPS_HOST`: Alamat IP Publik VPS.
+- `VPS_USERNAME`: Username login VPS (misalnya `root` atau `ubuntu`).
+- `VPS_SSH_KEY`: Isi lengkap dari Private Key SSH (`id_ed25519` atau `id_rsa`) yang sudah memiliki otorisasi masuk ke VPS.
+
+### Keamanan Khusus (Mixed Content & Proxy)
+Untuk memastikan keamanan HTTPS terjaga secara utuh (mencegah error *Mixed Content* saat berada di balik Reverse Proxy), sistem menggunakan dua tingkat pengamanan di dalam source code:
+1. `bootstrap/app.php` mengaktifkan `trustProxies(at: '*')` untuk membaca header `X-Forwarded-Proto` dari Nginx.
+2. `AppServiceProvider.php` memiliki kondisi wajib `URL::forceScheme('https')` setiap kali environment berada di status `production`.
