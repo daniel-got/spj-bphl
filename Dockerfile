@@ -1,12 +1,12 @@
 # ==========================================
 # STAGE 0: COMPOSER
 # ==========================================
-FROM composer:latest AS composer
+FROM docker.io/library/composer:latest AS composer
 
 # ==========================================
 # STAGE 1: BASE (Dependencies & Extensions)
 # ==========================================
-FROM php:8.3-fpm AS base
+FROM docker.io/library/php:8.3-fpm AS base
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -77,7 +77,7 @@ CMD ["php-fpm"]
 # ==========================================
 # STAGE 4: WEB (Nginx Production)
 # ==========================================
-FROM nginx:alpine AS web
+FROM docker.io/library/nginx:alpine AS web
 
 # Copy konfigurasi Nginx
 COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
