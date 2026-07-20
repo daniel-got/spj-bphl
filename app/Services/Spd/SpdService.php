@@ -89,8 +89,11 @@ class SpdService
                     ->where(function ($q) use ($user, $pegawai) {
                         $q->where('pembuat_id', $user->id);
                         if ($pegawai) {
-                            $q->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawai->id])
-                                ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawai->id]);
+                            $pegawaiId = $pegawai->id;
+                            $q->orWhere(function ($jsonQ) use ($pegawaiId) {
+                                $jsonQ->where('pegawai_ditugaskan', 'like', '%"pegawai_id":'.$pegawaiId.'%')
+                                    ->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id":"'.$pegawaiId.'"%');
+                            });
                         }
                     })->exists();
 
@@ -173,8 +176,11 @@ class SpdService
             $query->where(function ($q) use ($user, $pegawai) {
                 $q->where('pembuat_id', $user->id);
                 if ($pegawai) {
-                    $q->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawai->id])
-                        ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawai->id]);
+                    $pegawaiId = $pegawai->id;
+                    $q->orWhere(function ($jsonQ) use ($pegawaiId) {
+                        $jsonQ->where('pegawai_ditugaskan', 'like', '%"pegawai_id":'.$pegawaiId.'%')
+                            ->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id":"'.$pegawaiId.'"%');
+                    });
                 }
             });
         }
@@ -217,8 +223,11 @@ class SpdService
             $query->where(function ($q) use ($user, $pegawai) {
                 $q->where('pembuat_id', $user->id);
                 if ($pegawai) {
-                    $q->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => (string) $pegawai->id])
-                        ->orWhereJsonContains('pegawai_ditugaskan', ['pegawai_id' => $pegawai->id]);
+                    $pegawaiId = $pegawai->id;
+                    $q->orWhere(function ($jsonQ) use ($pegawaiId) {
+                        $jsonQ->where('pegawai_ditugaskan', 'like', '%"pegawai_id":'.$pegawaiId.'%')
+                            ->orWhere('pegawai_ditugaskan', 'like', '%"pegawai_id":"'.$pegawaiId.'"%');
+                    });
                 }
             });
         }
