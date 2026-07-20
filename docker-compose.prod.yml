@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      target: production
+    container_name: spj-bphl-app-prod
+    restart: always
+    working_dir: /var/www/html
+    networks:
+      - spj-network-prod
+
+  web:
+    build:
+      context: .
+      target: web
+    container_name: spj-bphl-web-prod
+    restart: always
+    ports:
+      - "8000:80"
+    depends_on:
+      - app
+    networks:
+      - spj-network-prod
+
+networks:
+  spj-network-prod:
+    driver: bridge
