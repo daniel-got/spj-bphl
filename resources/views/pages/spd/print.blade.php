@@ -43,7 +43,7 @@
 
         /* Override the extremely tall signature spacer rows from Excel template */
         tr[style*="56.25pt"] {
-            height: 18pt !important;
+            height: 5pt !important;
         }
 
         td,
@@ -85,14 +85,15 @@
                 display: none !important;
             }
 
-            /* Set exact sheet printable heights to fill the physical page fully */
+            /* Use vh to adapt exactly to the printable area of the physical page without overflowing */
             body.paper-a4 .sheet {
-                height: 279mm;
+                height: 99vh;
+                max-height: 99vh;
             }
 
             body.paper-a4 * {
-                font-size: 9pt !important;
-                line-height: 1.15 !important;
+                font-size: 8pt !important;
+                line-height: 1.1 !important;
             }
 
             body.paper-a4 td {
@@ -100,18 +101,17 @@
             }
 
             body.paper-a4 tr[style*="56.25pt"] {
-                height: 15pt !important;
+                height: 5pt !important;
             }
 
-            /* F4: sheet height = A4 printable area so 1 sheet = 1 physical page
-       regardless of whether the browser honours @page size: F4 */
             body.paper-f4 .sheet {
-                height: 255mm;
+                height: 99vh;
+                max-height: 99vh;
             }
 
             body.paper-f4 * {
-                font-size: 9pt !important;
-                line-height: 1.15 !important;
+                font-size: 8pt !important;
+                line-height: 1.1 !important;
             }
 
             body.paper-f4 td {
@@ -119,7 +119,7 @@
             }
 
             body.paper-f4 tr[style*="56.25pt"] {
-                height: 15pt !important;
+                height: 5pt !important;
             }
         }
     </style>

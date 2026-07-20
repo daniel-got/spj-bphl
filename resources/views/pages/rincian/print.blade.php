@@ -1,21 +1,50 @@
 <x-layout.print title="Rincian Biaya Perjalanan Dinas & Perhitungan SPD Rampung">
-    <style>
-        @media print {
-            .no-print { display: none !important; }
-        }
+    <style id="page-style">
         @page {
+            size: A4 portrait;
             margin: 15mm;
         }
+    </style>
+    <style>
+        @media print {
+            body { font-size: 12px !important; }
+            .no-print { display: none !important; }
+            .divider { margin: 15px 0 10px 0 !important; }
+            .terbilang { margin-bottom: 15px !important; }
+            .rampung-section { margin-top: 10px !important; }
+        }
         .signature-space {
-            height: 75px;
+            height: 50px;
         }
     </style>
 
     <div class="no-print" style="margin-bottom: 20px; text-align: center; padding: 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-        <button type="button" onclick="document.body.classList.remove('paper-f4'); document.body.classList.add('paper-a4'); window.print();" style="padding: 8px 16px; background-color: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold;">🖨️ Cetak (A4)</button>
-        <button type="button" onclick="document.body.classList.remove('paper-a4'); document.body.classList.add('paper-f4'); window.print();" style="padding: 8px 16px; background-color: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🖨️ Cetak (F4)</button>
+        <button type="button" onclick="printA4()" style="padding: 8px 16px; background-color: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold;">🖨️ Cetak (A4)</button>
+        <button type="button" onclick="printF4()" style="padding: 8px 16px; background-color: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🖨️ Cetak (F4)</button>
         <p style="font-size: 12px; color: #64748b; margin-top: 8px;">Pilih ukuran kertas sebelum mencetak. Jendela cetak akan otomatis terbuka.</p>
     </div>
+
+    <script>
+        function printA4() {
+            document.body.classList.remove('paper-f4');
+            document.body.classList.add('paper-a4');
+            const styleEl = document.getElementById('page-style');
+            if (styleEl) {
+                styleEl.innerHTML = `@page { size: A4 portrait; margin: 15mm; }`;
+            }
+            window.print();
+        }
+
+        function printF4() {
+            document.body.classList.remove('paper-a4');
+            document.body.classList.add('paper-f4');
+            const styleEl = document.getElementById('page-style');
+            if (styleEl) {
+                styleEl.innerHTML = `@page { size: 215.9mm 330.2mm portrait; margin: 15mm; }`;
+            }
+            window.print();
+        }
+    </script>
 
     @php
         $uangHarianRate = $uangHarianRate ?? 0;
@@ -206,12 +235,12 @@
                 </tr>
             </table>
 
-            <table class="signature-section" style="margin-top: 30px" cellspacing="0" cellpadding="0">
+            <table class="signature-section" style="margin-top: 15px" cellspacing="0" cellpadding="0">
                 <tr>
                     <td width="50%"></td>
                     <td width="50%">
                         Pejabat Pembuat Komitmen 3,<br />
-                        <div style="height: 75px"></div>
+                        <div class="signature-space"></div>
                         <span class="bold-name">{{ $rincian->nama_ppk }}</span><br />
                         NIP. {{ $rincian->nip_ppk }}
                     </td>

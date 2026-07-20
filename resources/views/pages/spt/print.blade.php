@@ -1,4 +1,10 @@
 <x-layout.print title="Surat Perintah Tugas (SPT)">
+    <style id="page-style">
+        @page {
+            size: A4 portrait;
+            margin: 1cm;
+        }
+    </style>
     <style>
         * {
             box-sizing: border-box;
@@ -10,15 +16,6 @@
             }
         }
 
-        body.paper-a4 @page {
-            size: A4 portrait;
-            margin: 1cm;
-        }
-
-        body.paper-f4 @page {
-            size: 215.9mm 330.2mm;
-            margin: 1cm;
-        }
 
         .spt-container {
             font-family: Arial, Helvetica, sans-serif;
@@ -236,6 +233,12 @@
         }
     </style>
 
+    <div class="no-print" style="margin-bottom: 20px; text-align: center; padding: 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+        <button type="button" onclick="printA4()" style="padding: 8px 16px; background-color: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold;">🖨️ Cetak (A4)</button>
+        <button type="button" onclick="printF4()" style="padding: 8px 16px; background-color: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🖨️ Cetak (F4)</button>
+        <p style="font-size: 12px; color: #64748b; margin-top: 8px;">Pilih ukuran kertas sebelum mencetak. Jendela cetak akan otomatis terbuka.</p>
+    </div>
+
     <div class="spt-container">
         <table class="header-table">
             <tr>
@@ -429,4 +432,26 @@
         {{--    yang diterbitkan oleh Balai Besar Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara (BSSN). --}}
         {{-- </div> --}}
     </div>
+
+    <script>
+        function printA4() {
+            document.body.classList.remove('paper-f4');
+            document.body.classList.add('paper-a4');
+            const styleEl = document.getElementById('page-style');
+            if (styleEl) {
+                styleEl.innerHTML = `@page { size: A4 portrait; margin: 1cm; }`;
+            }
+            window.print();
+        }
+
+        function printF4() {
+            document.body.classList.remove('paper-a4');
+            document.body.classList.add('paper-f4');
+            const styleEl = document.getElementById('page-style');
+            if (styleEl) {
+                styleEl.innerHTML = `@page { size: 215.9mm 330.2mm portrait; margin: 1cm; }`;
+            }
+            window.print();
+        }
+    </script>
 </x-layout.print>
