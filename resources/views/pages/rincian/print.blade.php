@@ -318,7 +318,7 @@
                 <tr>
                     <td width="50%"></td>
                     <td width="50%">
-                        Pejabat Pembuat Komitmen 3,<br />
+                        {{ $rincian->ppk ?? 'Pejabat Pembuat Komitmen' }},<br />
                         <div class="signature-space"></div>
                         <span class="bold-name">{{ $rincian->nama_ppk }}</span><br />
                         NIP. {{ $rincian->nip_ppk }}
