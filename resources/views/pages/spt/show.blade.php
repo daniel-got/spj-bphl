@@ -5,6 +5,22 @@
 
         <div class="max-w-5xl mx-auto w-full">
 
+            @if (session('success'))
+                <div class="mb-6">
+                    <x-feedback.alert type="success" title="Berhasil!" :dismissible="true">
+                        {{ session('success') }}
+                    </x-feedback.alert>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="mb-6">
+                    <x-feedback.alert type="error" title="Terjadi Kesalahan" :dismissible="true">
+                        {{ session('error') }}
+                    </x-feedback.alert>
+                </div>
+            @endif
+
             {{-- Header --}}
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center gap-4">

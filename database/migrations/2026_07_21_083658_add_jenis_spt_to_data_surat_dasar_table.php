@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -11,11 +12,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('data_surat_dasar', function (Blueprint $table) {
-            $table->id();
-            $table->text('teks');  // Isi teks surat dasar
-            $table->boolean('aktif')->default(true); // Tampilkan atau sembunyikan dari dropdown
-            $table->timestamps();
+        Schema::table('data_surat_dasar', function (Blueprint $table) {
+            $table->string('jenis_spt')->nullable()->after('id');
         });
     }
 
@@ -24,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('data_surat_dasar');
+        Schema::table('data_surat_dasar', function (Blueprint $table) {
+            $table->dropColumn('jenis_spt');
+        });
     }
 };

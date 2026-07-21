@@ -1,0 +1,22 @@
+[
+    {
+        "teks": "Keuangan ubah jadi dino pinkeu pastel",
+        "jenis_spt": "keuangan",
+        "aktif": true
+    },
+    {
+        "teks": "Keuangan untuk membeli dinosaurus warna pinkeu pastel",
+        "jenis_spt": "keuangan",
+        "aktif": true
+    },
+    {
+        "teks": "Makan Dino Bakar",
+        "jenis_spt": "pelatihan",
+        "aktif": true
+    },
+    {
+        "teks": "AYAM BAKAR",
+        "jenis_spt": "pelatihan",
+        "aktif": true
+    }
+]

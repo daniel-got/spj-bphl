@@ -17,6 +17,7 @@ class SuratDasar extends Model
 
     protected $fillable = [
         'teks',
+        'jenis_spt',
         'aktif',
     ];
 

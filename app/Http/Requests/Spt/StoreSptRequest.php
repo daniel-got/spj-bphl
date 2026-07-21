@@ -25,6 +25,13 @@ class StoreSptRequest extends FormRequest
                 'pegawai_ditugaskan' => json_decode($this->pegawai_ditugaskan, true),
             ]);
         }
+
+        if (is_array($this->surat_dasar)) {
+            $filtered = array_filter(array_map('trim', $this->surat_dasar));
+            $this->merge([
+                'surat_dasar' => implode("\n", $filtered),
+            ]);
+        }
     }
 
     /**

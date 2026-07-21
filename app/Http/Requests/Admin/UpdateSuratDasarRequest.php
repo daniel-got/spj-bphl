@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateSuratDasarRequest extends FormRequest
 {
@@ -15,7 +14,8 @@ class UpdateSuratDasarRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'teks' => ['required', 'string', Rule::unique('data_surat_dasar', 'teks')->ignore($this->route('surat_dasar'))],
+            'teks' => 'required|string',
+            'jenis_spt' => 'nullable|string|max:50',
             'aktif' => 'boolean',
         ];
     }
@@ -24,7 +24,6 @@ class UpdateSuratDasarRequest extends FormRequest
     {
         return [
             'teks.required' => 'Isi teks surat dasar wajib diisi.',
-            'teks.unique' => 'Teks surat dasar ini sudah ada di database.',
         ];
     }
 }

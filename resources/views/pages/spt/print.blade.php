@@ -293,23 +293,18 @@
                 <td class="ttk">:</td>
                 <td class="cnt">
                     <ol>
-                        <li>Peraturan Menteri Kehutanan Republik Indonesia Nomor 6 Tahun 2025 Tentang Organisasi dan
-                            Tata Kerja Balai Pengelolaan Hutan Lestari tanggal 19 Maret 2025;</li>
-
-                        @if ($spt->jenis_tugas == 'pelatihan')
-                            <li>Surat Pengesahan Daftar Isian Pelaksanaan Anggaran (DIPA) Balai 143.06.2.693523/2026
-                                Rev-6 tanggal 25 Mei 2026;</li>
-                        @elseif($spt->jenis_tugas == 'keuangan')
-                            <li>Surat Pengesahan Daftar Isian Pelaksanaan Anggaran (DIPA) Balai 143.06.2.693523/2026
-                                Rev-6 tanggal 25 Mei 2026;</li>
-                        @else
-                            <li>Surat Pengesahan Daftar Isian Pelaksanaan Anggaran (DIPA) Satker Balai Pengelolaan Hutan
-                                Lestari 143.06.2.693523/2026 tanggal 1 Desember 2025;</li>
-                        @endif
-
-                        {{-- Poin 3 Otomatis Mengisi Surat Undangan/Nota Dinas jika diinput --}}
                         @if (!empty($spt->surat_dasar))
-                            <li>{{ $spt->surat_dasar }}</li>
+                            @php
+                                $dasarPoints = explode("\n", $spt->surat_dasar);
+                            @endphp
+                            @foreach ($dasarPoints as $point)
+                                @php $cleanPoint = trim(preg_replace('/^\d+\.\s*/', '', $point)); @endphp
+                                @if ($cleanPoint !== '')
+                                    <li>{{ $cleanPoint }}</li>
+                                @endif
+                            @endforeach
+                        @else
+                            <li>-</li>
                         @endif
                     </ol>
                 </td>
@@ -338,6 +333,11 @@
                                     </td>
                                     <td class="sub-ttk">:</td>
                                     <td class="sub-cnt">{{ $pegawai['nama_pegawai'] ?? '-' }} / {{ $pegawai['nip'] ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="sub-lbl">&nbsp;&nbsp;&nbsp;&nbsp;Pangkat/Gol</td>
+                                    <td class="sub-ttk">:</td>
+                                    <td class="sub-cnt">{{ $pegawai['pangkat'] ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td class="sub-lbl">&nbsp;&nbsp;&nbsp;&nbsp;Jabatan</td>
