@@ -273,8 +273,53 @@
                             placeholder="Tuliskan tujuan kegiatan perjalanan dinas..." :rows="3"
                             :value="old('tujuan_kegiatan')" :required="true" :error="$errors->first('tujuan_kegiatan')" />
 
-                        <x-form.input name="tempat_tujuan" label="Tempat Tujuan" placeholder="Contoh: Jakarta"
-                            :value="old('tempat_tujuan')" :required="true" :error="$errors->first('tempat_tujuan')" />
+                        {{-- Tempat Tujuan --}}
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-text-main mb-2 block">
+                                Tempat Tujuan <span class="text-danger">*</span>
+                            </label>
+
+                            <div id="tempat-tujuan-list" class="space-y-2">
+                                @php
+                                    $oldTempat = old('tempat_tujuan', []);
+                                    if (is_string($oldTempat)) {
+                                        $parsedTempat = array_filter(array_map('trim', explode(',', $oldTempat)));
+                                    } elseif (is_array($oldTempat)) {
+                                        $parsedTempat = array_filter(array_map('trim', $oldTempat));
+                                    } else {
+                                        $parsedTempat = [];
+                                    }
+                                    if (empty($parsedTempat)) {
+                                        $parsedTempat = [''];
+                                    }
+                                @endphp
+
+                                @foreach($parsedTempat as $index => $val)
+                                    <div class="tempat-tujuan-item flex gap-2 items-center">
+                                        <div class="grow relative">
+                                            <input type="text" name="tempat_tujuan[]" value="{{ $val }}" required
+                                                placeholder="Contoh: Jakarta"
+                                                class="w-full px-3 py-2 text-sm border border-border-custom rounded-md bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" />
+                                        </div>
+                                        <button type="button" class="btn-remove-tempat-tujuan text-danger p-2 hover:bg-danger/10 rounded-md transition-colors" style="{{ count($parsedTempat) > 1 ? '' : 'display: none;' }}">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div class="mt-3">
+                                <x-action.button type="button" id="btn-add-tempat-tujuan"
+                                    class="border-primary text-primary text-sm hover:bg-primary hover:text-white px-3 py-1.5 gap-1.5">
+                                    <x-utility.icon name="plus" class="w-4 h-4" />
+                                    Tambah Tempat Tujuan
+                                </x-action.button>
+                            </div>
+
+                            @if ($errors->has('tempat_tujuan'))
+                                <p class="text-xs text-danger mt-1">{{ $errors->first('tempat_tujuan') }}</p>
+                            @endif
+                        </div>
                     </div>
 
                     {{-- Tanggal Berangkat, Kembali, Durasi Penugasan --}}
@@ -317,6 +362,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            function escapeHtml(str) {
+                if (!str) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
             const container = document.getElementById('pegawai-list');
             const addBtn = document.getElementById('add-pegawai-btn');
             const form = document.getElementById('spt-form');
@@ -740,6 +795,64 @@
                 jenisTugasSelect.dispatchEvent(new Event('change'));
             } else {
                 addSuratDasarRow();
+            }
+
+            // Dynamic Repeater untuk Tempat Tujuan
+            const tempatTujuanContainer = document.getElementById('tempat-tujuan-list');
+            const btnAddTempatTujuan = document.getElementById('btn-add-tempat-tujuan');
+
+            function addTempatTujuanRow(val = '') {
+                if (!tempatTujuanContainer) return;
+                const div = document.createElement('div');
+                div.className = 'tempat-tujuan-item flex gap-2 items-center';
+                div.innerHTML = `
+                    <div class="grow relative">
+                        <input type="text" name="tempat_tujuan[]" value="${escapeHtml(val)}" required
+                            placeholder="Contoh: Jakarta"
+                            class="w-full px-3 py-2 text-sm border border-border-custom rounded-md bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" />
+                    </div>
+                    <button type="button" class="btn-remove-tempat-tujuan text-danger p-2 hover:bg-danger/10 rounded-md transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                `;
+                tempatTujuanContainer.appendChild(div);
+                bindTempatTujuanRow(div);
+                updateTempatTujuanButtons();
+            }
+
+            function bindTempatTujuanRow(row) {
+                const btn = row.querySelector('.btn-remove-tempat-tujuan');
+                if (btn) {
+                    btn.addEventListener('click', function() {
+                        if (tempatTujuanContainer.querySelectorAll('.tempat-tujuan-item').length > 1) {
+                            row.remove();
+                            updateTempatTujuanButtons();
+                        }
+                    });
+                }
+            }
+
+            function updateTempatTujuanButtons() {
+                if (!tempatTujuanContainer) return;
+                const items = tempatTujuanContainer.querySelectorAll('.tempat-tujuan-item');
+                items.forEach(item => {
+                    const btn = item.querySelector('.btn-remove-tempat-tujuan');
+                    if (btn) {
+                        btn.style.display = items.length > 1 ? 'block' : 'none';
+                    }
+                });
+            }
+
+            if (tempatTujuanContainer) {
+                tempatTujuanContainer.querySelectorAll('.tempat-tujuan-item').forEach(bindTempatTujuanRow);
+                updateTempatTujuanButtons();
+            }
+
+            if (btnAddTempatTujuan) {
+                btnAddTempatTujuan.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    addTempatTujuanRow();
+                });
             }
 
             // Interseptor form submit untuk membundel data pegawai ke input JSON hidden

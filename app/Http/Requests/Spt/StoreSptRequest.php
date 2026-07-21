@@ -32,6 +32,13 @@ class StoreSptRequest extends FormRequest
                 'surat_dasar' => implode("\n", $filtered),
             ]);
         }
+
+        if (is_array($this->tempat_tujuan)) {
+            $filtered = array_filter(array_map('trim', $this->tempat_tujuan));
+            $this->merge([
+                'tempat_tujuan' => implode(', ', $filtered),
+            ]);
+        }
     }
 
     /**
