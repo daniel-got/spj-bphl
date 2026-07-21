@@ -117,16 +117,16 @@ class RincianTest extends TestCase
         $response = $this->actingAs($user)->post(route('user.rincian.store'), [
             'spd_id' => $spd->id,
             'rincian_biaya' => [
-                [
-                    'biaya_transport' => 150000,
-                    'penginapan' => 100,
-                    'hotel_ril' => 500000,
+                'transport' => [
+                    'Taksi' => [
+                        ['biaya' => 150000],
+                        ['biaya' => 200000],
+                    ]
                 ],
-                [
-                    'biaya_transport' => 200000,
-                    'penginapan' => 30,
-                    'hotel_ril' => 700000,
-                ],
+                'penginapan' => [
+                    ['penginapan_persen' => 100, 'hotel_ril' => 500000],
+                    ['penginapan_persen' => 30, 'hotel_ril' => 700000],
+                ]
             ],
         ]);
 
@@ -136,9 +136,9 @@ class RincianTest extends TestCase
         ]);
 
         $rincian = Rincian::where('spd_id', $spd->id)->first();
-        $this->assertCount(2, $rincian->rincian_biaya);
-        $this->assertEquals(150000, $rincian->rincian_biaya[0]['biaya_transport']);
-        $this->assertEquals(200000, $rincian->rincian_biaya[1]['biaya_transport']);
+        $this->assertCount(2, $rincian->rincian_biaya['transport']['Taksi']);
+        $this->assertEquals(150000, $rincian->rincian_biaya['transport']['Taksi'][0]['biaya']);
+        $this->assertEquals(200000, $rincian->rincian_biaya['transport']['Taksi'][1]['biaya']);
     }
 
     public function test_gagal_membuat_rincian_tanpa_spd_id(): void
@@ -147,9 +147,11 @@ class RincianTest extends TestCase
 
         $response = $this->actingAs($user)->post(route('user.rincian.store'), [
             'rincian_biaya' => [
-                [
-                    'biaya_transport' => 150000,
-                ],
+                'transport' => [
+                    'Taksi' => [
+                        ['biaya' => 150000]
+                    ]
+                ]
             ],
         ]);
 
@@ -192,25 +194,25 @@ class RincianTest extends TestCase
 
         $response = $this->actingAs($user)->put(route('user.rincian.update', $rincian), [
             'rincian_biaya' => [
-                [
-                    'biaya_transport' => 250000,
-                    'penginapan' => 100,
-                    'hotel_ril' => 750000,
+                'transport' => [
+                    'Taksi' => [
+                        ['biaya' => 250000],
+                        ['biaya' => 50000],
+                    ]
                 ],
-                [
-                    'biaya_transport' => 50000,
-                    'penginapan' => 30,
-                    'hotel_ril' => 0,
-                ],
+                'penginapan' => [
+                    ['penginapan_persen' => 100, 'hotel_ril' => 750000],
+                    ['penginapan_persen' => 30, 'hotel_ril' => 0],
+                ]
             ],
         ]);
 
         $response->assertRedirect(route('user.rincian.index'));
 
         $rincian->refresh();
-        $this->assertCount(2, $rincian->rincian_biaya);
-        $this->assertEquals(250000, $rincian->rincian_biaya[0]['biaya_transport']);
-        $this->assertEquals(50000, $rincian->rincian_biaya[1]['biaya_transport']);
+        $this->assertCount(2, $rincian->rincian_biaya['transport']['Taksi']);
+        $this->assertEquals(250000, $rincian->rincian_biaya['transport']['Taksi'][0]['biaya']);
+        $this->assertEquals(50000, $rincian->rincian_biaya['transport']['Taksi'][1]['biaya']);
     }
 
     // -------------------------------------------------------------------------

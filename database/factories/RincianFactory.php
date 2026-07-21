@@ -24,17 +24,16 @@ class RincianFactory extends Factory
         return [
             'spd_id' => Spd::factory(),
             'rincian_biaya' => [
-                [
-                    'item' => 'Biaya Transportasi',
-                    'transport' => fake()->numberBetween(100000, 1000000),
-                    'penginapan' => 0,
-                    'hotel_ril' => 0,
+                'transport' => [
+                    'Taksi' => [
+                        ['biaya' => fake()->numberBetween(100000, 1000000)],
+                    ]
                 ],
-                [
-                    'item' => 'Penginapan',
-                    'transport' => 0,
-                    'penginapan' => fake()->numberBetween(300000, 1000000),
-                    'hotel_ril' => fake()->numberBetween(200000, 800000),
+                'penginapan' => [
+                    [
+                        'hotel_ril' => fake()->numberBetween(200000, 800000),
+                        'penginapan_persen' => 100,
+                    ]
                 ],
             ],
             'status' => 'draft',
