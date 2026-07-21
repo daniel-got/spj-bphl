@@ -111,9 +111,7 @@
         body.values-only {
             color: transparent !important;
         }
-        body.values-only table {
-            transform: translateY(-2px);
-        }
+        
         body.values-only table,
         body.values-only tr,
         body.values-only td,
