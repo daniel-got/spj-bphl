@@ -26,6 +26,14 @@
                         <x-utility.icon name="printer" class="w-4 h-4 text-muted" />
                         Cetak Rincian
                     </a>
+                    
+                    <a href="{{ route('user.rincian.printLampiran', $rincian->id) }}" target="_blank"
+                       class="inline-flex items-center gap-1.5 border border-border-custom bg-surface hover:bg-background text-text-main text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition-colors duration-150"
+                       title="Cetak Lampiran">
+                        <svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                        Cetak Lampiran
+                    </a>
+
                     @can('update', $rincian)
                         @if(in_array($rincian->status, [\App\Models\Rincian::STATUS_DRAFT, \App\Models\Rincian::STATUS_REVISED]))
                             <a href="{{ route('user.rincian.edit', $rincian->id) }}"
@@ -140,36 +148,124 @@
                 <x-layout.card title="Detail Rincian Biaya">
                     @php
                         $rincianBiaya = $rincian->rincian_biaya ?? [];
+                        $transportData = $rincianBiaya['transport'] ?? [];
+                        $penginapanData = $rincianBiaya['penginapan'] ?? [];
                     @endphp
-                    @if (!empty($rincianBiaya))
-                        <div class="overflow-x-auto mt-4">
-                            @php
-                                $headersBiaya = [
-                                    '#', 
-                                    'Biaya Transport', 
-                                    'Penginapan (%)', 
-                                    ['label' => 'Biaya Hotel / Penginapan', 'class' => 'text-right']
-                                ];
-                                
-                                $rowsBiaya = [];
-                                foreach ($rincianBiaya as $i => $baris) {
-                                    $rowsBiaya[] = [
-                                        'cells' => [
-                                            '<span class="text-muted font-medium">' . ($i + 1) . '</span>',
-                                            'Rp ' . number_format($baris['biaya_transport'] ?? 0, 0, ',', '.'),
-                                            ($baris['penginapan'] ?? '-') . '%',
-                                            '<div class="text-right">Rp ' . number_format($baris['hotel_ril'] ?? 0, 0, ',', '.') . '</div>'
-                                        ]
-                                    ];
-                                }
-                            @endphp
+                    
+                    <div class="mt-4 space-y-8">
+                        {{-- Bagian Transportasi --}}
+                        <div>
+                            <h4 class="text-sm font-bold text-text-main mb-3 border-b border-border-custom pb-2">A. Biaya Transportasi</h4>
                             
-                            <x-data.table :headers="$headersBiaya" :rows="$rowsBiaya" :striped="false" />
+                            @if (!empty($transportData))
+                                @foreach ($transportData as $kategori => $items)
+                                    <div class="mb-4">
+                                        <h5 class="text-xs font-semibold text-text-main mb-2">Kategori: {{ $kategori }}</h5>
+                                        <div class="overflow-x-auto">
+                                            <table class="w-full text-sm text-left text-text-main border border-border-custom">
+                                                <thead class="text-xs text-muted uppercase bg-surface">
+                                                    <tr>
+                                                        <th class="px-4 py-2 border-b border-border-custom w-10 text-center">#</th>
+                                                        <th class="px-4 py-2 border-b border-border-custom">Lokasi Awal</th>
+                                                        <th class="px-4 py-2 border-b border-border-custom">Lokasi Tujuan</th>
+                                                        <th class="px-4 py-2 border-b border-border-custom text-right">Biaya (Rp)</th>
+                                                        <th class="px-4 py-2 border-b border-border-custom text-center">Lampiran</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @php $totalTransport = 0; @endphp
+                                                    @foreach ($items as $index => $item)
+                                                        @php 
+                                                            $biaya = $item['biaya'] ?? 0;
+                                                            $totalTransport += $biaya;
+                                                        @endphp
+                                                        <tr class="bg-background border-b border-border-custom hover:bg-surface">
+                                                            <td class="px-4 py-2 text-center">{{ $index + 1 }}</td>
+                                                            <td class="px-4 py-2">{{ $item['lokasi_awal'] ?? '-' }}</td>
+                                                            <td class="px-4 py-2">{{ $item['lokasi_tujuan'] ?? '-' }}</td>
+                                                            <td class="px-4 py-2 text-right">Rp {{ number_format($biaya, 0, ',', '.') }}</td>
+                                                            <td class="px-4 py-2 text-center">
+                                                                @if (!empty($item['lampiran']))
+                                                                    <button type="button" onclick="openLampiranModal('{{ Storage::url($item['lampiran']) }}')" class="text-xs text-primary hover:underline flex items-center justify-center gap-1 mx-auto">
+                                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                                                        Lihat
+                                                                    </button>
+                                                                @else
+                                                                    <span class="text-xs text-muted">-</span>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                    <tr class="bg-surface font-semibold">
+                                                        <td colspan="3" class="px-4 py-2 text-right">Total {{ $kategori }}:</td>
+                                                        <td class="px-4 py-2 text-right">Rp {{ number_format($totalTransport, 0, ',', '.') }}</td>
+                                                        <td></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <p class="text-sm text-muted italic">Tidak ada data biaya transportasi.</p>
+                            @endif
                         </div>
-                    @else
-                        <p class="text-sm text-muted mt-4 italic">Belum ada data rincian biaya.</p>
-                    @endif
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6 border-t border-border-custom pt-4">
+
+                        {{-- Bagian Penginapan --}}
+                        <div>
+                            <h4 class="text-sm font-bold text-text-main mb-3 border-b border-border-custom pb-2">B. Biaya Hotel / Penginapan</h4>
+                            
+                            @if (!empty($penginapanData))
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm text-left text-text-main border border-border-custom">
+                                        <thead class="text-xs text-muted uppercase bg-surface">
+                                            <tr>
+                                                <th class="px-4 py-2 border-b border-border-custom w-10 text-center">#</th>
+                                                <th class="px-4 py-2 border-b border-border-custom">Keterangan</th>
+                                                <th class="px-4 py-2 border-b border-border-custom text-center">Rate (%)</th>
+                                                <th class="px-4 py-2 border-b border-border-custom text-right">Biaya (Rp)</th>
+                                                <th class="px-4 py-2 border-b border-border-custom text-center">Lampiran</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @php $totalPenginapan = 0; @endphp
+                                            @foreach ($penginapanData as $index => $item)
+                                                @php 
+                                                    $biaya = $item['hotel_ril'] ?? 0;
+                                                    $totalPenginapan += $biaya;
+                                                @endphp
+                                                <tr class="bg-background border-b border-border-custom hover:bg-surface">
+                                                    <td class="px-4 py-2 text-center">{{ $index + 1 }}</td>
+                                                    <td class="px-4 py-2">{{ $item['keterangan'] ?? '-' }}</td>
+                                                    <td class="px-4 py-2 text-center">{{ $item['penginapan_persen'] ?? '-' }}%</td>
+                                                    <td class="px-4 py-2 text-right">Rp {{ number_format($biaya, 0, ',', '.') }}</td>
+                                                    <td class="px-4 py-2 text-center">
+                                                        @if (!empty($item['lampiran']))
+                                                            <button type="button" onclick="openLampiranModal('{{ Storage::url($item['lampiran']) }}')" class="text-xs text-primary hover:underline flex items-center justify-center gap-1 mx-auto">
+                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943-9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                                                Lihat
+                                                            </button>
+                                                        @else
+                                                            <span class="text-xs text-muted">-</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                            <tr class="bg-surface font-semibold">
+                                                <td colspan="3" class="px-4 py-2 text-right">Total Penginapan:</td>
+                                                <td class="px-4 py-2 text-right">Rp {{ number_format($totalPenginapan, 0, ',', '.') }}</td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <p class="text-sm text-muted italic">Tidak ada data biaya penginapan.</p>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8 border-t border-border-custom pt-4">
                         <div>
                             <span class="text-xs font-semibold text-muted uppercase tracking-wider">Kode MAK</span>
                             <p class="text-sm font-medium text-text-main mt-1">{{ $rincian->kode_mak }}</p>
@@ -194,6 +290,97 @@
         </div>
 
     </main>
+
+    {{-- Modal Lampiran --}}
+    <div id="lampiran-modal" class="fixed inset-0 z-50 hidden bg-black/60 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4">
+        <div class="bg-background rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col transform scale-95 transition-transform duration-300">
+            <div class="flex items-center justify-between p-4 border-b border-border-custom">
+                <h3 class="text-lg font-bold text-text-main">Preview Lampiran</h3>
+                <button onclick="closeLampiranModal()" class="text-muted hover:text-text-main transition bg-surface rounded-md p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="flex-1 overflow-auto p-4 flex items-center justify-center bg-surface-muted min-h-[400px]">
+                {{-- Konten disisipkan via JS --}}
+                <div id="lampiran-content" class="w-full h-full flex items-center justify-center"></div>
+            </div>
+            <div class="p-4 border-t border-border-custom flex justify-end gap-3">
+                <a id="lampiran-download-btn" href="#" target="_blank" download class="inline-flex items-center gap-2 px-4 py-2 border border-border-custom bg-surface rounded-md text-sm font-semibold text-text-main hover:bg-background transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Download File
+                </a>
+                <button onclick="closeLampiranModal()" class="px-4 py-2 border border-border-custom rounded-md text-sm font-semibold text-text-main hover:bg-surface transition">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openLampiranModal(url) {
+            const modal = document.getElementById('lampiran-modal');
+            const content = document.getElementById('lampiran-content');
+            const btnDownload = document.getElementById('lampiran-download-btn');
+            
+            // Set link download
+            btnDownload.href = url;
+            
+            // Cek ekstensi file
+            const ext = url.split('.').pop().toLowerCase();
+            
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+                content.innerHTML = `<img src="${url}" class="max-w-full max-h-full object-contain rounded-lg shadow-sm" alt="Lampiran" />`;
+            } else if (ext === 'pdf') {
+                content.innerHTML = `<iframe src="${url}" class="w-full h-[600px] border-0 rounded-lg shadow-sm"></iframe>`;
+            } else {
+                content.innerHTML = `
+                    <div class="text-center p-8 bg-background border border-border-custom rounded-lg shadow-sm">
+                        <svg class="w-12 h-12 text-muted mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <p class="text-sm font-medium text-text-main mb-2">Preview tidak tersedia untuk format file ini.</p>
+                        <a href="${url}" target="_blank" class="text-primary text-sm hover:underline font-semibold">Klik di sini untuk mengunduh</a>
+                    </div>
+                `;
+            }
+            
+            // Tampilkan modal dengan animasi
+            modal.classList.remove('hidden');
+            // Sedikit delay agar transisi jalan
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.bg-background').classList.remove('scale-95');
+                modal.querySelector('.bg-background').classList.add('scale-100');
+            }, 10);
+            
+            // Cegah scroll di body
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeLampiranModal() {
+            const modal = document.getElementById('lampiran-modal');
+            
+            modal.classList.add('opacity-0');
+            modal.querySelector('.bg-background').classList.remove('scale-100');
+            modal.querySelector('.bg-background').classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.getElementById('lampiran-content').innerHTML = ''; // bersihkan konten
+                document.body.style.overflow = ''; // kembalikan scroll body
+            }, 300);
+        }
+        
+        // Tutup modal jika klik di luar box
+        document.getElementById('lampiran-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLampiranModal();
+            }
+        });
+        
+        // Tutup modal dengan tombol escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !document.getElementById('lampiran-modal').classList.contains('hidden')) {
+                closeLampiranModal();
+            }
+        });
+    </script>
 
     <x-layout.footer />
 

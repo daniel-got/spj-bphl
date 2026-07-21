@@ -51,14 +51,8 @@
         $lamaKegiatan = $rincian->spd->lama_kegiatan ?? 0;
         $uangHarianTotal = $uangHarianRate * $lamaKegiatan;
         
-        $transportTotal = 0;
-        $hotelTotal = 0;
-        if (is_array($rincian->rincian_biaya)) {
-            foreach ($rincian->rincian_biaya as $item) {
-                $transportTotal += (int) ($item['biaya_transport'] ?? 0);
-                $hotelTotal += (int) ($item['hotel_ril'] ?? 0);
-            }
-        }
+        $transportTotal = $rincian->biaya_transport;
+        $hotelTotal = $rincian->hotel_ril;
         
         $totalKeseluruhan = $uangHarianTotal + $transportTotal + $hotelTotal;
     @endphp
@@ -90,19 +84,30 @@
                 </tr>
             </thead>
             <tbody>
+                <!-- 1. Uang Harian -->
                 <tr>
-                    <td class="text-center">1.</td>
-                    <td>
-                        Uang Harian :<br />
-                        <span style="display: inline-block; margin-left: 20px">
-                            {{ $lamaKegiatan }} hari x Rp. {{ number_format($uangHarianRate, 0, ',', '.') }}
-                        </span>
-                    </td>
-                    <td style="vertical-align: bottom">
-                        <table width="100%" style="border: none; margin: 0; padding: 0">
+                    <td class="text-center" style="vertical-align: top;">1.</td>
+                    <td style="vertical-align: top; padding: 0;">
+                        <table width="100%" style="border: none; margin: 0; padding: 0;">
+                            <tr><td style="border: none; padding: 5px;"><strong>Uang Harian</strong></td></tr>
                             <tr>
-                                <td style="border: none; padding: 0; width: 20px;">Rp.</td>
-                                <td style="border: none; padding: 0; text-align: right;">
+                                <td style="border: none; padding: 5px 5px 5px 15px;">
+                                    - {{ $lamaKegiatan }} hari x Rp. {{ number_format($uangHarianRate, 0, ',', '.') }}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="vertical-align: top; padding: 0;">
+                        <table width="100%" style="border: none; margin: 0; padding: 0;">
+                            <tr>
+                                <td style="border: none; padding: 5px; width: 20px; font-weight: bold;">Rp.</td>
+                                <td style="border: none; padding: 5px; text-align: right; font-weight: bold;">
+                                    {{ number_format($uangHarianTotal, 0, ',', '.') }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: none; padding: 5px; width: 20px;"></td>
+                                <td style="border: none; padding: 5px; text-align: right;">
                                     {{ number_format($uangHarianTotal, 0, ',', '.') }}
                                 </td>
                             </tr>
@@ -110,51 +115,123 @@
                     </td>
                     <td></td>
                 </tr>
+
+                <!-- 2. Transportasi -->
                 <tr>
-                    <td class="text-center">2.</td>
-                    <td>
-                        Transportasi :<br />
-                        <span style="display: inline-block; margin-left: 20px">
-                            {{ $rincian->berangkat_dari }} - {{ $rincian->tempat_tujuan }} (PP)
-                        </span>
+                    <td class="text-center" style="vertical-align: top;">2.</td>
+                    <td style="vertical-align: top; padding: 0;">
+                        <table width="100%" style="border: none; margin: 0; padding: 0;">
+                            <tr><td style="border: none; padding: 5px;"><strong>Transportasi</strong></td></tr>
+                            @php
+                                $transportData = $rincian->rincian_biaya['transport'] ?? [];
+                            @endphp
+                            @foreach($transportData as $kategori => $items)
+                                <tr>
+                                    <td style="border: none; padding: 2px 5px 2px 15px;">
+                                        {{ chr(96 + $loop->iteration) }}. {{ $kategori }}:
+                                    </td>
+                                </tr>
+                                @foreach($items as $item)
+                                    <tr>
+                                        <td style="border: none; padding: 2px 5px 2px 30px; font-size: 0.9em; color: #444;">
+                                            - {{ $item['lokasi_awal'] ?? '' }} &rarr; {{ $item['lokasi_tujuan'] ?? '' }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endforeach
+                        </table>
                     </td>
-                    <td style="vertical-align: bottom">
-                        <table width="100%" style="border: none; margin: 0; padding: 0">
+                    <td style="vertical-align: top; padding: 0;">
+                        <table width="100%" style="border: none; margin: 0; padding: 0;">
                             <tr>
-                                <td style="border: none; padding: 0; width: 20px;">Rp.</td>
-                                <td style="border: none; padding: 0; text-align: right;">
+                                <td style="border: none; padding: 5px; width: 20px; font-weight: bold;">Rp.</td>
+                                <td style="border: none; padding: 5px; text-align: right; font-weight: bold;">
                                     {{ number_format($transportTotal, 0, ',', '.') }}
                                 </td>
                             </tr>
+                            @foreach($transportData as $kategori => $items)
+                                @php $catTotal = collect($items)->sum('biaya'); @endphp
+                                <tr>
+                                    <td style="border: none; padding: 2px 5px; width: 20px;"></td>
+                                    <td style="border: none; padding: 2px 5px; text-align: right;">
+                                        {{ number_format($catTotal, 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                                @foreach($items as $item)
+                                    <tr>
+                                        <td style="border: none; padding: 2px 5px; width: 20px;"></td>
+                                        <td style="border: none; padding: 2px 5px; text-align: right; font-size: 0.9em; color: #444;">
+                                            {{ number_format($item['biaya'] ?? 0, 0, ',', '.') }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endforeach
                         </table>
                     </td>
                     <td></td>
                 </tr>
+
+                <!-- 3. Uang Penginapan -->
                 <tr>
-                    <td class="text-center">3.</td>
-                    <td>
-                        Penginapan :<br />
-                        <span style="display: inline-block; margin-left: 20px">
-                            {{ $lamaKegiatan > 1 ? $lamaKegiatan - 1 : 1 }} x Rp. {{ number_format( ($lamaKegiatan > 1 ? $hotelTotal / ($lamaKegiatan - 1) : $hotelTotal), 0, ',', '.') }},-
-                        </span>
+                    <td class="text-center" style="vertical-align: top;">3.</td>
+                    <td style="vertical-align: top; padding: 0;">
+                        <table width="100%" style="border: none; margin: 0; padding: 0;">
+                            <tr><td style="border: none; padding: 5px;"><strong>Uang Penginapan</strong></td></tr>
+                            @php
+                                $penginapanData = $rincian->rincian_biaya['penginapan'] ?? [];
+                                $durasi = $lamaKegiatan > 1 ? $lamaKegiatan - 1 : 1;
+                            @endphp
+                            @foreach($penginapanData as $item)
+                                @php
+                                    $persen = $item['penginapan_persen'] ?? 100;
+                                    $hotelRil = $item['hotel_ril'] ?? 0;
+                                    $nilaiPerHari = $hotelRil / $durasi;
+                                    $rateDbup = $persen > 0 ? $nilaiPerHari / ($persen / 100) : 0;
+                                @endphp
+                                <tr>
+                                    <td style="border: none; padding: 2px 5px 2px 15px; font-size: 0.9em;">
+                                        - {{ $durasi }} x Rp. {{ number_format($nilaiPerHari, 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none; padding: 2px 5px 2px 15px; font-size: 0.9em; color: #444;">
+                                        - {{ $persen }}% x Rp. {{ number_format($rateDbup, 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </table>
                     </td>
-                    <td style="vertical-align: bottom">
-                        <table width="100%" style="border: none; margin: 0; padding: 0">
+                    <td style="vertical-align: top; padding: 0;">
+                        <table width="100%" style="border: none; margin: 0; padding: 0;">
                             <tr>
-                                <td style="border: none; padding: 0; width: 20px;">Rp.</td>
-                                <td style="border: none; padding: 0; text-align: right;">
+                                <td style="border: none; padding: 5px; width: 20px; font-weight: bold;">Rp.</td>
+                                <td style="border: none; padding: 5px; text-align: right; font-weight: bold;">
                                     {{ number_format($hotelTotal, 0, ',', '.') }}
                                 </td>
                             </tr>
+                            @foreach($penginapanData as $item)
+                                <tr>
+                                    <td style="border: none; padding: 2px 5px; width: 20px;"></td>
+                                    <td style="border: none; padding: 2px 5px; text-align: right; font-size: 0.9em;">
+                                        {{ number_format($item['hotel_ril'] ?? 0, 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none; padding: 2px 5px; width: 20px;"></td>
+                                    <td style="border: none; padding: 2px 5px; text-align: right; font-size: 0.9em;"></td>
+                                </tr>
+                            @endforeach
                         </table>
                     </td>
                     <td></td>
                 </tr>
+
+                <!-- Total -->
                 <tr>
                     <td colspan="2" class="text-right" style="font-weight: bold; padding-right: 20px">
                         Jumlah
                     </td>
-                    <td style="font-weight: bold">
+                    <td style="font-weight: bold; vertical-align: top">
                         <table width="100%" style="border: none; margin: 0; padding: 0">
                             <tr>
                                 <td style="border: none; padding: 0; width: 20px;">Rp.</td>
@@ -166,12 +243,14 @@
                     </td>
                     <td></td>
                 </tr>
+                <tr>
+                    <td></td>
+                    <td colspan="3" style="font-style: italic;">
+                        Terbilang: = {{ \App\Helpers\TerbilangHelper::format($totalKeseluruhan) }} =
+                    </td>
+                </tr>
             </tbody>
         </table>
-
-        <div class="terbilang">
-            Terbilang : = {{ \App\Helpers\TerbilangHelper::format($totalKeseluruhan) }} =
-        </div>
 
         <table class="signature-section" cellspacing="0" cellpadding="0">
             <tr>

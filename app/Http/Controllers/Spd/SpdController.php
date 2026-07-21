@@ -145,7 +145,8 @@ class SpdController extends Controller
      */
     public function printBlank()
     {
-        $spd = new \App\Models\Spd();
+        $spd = new Spd;
+
         return view('pages.spd.print', compact('spd'));
     }
 

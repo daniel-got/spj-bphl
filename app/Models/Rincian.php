@@ -138,6 +138,42 @@ class Rincian extends Model
     }
 
     // -------------------------------------------------------------------------
+    // Accessors untuk total biaya dari JSON rincian_biaya
+    // -------------------------------------------------------------------------
+
+    public function getBiayaTransportAttribute()
+    {
+        $total = 0;
+        $rb = $this->rincian_biaya;
+        if (is_array($rb) && isset($rb['transport']) && is_array($rb['transport'])) {
+            foreach ($rb['transport'] as $items) {
+                if (is_array($items)) {
+                    foreach ($items as $item) {
+                        $total += (float) ($item['biaya'] ?? 0);
+                    }
+                }
+            }
+        }
+
+        return $total;
+    }
+
+    public function getHotelRilAttribute()
+    {
+        $total = 0;
+        $rb = $this->rincian_biaya;
+        if (is_array($rb) && isset($rb['penginapan']) && is_array($rb['penginapan'])) {
+            foreach ($rb['penginapan'] as $item) {
+                if (is_array($item)) {
+                    $total += (float) ($item['hotel_ril'] ?? 0);
+                }
+            }
+        }
+
+        return $total;
+    }
+
+    // -------------------------------------------------------------------------
     // Scopes
     // -------------------------------------------------------------------------
 

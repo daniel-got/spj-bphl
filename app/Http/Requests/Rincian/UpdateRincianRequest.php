@@ -20,13 +20,23 @@ class UpdateRincianRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'rincian_biaya' => 'required|array|min:1',
-            // Kunci mengikuti skema form & tampilan: biaya_transport, penginapan (%), hotel_ril.
-            'rincian_biaya.*.biaya_transport' => 'required|numeric|min:0',
-            'rincian_biaya.*.penginapan' => 'required|numeric|min:0',
-            'rincian_biaya.*.hotel_ril' => 'required|numeric|min:0',
+            'rincian_biaya' => 'required|array',
+            'rincian_biaya.transport' => 'nullable|array',
+            'rincian_biaya.penginapan' => 'nullable|array',
+
+            // Validasi field dalam rincian biaya transport
+            'rincian_biaya.transport.*.*.lokasi_awal' => 'nullable|string',
+            'rincian_biaya.transport.*.*.lokasi_tujuan' => 'nullable|string',
+            'rincian_biaya.transport.*.*.biaya' => 'nullable|numeric',
+            'rincian_biaya.transport.*.*.lampiran' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:5120',
+
+            // Validasi field dalam rincian biaya penginapan
+            'rincian_biaya.penginapan.*.keterangan' => 'nullable|string',
+            'rincian_biaya.penginapan.*.penginapan_persen' => 'nullable|numeric',
+            'rincian_biaya.penginapan.*.hotel_ril' => 'nullable|numeric',
+            'rincian_biaya.penginapan.*.lampiran' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:5120',
+
             'status' => 'nullable|in:draft,diajukan,direvisi,disetujui,ditolak',
-            'lampiran' => 'nullable|file|mimes:pdf|max:5120',
         ];
     }
 }

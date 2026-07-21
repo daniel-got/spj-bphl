@@ -1,9 +1,10 @@
 <?php
+
 $file = 'resources/views/pages/spd/print.blade.php';
 $content = file_get_contents($file);
 
 // Replace CSS
-$cssOld = <<<CSS
+$cssOld = <<<'CSS'
         .labelrow {
             display: block;
             width: 100%;
@@ -22,7 +23,7 @@ $cssOld = <<<CSS
         }
 CSS;
 
-$cssNew = <<<CSS
+$cssNew = <<<'CSS'
         .labelrow-table {
             width: 100%;
             border-collapse: collapse;

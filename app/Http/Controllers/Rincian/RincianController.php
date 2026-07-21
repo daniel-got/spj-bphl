@@ -8,6 +8,7 @@ use App\Http\Requests\Rincian\UpdateRincianRequest;
 use App\Models\Rincian;
 use App\Services\Rincian\RincianService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class RincianController extends Controller
 {
@@ -125,6 +126,51 @@ class RincianController extends Controller
         $uangHarianRate = $this->rincianService->calculateUangHarianRate($rincian->spd);
 
         return view('pages.rincian.print', compact('rincian', 'uangHarianRate'));
+    }
+
+    /**
+     * Print all lampiran inside rincian.
+     */
+    public function printLampiran(string $id)
+    {
+        $rincian = $this->rincianService->getRincianById($id);
+        $this->authorize('view', $rincian);
+
+        // Kumpulkan semua lampiran (transport dan penginapan)
+        $lampirans = [];
+        $rb = $rincian->rincian_biaya ?? [];
+
+        if (isset($rb['transport']) && is_array($rb['transport'])) {
+            foreach ($rb['transport'] as $kategori => $items) {
+                if (is_array($items)) {
+                    foreach ($items as $item) {
+                        if (! empty($item['lampiran'])) {
+                            $lampirans[] = [
+                                'tipe' => 'Transport - '.$kategori,
+                                'path' => $item['lampiran'],
+                                'url' => Storage::url($item['lampiran']),
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        if (isset($rb['penginapan']) && is_array($rb['penginapan'])) {
+            foreach ($rb['penginapan'] as $item) {
+                if (is_array($item)) {
+                    if (! empty($item['lampiran'])) {
+                        $lampirans[] = [
+                            'tipe' => 'Penginapan - '.($item['keterangan'] ?? 'Hotel'),
+                            'path' => $item['lampiran'],
+                            'url' => Storage::url($item['lampiran']),
+                        ];
+                    }
+                }
+            }
+        }
+
+        return view('pages.rincian.print_lampiran', compact('rincian', 'lampirans'));
     }
 
     public function searchSpd(Request $request)

@@ -1,4 +1,5 @@
 <?php
+
 $content = file_get_contents('resources/views/pages/spd/print.blade.php');
 $lines = explode("\n", $content);
 $pattern = '/<div class="labelrow">\s*<span>(.*?)<\/span>\s*<span>(.*?)<\/span>\s*<\/div>/s';
@@ -17,8 +18,8 @@ array_shift($parts); // remove the first part before first labelrow
 
 $unmatched = [];
 foreach ($parts as $part) {
-    $block = 'class="labelrow"' . substr($part, 0, 300);
-    if (!preg_match('/class="labelrow">\s*<span>(.*?)<\/span>\s*<span>(.*?)<\/span>\s*<\/div>/s', $block)) {
+    $block = 'class="labelrow"'.substr($part, 0, 300);
+    if (! preg_match('/class="labelrow">\s*<span>(.*?)<\/span>\s*<span>(.*?)<\/span>\s*<\/div>/s', $block)) {
         $unmatched[] = substr($block, 0, 100);
     }
 }

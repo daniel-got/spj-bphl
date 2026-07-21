@@ -136,18 +136,15 @@ class RincianService
                 ]);
             }
 
-            // Jika ada file lampiran
-            $lampiranPath = null;
-            if (isset($data['lampiran']) && $data['lampiran'] instanceof UploadedFile) {
-                $lampiranPath = $data['lampiran']->store('lampiran_spj', 'public');
-            }
+            // Proses file lampiran dinamis
+            $rincianBiayaProcessed = $this->processRincianBiayaFiles($data['rincian_biaya'] ?? []);
 
             $rincian = Rincian::create([
                 'spd_id' => $data['spd_id'],
-                'rincian_biaya' => $data['rincian_biaya'] ?? [],
+                'rincian_biaya' => $rincianBiayaProcessed,
                 'status' => Rincian::STATUS_DRAFT,
                 'pembuat_id' => $authId,
-                'lampiran' => $lampiranPath,
+                'lampiran' => null, // Kolom lampiran lama dikosongkan
             ]);
 
             session()->flash('success', 'Rincian biaya berhasil disimpan sebagai Draft.');
@@ -162,19 +159,17 @@ class RincianService
     public function updateRincian(Rincian $rincian, array $data)
     {
         return DB::transaction(function () use ($rincian, $data) {
-            $updateData = [
-                'rincian_biaya' => $data['rincian_biaya'] ?? $rincian->rincian_biaya,
-                'status' => $data['status'] ?? $rincian->status,
-            ];
+            // Proses file lampiran dinamis
+            $newRincianBiaya = $this->processRincianBiayaFiles(
+                $data['rincian_biaya'] ?? $rincian->rincian_biaya,
+                $rincian->rincian_biaya
+            );
 
-            // Update lampiran jika ada file baru
-            if (isset($data['lampiran']) && $data['lampiran'] instanceof UploadedFile) {
-                // Hapus lampiran lama jika ada
-                if ($rincian->lampiran) {
-                    Storage::disk('public')->delete($rincian->lampiran);
-                }
-                $updateData['lampiran'] = $data['lampiran']->store('lampiran_spj', 'public');
-            }
+            $updateData = [
+                'rincian_biaya' => $newRincianBiaya,
+                'status' => $data['status'] ?? $rincian->status,
+                'lampiran' => null, // Hapus lampiran lama di root jika ada
+            ];
 
             // Jika status berubah menjadi diajukan, beri notifikasi khusus untuk verifikator
             if (isset($data['status']) && $data['status'] === Rincian::STATUS_SUBMITTED && $rincian->status !== Rincian::STATUS_SUBMITTED) {
@@ -195,9 +190,31 @@ class RincianService
     public function deleteRincian(Rincian $rincian)
     {
         return DB::transaction(function () use ($rincian) {
-            // Hapus lampiran jika ada
+            // Hapus lampiran lama di kolom tunggal jika ada
             if ($rincian->lampiran) {
-                Storage::disk('public')->delete($rincian->lampiran);
+                Storage::disk(config('filesystems.default', 'public'))->delete($rincian->lampiran);
+            }
+
+            // Hapus semua file lampiran di dalam rincian_biaya
+            $disk = config('filesystems.default', 'public');
+            $rb = $rincian->rincian_biaya;
+            if (is_array($rb)) {
+                if (isset($rb['transport']) && is_array($rb['transport'])) {
+                    foreach ($rb['transport'] as $kategori => $items) {
+                        foreach ($items as $item) {
+                            if (! empty($item['lampiran'])) {
+                                Storage::disk($disk)->delete($item['lampiran']);
+                            }
+                        }
+                    }
+                }
+                if (isset($rb['penginapan']) && is_array($rb['penginapan'])) {
+                    foreach ($rb['penginapan'] as $item) {
+                        if (! empty($item['lampiran'])) {
+                            Storage::disk($disk)->delete($item['lampiran']);
+                        }
+                    }
+                }
             }
 
             $rincian->delete();
@@ -206,6 +223,47 @@ class RincianService
 
             return true;
         });
+    }
+
+    /**
+     * Memproses upload file dalam rincian biaya dinamis
+     */
+    protected function processRincianBiayaFiles(array $rincianBiaya, ?array $oldRincianBiaya = null): array
+    {
+        $disk = config('filesystems.default', 'public');
+
+        if (isset($rincianBiaya['transport']) && is_array($rincianBiaya['transport'])) {
+            foreach ($rincianBiaya['transport'] as $kategori => &$items) {
+                foreach ($items as $index => &$item) {
+                    if (isset($item['lampiran']) && $item['lampiran'] instanceof UploadedFile) {
+                        // Hapus lampiran lama jika diupload ulang
+                        if ($oldRincianBiaya && isset($oldRincianBiaya['transport'][$kategori][$index]['lampiran'])) {
+                            Storage::disk($disk)->delete($oldRincianBiaya['transport'][$kategori][$index]['lampiran']);
+                        }
+                        $item['lampiran'] = $item['lampiran']->store('lampiran_spj', $disk);
+                    } elseif ($oldRincianBiaya && isset($oldRincianBiaya['transport'][$kategori][$index]['lampiran'])) {
+                        // Pertahankan lampiran lama jika tidak ada file baru
+                        $item['lampiran'] = $oldRincianBiaya['transport'][$kategori][$index]['lampiran'];
+                    }
+                }
+            }
+        }
+
+        if (isset($rincianBiaya['penginapan']) && is_array($rincianBiaya['penginapan'])) {
+            foreach ($rincianBiaya['penginapan'] as $index => &$item) {
+                if (isset($item['lampiran']) && $item['lampiran'] instanceof UploadedFile) {
+                    // Hapus lampiran lama jika diupload ulang
+                    if ($oldRincianBiaya && isset($oldRincianBiaya['penginapan'][$index]['lampiran'])) {
+                        Storage::disk($disk)->delete($oldRincianBiaya['penginapan'][$index]['lampiran']);
+                    }
+                    $item['lampiran'] = $item['lampiran']->store('lampiran_spj', $disk);
+                } elseif ($oldRincianBiaya && isset($oldRincianBiaya['penginapan'][$index]['lampiran'])) {
+                    $item['lampiran'] = $oldRincianBiaya['penginapan'][$index]['lampiran'];
+                }
+            }
+        }
+
+        return $rincianBiaya;
     }
 
     /**

@@ -32,7 +32,7 @@
                 </h1>
             </div>
 
-            <form action="{{ route('user.rincian.store') }}" method="POST">
+            <form action="{{ route('user.rincian.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <div class="bg-surface border border-border-custom rounded-xl shadow-sm p-6 space-y-6">
@@ -84,47 +84,33 @@
                     </div>
 
                     {{-- Field Khusus Rincian (Editable + Dinamis) --}}
-                    <div class="border-t border-border-custom pt-6 space-y-4">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-base font-bold text-text-main">Biaya Rincian</h3>
-                            <x-action.button id="btn-tambah-biaya"
-                                class="border-primary text-primary text-sm hover:bg-primary hover:text-white px-3 py-1.5 gap-1.5">
-                                <x-utility.icon name="plus" class="w-4 h-4" />
-                                Tambah Rincian
-                            </x-action.button>
+                    <div class="border-t border-border-custom pt-6 space-y-6">
+                        
+                        {{-- Bagian Transportasi --}}
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-base font-bold text-text-main">Biaya Transportasi</h3>
+                            </div>
+                            <p class="text-sm text-muted mb-4">Kategori transportasi disesuaikan dengan Alat Angkut pada SPD.</p>
+                            
+                            <div id="transport-container" class="space-y-6">
+                                <p class="text-sm italic text-muted">Pilih SPD terlebih dahulu untuk menampilkan kategori transportasi.</p>
+                            </div>
                         </div>
 
-                        <div id="rincian-biaya-container" class="space-y-4">
-                            {{-- Baris pertama selalu ada --}}
-                            <div class="rincian-row bg-background border border-border-custom rounded-lg p-4 relative">
-                                <x-action.icon-button color="danger"
-                                    class="btn-hapus-baris absolute top-3 right-3 hidden"
-                                    title="Hapus baris ini">
-                                    <x-utility.icon name="trash" class="w-4 h-4" />
-                                </x-action.icon-button>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div class="flex flex-col gap-1">
-                                        <label class="text-sm font-semibold text-text-main">Biaya Transport (Rp)</label>
-                                        <input type="number" name="rincian_biaya[0][biaya_transport]" min="0"
-                                            placeholder="Contoh: 150000"
-                                            class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary" />
-                                    </div>
-                                    <div class="flex flex-col gap-1">
-                                        <label class="text-sm font-semibold text-text-main">Penginapan (%)</label>
-                                        <select name="rincian_biaya[0][penginapan]"
-                                            class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary">
-                                            <option value="">-- Pilih --</option>
-                                            <option value="100">100%</option>
-                                            <option value="30">30%</option>
-                                        </select>
-                                    </div>
-                                    <div class="flex flex-col gap-1">
-                                        <label class="text-sm font-semibold text-text-main">Biaya Hotel / Penginapan (Rp)</label>
-                                        <input type="number" name="rincian_biaya[0][hotel_ril]" min="0"
-                                            placeholder="Otomatis dihitung..." readonly
-                                            class="block w-full rounded-md border border-border-custom bg-surface-muted px-3 py-2 text-sm text-text-main focus:outline-none" />
-                                    </div>
-                                </div>
+                        {{-- Bagian Penginapan --}}
+                        <div class="border-t border-border-custom pt-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-base font-bold text-text-main">Biaya Hotel / Penginapan</h3>
+                                <x-action.button id="btn-tambah-penginapan"
+                                    class="border-primary text-primary text-sm hover:bg-primary hover:text-white px-3 py-1.5 gap-1.5" type="button">
+                                    <x-utility.icon name="plus" class="w-4 h-4" />
+                                    Tambah Penginapan
+                                </x-action.button>
+                            </div>
+                            
+                            <div id="penginapan-container" class="space-y-4">
+                                {{-- Row penginapan akan diisi lewat JS --}}
                             </div>
                         </div>
                     </div>
@@ -201,8 +187,12 @@
                             // Simpan rate penginapan ke data attribute form atau window
                             window.currentPenginapanRate = data.penginapan_rate || 0;
                             
-                            // Trigger kalkulasi ulang jika sudah ada baris rincian
-                            calculateAllPenginapan();
+                            // Generate Transport Categories
+                            generateTransportCategories(data.alat_angkut || '');
+                            
+                            // Kosongkan penginapan
+                            document.getElementById('penginapan-container').innerHTML = '';
+                            addPenginapanRow();
                         },
                         error: function() {
                             alert('Gagal mengambil data SPD.');
@@ -216,7 +206,8 @@
                 // Reset semua field
                 $('#nomor_spd, #tgl_spd, #pegawai_ditugaskan, #nip_pegawai, #tujuan_kegiatan, #berangkat_dari, #tempat_tujuan, #lama_kegiatan, #jenis_perjalanan, #alat_angkut, #kode_mak, #ppk, #nama_ppk, #nip_ppk').val('');
                 window.currentPenginapanRate = 0;
-                calculateAllPenginapan();
+                document.getElementById('transport-container').innerHTML = '<p class="text-sm italic text-muted">Pilih SPD terlebih dahulu untuk menampilkan kategori transportasi.</p>';
+                document.getElementById('penginapan-container').innerHTML = '';
             });
         });
     </script>
@@ -225,117 +216,200 @@
         // -----------------------------------------------------------------------
         // Dynamic Rincian Biaya Rows
         // -----------------------------------------------------------------------
-        (function () {
-            const container = document.getElementById('rincian-biaya-container');
-            const btnTambah = document.getElementById('btn-tambah-biaya');
+        
+        function generateTransportCategories(alatAngkutString) {
+            const container = document.getElementById('transport-container');
+            container.innerHTML = '';
+            if (!alatAngkutString) return;
 
-            /** Build a single rincian row HTML with a given index */
-            function buildRow(index) {
-                return `
-                    <div class="rincian-row bg-background border border-border-custom rounded-lg p-4 relative">
-                        <x-action.icon-button color="danger"
-                            class="btn-hapus-baris absolute top-3 right-3"
-                            title="Hapus baris ini">
-                            <x-utility.icon name="trash" class="w-4 h-4" />
-                        </x-action.icon-button>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="flex flex-col gap-1">
-                                <label class="text-sm font-semibold text-text-main">Biaya Transport (Rp)</label>
-                                <input type="number" name="rincian_biaya[${index}][biaya_transport]" min="0"
-                                    placeholder="Contoh: 150000"
-                                    class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary" />
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-sm font-semibold text-text-main">Penginapan (%)</label>
-                                <select name="rincian_biaya[${index}][penginapan]"
-                                    class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary">
-                                    <option value="">-- Pilih --</option>
-                                    <option value="100">100%</option>
-                                    <option value="30">30%</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-sm font-semibold text-text-main">Biaya Hotel / Penginapan (Rp)</label>
-                                <input type="number" name="rincian_biaya[${index}][hotel_ril]" min="0"
-                                    placeholder="Otomatis dihitung..." readonly
-                                    class="block w-full rounded-md border border-border-custom bg-surface-muted px-3 py-2 text-sm text-text-main focus:outline-none" />
-                            </div>
+            const categories = alatAngkutString.split(',').map(s => s.trim()).filter(s => s);
+            
+            categories.forEach(category => {
+                const safeCategory = category.replace(/[^a-zA-Z0-9]/g, '_');
+                
+                const html = `
+                    <div class="transport-category border border-border-custom rounded-lg p-4 bg-surface" data-kategori="${category}">
+                        <div class="flex items-center justify-between mb-4 pb-2 border-b border-border-custom">
+                            <h4 class="font-semibold text-text-main">${category}</h4>
+                            <button class="btn-tambah-transport inline-flex items-center justify-center px-3 py-1 text-sm font-medium border border-primary text-primary hover:bg-primary hover:text-white rounded-md transition" type="button" data-kategori="${category}" data-safe-kategori="${safeCategory}">
+                                Tambah Rute
+                            </button>
                         </div>
-                    </div>`;
-            }
-
-            /** Re-index all rows sequentially after add/remove */
-            function reindex() {
-                container.querySelectorAll('.rincian-row').forEach(function (row, i) {
-                    row.querySelectorAll('input, select').forEach(function (el) {
-                        if (el.name) {
-                            el.name = el.name.replace(/\[\d+\]/, '[' + i + ']');
-                        }
-                    });
-                });
-
-                // Show/hide delete button: hide when only 1 row
-                const rows = container.querySelectorAll('.rincian-row');
-                rows.forEach(function (row) {
-                    const btn = row.querySelector('.btn-hapus-baris');
-                    if (btn) btn.classList.toggle('hidden', rows.length === 1);
-                });
-            }
-
-            // Tambah baris baru
-            btnTambah.addEventListener('click', function () {
-                const index = container.querySelectorAll('.rincian-row').length;
-                container.insertAdjacentHTML('beforeend', buildRow(index));
-                reindex();
+                        <div class="transport-rows space-y-4" id="transport-rows-${safeCategory}">
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', html);
+                
+                // Add default row
+                addTransportRow(category, document.getElementById(`transport-rows-${safeCategory}`));
             });
+        }
 
-            // Hapus baris (delegasi event ke container)
-            container.addEventListener('click', function (e) {
-                const btn = e.target.closest('.btn-hapus-baris');
-                if (!btn) return;
-                const row = btn.closest('.rincian-row');
-                if (container.querySelectorAll('.rincian-row').length > 1) {
-                    row.remove();
-                    reindex();
+        function addTransportRow(category, rowsContainer) {
+            const index = rowsContainer.querySelectorAll('.transport-row').length;
+            const html = `
+                <div class="transport-row relative grid grid-cols-1 md:grid-cols-4 gap-4 p-3 bg-background border border-border-custom rounded-md mt-3">
+                    <button type="button" class="btn-hapus-transport absolute -top-2 -right-2 bg-danger text-white rounded-full p-1 shadow-sm hover:bg-red-600 z-10 hidden">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-xs font-semibold text-text-main">Lokasi Awal</label>
+                        <input type="text" name="rincian_biaya[transport][${category}][${index}][lokasi_awal]" required placeholder="Cth: Jakarta"
+                            class="block w-full rounded-md border border-border-custom bg-surface px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-xs font-semibold text-text-main">Lokasi Tujuan</label>
+                        <input type="text" name="rincian_biaya[transport][${category}][${index}][lokasi_tujuan]" required placeholder="Cth: Bandung"
+                            class="block w-full rounded-md border border-border-custom bg-surface px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-xs font-semibold text-text-main">Biaya (Rp)</label>
+                        <input type="number" name="rincian_biaya[transport][${category}][${index}][biaya]" min="0" required placeholder="Cth: 150000"
+                            class="block w-full rounded-md border border-border-custom bg-surface px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-xs font-semibold text-text-main">Lampiran (Opsional)</label>
+                        <input type="file" name="rincian_biaya[transport][${category}][${index}][lampiran]" accept=".pdf,.png,.jpg,.jpeg"
+                            class="block w-full text-xs text-text-main file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-primary file:text-white hover:file:bg-primary-dark" />
+                    </div>
+                </div>
+            `;
+            rowsContainer.insertAdjacentHTML('beforeend', html);
+            reindexTransportRows(rowsContainer, category);
+        }
+
+        function reindexTransportRows(rowsContainer, category) {
+            const rows = rowsContainer.querySelectorAll('.transport-row');
+            rows.forEach((row, i) => {
+                row.querySelectorAll('input').forEach(el => {
+                    if (el.name) {
+                        el.name = el.name.replace(/\[\d+\]/, '[' + i + ']');
+                    }
+                });
+                
+                const btn = row.querySelector('.btn-hapus-transport');
+                if (btn) btn.classList.toggle('hidden', rows.length === 1);
+            });
+        }
+
+        function addPenginapanRow() {
+            const container = document.getElementById('penginapan-container');
+            const index = container.querySelectorAll('.penginapan-row').length;
+            const html = `
+                <div class="penginapan-row relative grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-background border border-border-custom rounded-lg mt-3">
+                    <button type="button" class="btn-hapus-penginapan absolute -top-2 -right-2 bg-danger text-white rounded-full p-1.5 shadow-sm hover:bg-red-600 z-10 hidden">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-sm font-semibold text-text-main">Keterangan</label>
+                        <input type="text" name="rincian_biaya[penginapan][${index}][keterangan]" required placeholder="Cth: Hotel ABC"
+                            class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-sm font-semibold text-text-main">Penginapan (%)</label>
+                        <select name="rincian_biaya[penginapan][${index}][penginapan_persen]" required
+                            class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="">-- Pilih --</option>
+                            <option value="100">100%</option>
+                            <option value="30">30%</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-sm font-semibold text-text-main">Biaya Hotel (Rp)</label>
+                        <input type="number" name="rincian_biaya[penginapan][${index}][hotel_ril]" min="0" readonly placeholder="Otomatis"
+                            class="block w-full rounded-md border border-border-custom bg-surface-muted px-3 py-2 text-sm focus:outline-none" />
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-sm font-semibold text-text-main">Lampiran (Opsional)</label>
+                        <input type="file" name="rincian_biaya[penginapan][${index}][lampiran]" accept=".pdf,.png,.jpg,.jpeg"
+                            class="block w-full text-sm text-text-main file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:font-medium file:bg-primary file:text-white hover:file:bg-primary-dark" />
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+            reindexPenginapanRows();
+        }
+
+        function reindexPenginapanRows() {
+            const container = document.getElementById('penginapan-container');
+            const rows = container.querySelectorAll('.penginapan-row');
+            rows.forEach((row, i) => {
+                row.querySelectorAll('input, select').forEach(el => {
+                    if (el.name) {
+                        el.name = el.name.replace(/\[\d+\]/, '[' + i + ']');
+                    }
+                });
+                const btn = row.querySelector('.btn-hapus-penginapan');
+                if (btn) btn.classList.toggle('hidden', rows.length === 1);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const transportContainer = document.getElementById('transport-container');
+            const penginapanContainer = document.getElementById('penginapan-container');
+            const btnTambahPenginapan = document.getElementById('btn-tambah-penginapan');
+
+            // Tambah Row Transport
+            transportContainer.addEventListener('click', function (e) {
+                const btnTambah = e.target.closest('.btn-tambah-transport');
+                if (btnTambah) {
+                    const category = btnTambah.getAttribute('data-kategori');
+                    const safeCategory = btnTambah.getAttribute('data-safe-kategori');
+                    const rowsContainer = document.getElementById(`transport-rows-${safeCategory}`);
+                    addTransportRow(category, rowsContainer);
+                }
+
+                const btnHapus = e.target.closest('.btn-hapus-transport');
+                if (btnHapus) {
+                    const row = btnHapus.closest('.transport-row');
+                    const categoryContainer = row.closest('.transport-rows');
+                    const category = categoryContainer.closest('.transport-category').getAttribute('data-kategori');
+                    
+                    if (categoryContainer.querySelectorAll('.transport-row').length > 1) {
+                        row.remove();
+                        reindexTransportRows(categoryContainer, category);
+                    }
                 }
             });
 
-            // Kalkulasi penginapan saat persentase berubah
-            container.addEventListener('change', function(e) {
-                if (e.target.matches('select[name*="[penginapan]"]')) {
-                    const row = e.target.closest('.rincian-row');
-                    calculateRowPenginapan(row);
+            // Tambah Row Penginapan
+            btnTambahPenginapan.addEventListener('click', function () {
+                addPenginapanRow();
+            });
+
+            // Hapus Row Penginapan
+            penginapanContainer.addEventListener('click', function (e) {
+                const btnHapus = e.target.closest('.btn-hapus-penginapan');
+                if (btnHapus) {
+                    const row = btnHapus.closest('.penginapan-row');
+                    if (penginapanContainer.querySelectorAll('.penginapan-row').length > 1) {
+                        row.remove();
+                        reindexPenginapanRows();
+                    }
+                }
+            });
+
+            // Kalkulasi Penginapan
+            penginapanContainer.addEventListener('change', function(e) {
+                if (e.target.matches('select[name*="[penginapan_persen]"]')) {
+                    calculateRowPenginapan(e.target.closest('.penginapan-row'));
                 }
             });
             
             window.calculateRowPenginapan = function(row) {
-                const select = row.querySelector('select[name*="[penginapan]"]');
+                const select = row.querySelector('select[name*="[penginapan_persen]"]');
                 const inputHotel = row.querySelector('input[name*="[hotel_ril]"]');
                 const persentase = parseInt(select.value) || 0;
                 const rate = window.currentPenginapanRate || 0;
                 const lamaKegiatan = parseInt(document.getElementById('lama_kegiatan').value) || 0;
                 
-                // Menghitung total: rate * persentase% * (lama_kegiatan - 1)
-                // Menginap biasanya lama kegiatan - 1 hari. 
-                // Wait, default calculation might be just rate * percentage * days? 
-                // Usually hotel calculation requires user to input quantity, but for now we just do rate * percentage% * (lama_kegiatan-1) if applicable, 
-                // Let's just do rate * percentage% for 1 day first, or should we multiply by days?
-                // Let's multiply by (lamaKegiatan > 1 ? lamaKegiatan - 1 : 1) as a default, or just rate * percentage%
                 let hariMenginap = lamaKegiatan > 1 ? lamaKegiatan - 1 : 1;
                 if (lamaKegiatan === 0) hariMenginap = 1; // fallback
                 
                 const total = Math.round((rate * (persentase / 100)) * hariMenginap);
                 inputHotel.value = total > 0 ? total : '';
             }
-            
-            window.calculateAllPenginapan = function() {
-                container.querySelectorAll('.rincian-row').forEach(row => {
-                    calculateRowPenginapan(row);
-                });
-            }
-
-            // Inisialisasi: tampilkan tombol hapus hanya jika lebih dari 1
-            reindex();
-        })();
+        });
     </script>
 </x-layout.app>
