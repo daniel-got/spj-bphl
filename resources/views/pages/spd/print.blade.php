@@ -40,7 +40,10 @@
         tr[style*="56.25pt"] {
             height: 5pt !important;
         }
-
+        /* Shrink empty spacer rows to save vertical space so it fits exactly on 2 pages */
+        tr[style*="8.9pt"] { height: 2pt !important; }
+        tr[style*="9.3pt"] { height: 2pt !important; }
+        
         td,
         span,
         div,
@@ -65,6 +68,8 @@
         .labelrow {
             display: flex;
             width: 100%;
+            position: relative;
+            top: 2px;
         }
         .labelrow .label-col {
             flex: 0 0 75pt;
@@ -75,13 +80,15 @@
             flex: 1 0 auto;
             white-space: nowrap;
             overflow: hidden;
+            position: relative;
+            top: 1px;
         }
 
         .sheet {
             page-break-after: always !important;
             page-break-inside: avoid !important;
             width: 100%;
-            overflow: hidden;
+            overflow: visible;
             box-sizing: border-box;
         }
 
@@ -143,8 +150,8 @@
 
             /* Use vh to adapt exactly to the printable area of the physical page without overflowing */
             body.paper-a4 .sheet {
-                height: 99vh;
-                max-height: 99vh;
+                /* height: 280mm; */
+                /* max-height: 280mm; */
             }
 
             body.paper-a4 * {
@@ -161,8 +168,8 @@
             }
 
             body.paper-f4 .sheet {
-                height: 99vh;
-                max-height: 99vh;
+                /* height: 310mm; */
+                /* max-height: 310mm; */
             }
 
             body.paper-f4 * {
@@ -2320,7 +2327,7 @@
                     <td
                         style="border-left:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                         c.
-                        <span class="print-value">{{ $spd->tgl_kembali ? \Carbon\Carbon::parse($spd->tgl_kembali)->locale('id')->translatedFormat('d F Y') : '-' }}</span>
+                        <span class="print-value">{{ $spd->tgl_kembali ? \Carbon\Carbon::parse($spd->tgl_kembali)->locale('id')->translatedFormat('d F Y') : '' }}</span>
                     </td>
                     <td colspan="4"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
@@ -3062,7 +3069,7 @@
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        a. Instansi </td>
+                        <span style="position: relative; top: -15px;"> a. Instansi </span></td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -3083,7 +3090,7 @@
                     </td>
                     <td
                         style="border-left:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        a. BPHL Wilayah IV Jambi</td>
+                                                <span style="position: relative; top: -15px;"> a. BPHL Wilayah IV Jambi</span></td></td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -3186,13 +3193,13 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:10pt;">
                     <td
                         style="border-bottom:0.75pt solid #000;border-right:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:middle;white-space:nowrap;overflow:visible;">
-                        b. Akun</td>
+                        <span style="position: relative; top: -17px;">b. Akun</span></td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -3213,7 +3220,7 @@
                     </td>
                     <td
                         style="border-bottom:0.75pt solid #000;border-left:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:middle;white-space:nowrap;overflow:visible;">
-                        b. <span class="print-value">{{ $spd->kode_mak }}</span></td>
+                        <span style="position: relative; top: -17px;">b. <span class="print-value">{{ $spd->kode_mak }}</span></span></td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:middle;white-space:nowrap;overflow:visible;">
                     </td>
@@ -3721,7 +3728,7 @@
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        <span class="print-value">{{ $spd->exists ? ($spd->ppk ?? 'Pejabat Pembuat Komitmen') : '' }}</span></td>
+                        <span class="print-value" style="position: relative; top: -10px;">{{ $spd->exists ? ($spd->ppk ?? 'Pejabat Pembuat Komitmen') : '' }}</span></td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -3916,7 +3923,7 @@
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        <span class="print-value">{{ $spd->nama_ppk }}</span></td>
+                        <span class="print-value" style="position: relative; top: 10px; ">{{ $spd->nama_ppk }}</span></td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -3981,7 +3988,7 @@
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        @if($spd->nip_ppk)<span class="print-value">NIP. {{ $spd->nip_ppk }}</span>@endif</td>
+                        <span style="position: relative; top: 8px;">@if($spd->nip_ppk)<span class="print-value">NIP. {{ $spd->nip_ppk }}</span>@endif</span></td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4695,7 +4702,7 @@
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <span style="padding-left: 3.5em; text-decoration: underline;"><span class="print-value">{{ $spd->kepala_seksi_nama }}</span></span>
+                        <span style="padding-left: 3.5em; text-decoration: underline; position: relative; top: 5px;"><span class="print-value">{{ $spd->kepala_seksi_nama }}</span></span>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -4755,7 +4762,7 @@
                     </td>
                     <td colspan="3"
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <span style="padding-left: 3.5em;">@if($spd->kepala_seksi_nip)<span class="print-value">NIP. {{ $spd->kepala_seksi_nip }}</span>@endif</span>
+                        <span style="padding-left: 3.5em; position: relative; top: 1px;">@if($spd->kepala_seksi_nip)<span class="print-value">NIP. {{ $spd->kepala_seksi_nip }}</span>@endif</span>
                     </td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -4919,7 +4926,7 @@
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                                             {{--kolom kanan untuk kepulangan--}}
-                        <div class="labelrow"><span class="label-col">Pada Tanggal</span><span class="value-col">:<span class="print-value">{{ $spd->tgl_kembali ? \Carbon\Carbon::parse($spd->tgl_kembali)->locale('id')->translatedFormat('d F Y') : '-' }}</span></span></div>
+                        <div class="labelrow"><span class="label-col">Pada Tanggal</span><span class="value-col">:<span class="print-value">{{ $spd->tgl_kembali ? \Carbon\Carbon::parse($spd->tgl_kembali)->locale('id')->translatedFormat('d F Y') : '' }}</span></span></div>
                     </td>
                     <td colspan="5"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
@@ -5211,7 +5218,7 @@
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <span style="padding-left: 3.5em; text-decoration: underline;"><span class="print-value">{{ $spd->pejabat_instansi_perusahaan_nama }}</span></span>
+                        <span style="padding-left: 3.5em; text-decoration: underline; position: relative; top: 3px;"><span class="print-value">{{ $spd->pejabat_instansi_perusahaan_nama }}</span></span>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5230,7 +5237,7 @@
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <span style="padding-left: 3.5em; text-decoration: underline;"><span class="print-value">{{ $spd->pejabat_instansi_perusahaan_nama }}</span></span>
+                        <span style="padding-left: 3.5em; text-decoration: underline; position: relative; top: 3px;"><span class="print-value">{{ $spd->pejabat_instansi_perusahaan_nama }}</span></span>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5266,7 +5273,7 @@
                     </td>
                     <td colspan="3"
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        @if($spd->pejabat_instansi_perusahaan_nip)<span style="padding-left: 3.5em;"><span class="print-value">NIP. {{ $spd->pejabat_instansi_perusahaan_nip }}</span></span>@endif
+                        @if($spd->pejabat_instansi_perusahaan_nip)<span style="padding-left: 3.5em; position: relative; top: 1px;"><span class="print-value">NIP. {{ $spd->pejabat_instansi_perusahaan_nip }}</span></span>@endif
                     </td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5285,7 +5292,7 @@
                     </td>
                     <td colspan="3"
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        @if($spd->pejabat_instansi_perusahaan_nip)<span style="padding-left: 3.5em;"><span class="print-value">NIP. {{ $spd->pejabat_instansi_perusahaan_nip }}</span></span>@endif
+                        @if($spd->pejabat_instansi_perusahaan_nip)<span style="padding-left: 3.5em; position: relative; top: 1px;"><span class="print-value">NIP. {{ $spd->pejabat_instansi_perusahaan_nip }}</span></span>@endif
                     </td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -7119,7 +7126,7 @@
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
                     </td>
                     <td colspan="12" rowspan="3"
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:normal;overflow:visible;">
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:top;text-align:left;white-space:normal;overflow:visible;">
                         Telah diperiksa keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk
                         kepentingan jabatan dan waktu yang sesingkat-singkatnya.</td>
                 </tr>
@@ -7159,7 +7166,7 @@
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
                         <div class="labelrow"><span class="label-col">Pada Tgl.</span><span class="value-col">:
-                                <span class="print-value">{{ $spd->tgl_kembali ? \Carbon\Carbon::parse($spd->tgl_kembali)->locale('id')->translatedFormat('d F Y') : '-' }}</span></span></div>
+                                <span class="print-value">{{ $spd->tgl_kembali ? \Carbon\Carbon::parse($spd->tgl_kembali)->locale('id')->translatedFormat('d F Y') :'' }}</span></span></div>
                     </td>
                     <td
                         style="font-size:10.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
@@ -7237,13 +7244,13 @@
                     </td>
                     <td colspan="5"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
-                        <span class="print-value">{{ $spd->nama_ppk }}</span></td>
+                        <span style="position: relative; top: -5px;"><span class="print-value">{{ $spd->nama_ppk }}</span></span></td>
                     <td colspan="2"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                     <td colspan="10"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        <span class="print-value">{{ $spd->nama_ppk }}</span></td>
+                        <span style="position: relative; top: -5px;"><span class="print-value">{{ $spd->nama_ppk }}</span></span></td>
                 </tr>
                 <tr style="height:14.4pt;">
                     <td
@@ -7254,13 +7261,13 @@
                     </td>
                     <td colspan="5"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
-                        @if($spd->nip_ppk)<span class="print-value">NIP. {{ $spd->nip_ppk }}</span>@endif</td>
+                        @if($spd->nip_ppk) <span style="position: relative; top: -5px;"><span class="print-value">NIP. {{ $spd->nip_ppk }}</span></span>@endif</td>
                     <td colspan="2"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                     <td colspan="10"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        @if($spd->nip_ppk)<span class="print-value">NIP. {{ $spd->nip_ppk }}</span>@endif</td>
+                        @if($spd->nip_ppk) <span style="position: relative; top: -5px;"><span class="print-value">NIP. {{ $spd->nip_ppk }}</span></span>@endif</td>
                 </tr>
                 <tr style="height:9.3pt;">
                     <td
