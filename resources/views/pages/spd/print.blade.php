@@ -111,7 +111,7 @@
         body.values-only {
             color: transparent !important;
         }
-        
+
         body.values-only table,
         body.values-only tr,
         body.values-only td,
@@ -703,8 +703,9 @@
                     <td
                         style="border-right:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
-                    <td
-                        style="border-left:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
+                    <td colspan="8" rowspan="2"
+                        style="border-left:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:middle;text-align:left;white-space:nowrap;overflow:visible;padding-left:10px !important;">
+                        <span class="print-value">{{ $spd->nama_ppk }}</span> / @if($spd->nip_ppk)<span class="print-value">NIP. {{ $spd->nip_ppk }}</span>@endif
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
