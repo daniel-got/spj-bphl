@@ -37,14 +37,19 @@
         }
 
         /* Override the extremely tall signature spacer rows from Excel template */
-        tr[style*="56.25pt"] {
+        .sheet-1 tr[style*="56.25pt"] {
             height: 35pt !important;
         }
+        .sheet-2 tr[style*="56.25pt"] {
+            height: 25pt !important;
+        }
         /* Give text rows roughly 2px extra height to make them less tight */
-        tr[style*="14.4pt"] { height: 15pt !important; }
-        tr[style*="14.25pt"] { height: 15pt !important; }
+        .sheet-1 tr[style*="14.4pt"] { height: 17.5pt !important; }
+        .sheet-1 tr[style*="14.25pt"] { height: 17.5pt !important; }
+        .sheet-2 tr[style*="14.4pt"] { height: 15pt !important; }
+        .sheet-2 tr[style*="14.25pt"] { height: 15pt !important; }
         /* Shrink empty spacer rows to save vertical space so it fits exactly on 2 pages */
-        tr[style*="8.9pt"] { height: 7pt !important; }
+        tr[style*="8.9pt"] { height: 5pt !important; }
         tr[style*="9.3pt"] { height: 2pt !important; }
 
         td,
@@ -162,9 +167,7 @@
                 padding: 1.5px 3px !important;
             }
 
-            body.paper-a4 tr[style*="56.25pt"] {
-                height: 5pt !important;
-            }
+            body.paper-a4 .sheet-1 tr[style*="56.25pt"] { height: 35pt !important; } body.paper-a4 .sheet-2 tr[style*="56.25pt"] { height: 25pt !important; }
 
             body.paper-f4 .sheet {
                 /* height: 310mm; */
@@ -180,9 +183,7 @@
                 padding: 1.5px 3px !important;
             }
 
-            body.paper-f4 tr[style*="56.25pt"] {
-                height: 5pt !important;
-            }
+            body.paper-f4 .sheet-1 tr[style*="56.25pt"] { height: 35pt !important; } body.paper-f4 .sheet-2 tr[style*="56.25pt"] { height: 25pt !important; }
         }
     </style>
 </head>
@@ -205,7 +206,7 @@
         <p style="font-size: 12px; color: #64748b; margin-top: 8px;">Pilih ukuran kertas sebelum mencetak. Jendela cetak
             akan otomatis terbuka.</p>
     </div>
-    <div class="sheet">
+    <div class="sheet sheet-1">
         <table>
             <colgroup>
                 <col style="width:3.4177%;" />
@@ -4020,7 +4021,7 @@
             </tbody>
         </table>
     </div>
-    <div class="sheet">
+    <div class="sheet sheet-2">
         <table>
             <colgroup>
                 <col style="width:3.4177%;" />
