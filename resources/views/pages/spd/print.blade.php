@@ -100,6 +100,9 @@
         body.values-only {
             color: transparent !important;
         }
+        body.values-only table {
+            transform: translateY(-2px);
+        }
         body.values-only table,
         body.values-only tr,
         body.values-only td,
@@ -676,7 +679,7 @@
                         1. </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        <span class="print-value">{{ $spd->ppk ?? 'Pejabat Pembuat Komitmen' }}</span></td>
+                        <span class="print-value">{{ $spd->exists ? ($spd->ppk ?? 'Pejabat Pembuat Komitmen') : '' }}</span></td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -827,7 +830,7 @@
                     </td>
                     <td colspan="8" rowspan="2"
                         style="border-top:0.75pt solid #000;border-bottom:0.75pt solid #000;border-left:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:middle;text-align:left;white-space:nowrap;overflow:visible;">
-                        <span class="print-value">{{ $spd->pegawai_ditugaskan }}</span> / NIP. <span class="print-value">{{ $spd->nip_pegawai }}</span></td>
+                        <span class="print-value">{{ $spd->pegawai_ditugaskan }}</span> / @if($spd->nip_pegawai)<span class="print-value">NIP. {{ $spd->nip_pegawai }}</span>@endif</td>
                     <td rowspan="2"
                         style="border-top:0.75pt solid #000;border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:middle;text-align:center;white-space:nowrap;overflow:visible;">
                     </td>
@@ -953,7 +956,7 @@
                     </td>
                     <td
                         style="border-left:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        a. <span class="print-value">{{ $spd->pangkat_pegawai ?? '-' }}</span></td>
+                        a. <span class="print-value">{{ $spd->exists ? ($spd->pangkat_pegawai ?? '-') : '' }}</span></td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -1083,7 +1086,7 @@
                     </td>
                     <td
                         style="border-left:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        b. <span class="print-value">{{ $spd->jabatan_pegawai ?? '-' }}</span></td>
+                        b. <span class="print-value">{{ $spd->exists ? ($spd->jabatan_pegawai ?? '-') : '' }}</span></td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -3718,7 +3721,7 @@
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        <span class="print-value">{{ $spd->ppk ?? 'Pejabat Pembuat Komitmen' }}</span></td>
+                        <span class="print-value">{{ $spd->exists ? ($spd->ppk ?? 'Pejabat Pembuat Komitmen') : '' }}</span></td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -3978,7 +3981,7 @@
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        NIP. <span class="print-value">{{ $spd->nip_ppk }}</span></td>
+                        @if($spd->nip_ppk)<span class="print-value">NIP. {{ $spd->nip_ppk }}</span>@endif</td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4752,7 +4755,7 @@
                     </td>
                     <td colspan="3"
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <span style="padding-left: 3.5em;">NIP. <span class="print-value">{{ $spd->kepala_seksi_nip }}</span></span>
+                        <span style="padding-left: 3.5em;">@if($spd->kepala_seksi_nip)<span class="print-value">NIP. {{ $spd->kepala_seksi_nip }}</span>@endif</span>
                     </td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5263,7 +5266,7 @@
                     </td>
                     <td colspan="3"
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        @if($spd->pejabat_instansi_perusahaan_nip)<span style="padding-left: 3.5em;">NIP. <span class="print-value">{{ $spd->pejabat_instansi_perusahaan_nip }}</span></span>@endif
+                        @if($spd->pejabat_instansi_perusahaan_nip)<span style="padding-left: 3.5em;"><span class="print-value">NIP. {{ $spd->pejabat_instansi_perusahaan_nip }}</span></span>@endif
                     </td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5282,7 +5285,7 @@
                     </td>
                     <td colspan="3"
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        @if($spd->pejabat_instansi_perusahaan_nip)<span style="padding-left: 3.5em;">NIP. <span class="print-value">{{ $spd->pejabat_instansi_perusahaan_nip }}</span></span>@endif
+                        @if($spd->pejabat_instansi_perusahaan_nip)<span style="padding-left: 3.5em;"><span class="print-value">NIP. {{ $spd->pejabat_instansi_perusahaan_nip }}</span></span>@endif
                     </td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -7183,13 +7186,13 @@
                     </td>
                     <td colspan="5"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
-                        <span class="print-value">{{ $spd->ppk ?? 'Pejabat Pembuat Komitmen' }}</span></td>
+                        <span class="print-value">{{ $spd->exists ? ($spd->ppk ?? 'Pejabat Pembuat Komitmen') : '' }}</span></td>
                     <td colspan="2"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                     <td colspan="10"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        <span class="print-value">{{ $spd->ppk ?? 'Pejabat Pembuat Komitmen' }}</span></td>
+                        <span class="print-value">{{ $spd->exists ? ($spd->ppk ?? 'Pejabat Pembuat Komitmen') : '' }}</span></td>
                 </tr>
                 <tr style="height:56.25pt;">
                     <td
@@ -7251,13 +7254,13 @@
                     </td>
                     <td colspan="5"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
-                        NIP. <span class="print-value">{{ $spd->nip_ppk }}</span></td>
+                        @if($spd->nip_ppk)<span class="print-value">NIP. {{ $spd->nip_ppk }}</span>@endif</td>
                     <td colspan="2"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                     <td colspan="10"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        NIP. <span class="print-value">{{ $spd->nip_ppk }}</span></td>
+                        @if($spd->nip_ppk)<span class="print-value">NIP. {{ $spd->nip_ppk }}</span>@endif</td>
                 </tr>
                 <tr style="height:9.3pt;">
                     <td
