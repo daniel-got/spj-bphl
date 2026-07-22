@@ -78,10 +78,80 @@
                 @else
                     <div class="h-px bg-border-custom my-4 mx-2"></div>
                 @endif
+            @elseif (isset($item['sub_items']))
+                @php
+                    $isActive = false;
+                    foreach($item['sub_items'] as $subItem) {
+                        $pattern = ltrim($subItem['url'], '/') ?: '/';
+                        if (request()->is($pattern) || request()->is($pattern . '/*')) {
+                            $isActive = true;
+                            break;
+                        }
+                    }
+                @endphp
+                <div x-data="{ open: {{ $isActive ? 'true' : 'false' }} }">
+                    <button
+                        @click="open = !open"
+                        class="w-full flex items-center justify-between gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
+                            {{ $isActive ? 'bg-primary/10 text-primary' : 'text-muted hover:bg-primary-light hover:text-primary' }}"
+                        title="{{ $collapsed ? $item['label'] : '' }}"
+                    >
+                        <span class="flex items-center gap-3">
+                            @if (isset($item['icon']))
+                                <x-utility.icon :name="$item['icon']" class="w-5 h-5 shrink-0" />
+                            @endif
+                            @if (!$collapsed)
+                                <span class="truncate">{{ $item['label'] }}</span>
+                            @endif
+                        </span>
+                        @if (!$collapsed)
+                            <x-utility.icon
+                                name="chevron-down"
+                                class="w-4 h-4 shrink-0 transition-transform duration-200"
+                                ::class="open ? 'rotate-180' : ''"
+                            />
+                        @endif
+                    </button>
+
+                    @if (!$collapsed)
+                    <div
+                        x-show="open"
+                        x-transition:enter="transition ease-out duration-150"
+                        x-transition:enter-start="opacity-0 -translate-y-1"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100 translate-y-0"
+                        x-transition:leave-end="opacity-0 -translate-y-1"
+                        class="mt-1 ml-4 pl-3 border-l-2 border-primary-light space-y-0.5"
+                    >
+                        @foreach ($item['sub_items'] as $subItem)
+                            @php
+                                $pattern = ltrim($subItem['url'], '/') ?: '/';
+                                $isSubActive = request()->is($pattern) || request()->is($pattern . '/*');
+                            @endphp
+                            <a href="{{ $subItem['url'] ?? '#' }}"
+                                class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
+                                    {{ $isSubActive ? 'bg-primary/10 text-primary font-semibold' : 'text-muted hover:bg-primary-light hover:text-primary' }}">
+                                @if (isset($subItem['icon']))
+                                    <x-utility.icon :name="$subItem['icon']" class="w-4 h-4 shrink-0" />
+                                @endif
+                                <span>{{ $subItem['label'] }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                    @endif
+                </div>
             @else
+                @php
+                    $pattern = isset($item['url']) ? ltrim($item['url'], '/') : '';
+                    $isActive = $item['active'] ?? false;
+                    if ($pattern && (request()->is($pattern) || request()->is($pattern . '/*'))) {
+                        $isActive = true;
+                    }
+                @endphp
                 <a href="{{ $item['url'] ?? '#' }}" title="{{ $collapsed ? $item['label'] : '' }}"
                     class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
-                        {{ $item['active'] ?? false ? 'bg-primary text-white' : 'text-muted hover:bg-primary-light hover:text-primary' }}">
+                        {{ $isActive ? 'bg-primary text-white' : 'text-muted hover:bg-primary-light hover:text-primary' }}">
                     @if (isset($item['icon']))
                         <x-utility.icon :name="$item['icon']" class="w-5 h-5 shrink-0" />
                     @endif

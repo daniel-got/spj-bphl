@@ -110,7 +110,7 @@
                         Batal
                     </a>
                     <x-action.button-primary type="submit">
-                        Simpan Perubahan
+                        Simpan dan Buat kwitansi
                     </x-action.button-primary>
                 </div>
             </form>

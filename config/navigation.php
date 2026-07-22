@@ -62,9 +62,20 @@ return [
         ],
         [
             'label' => 'Rincian Saya',
-            'url' => '/user/rincian',
             'icon' => 'calculator',
             'roles' => ['admin', 'user', 'ppk_1', 'ppk_2', 'ppk_3', 'bendahara_pengeluaran', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
+            'sub_items' => [
+                [
+                    'label' => 'Rincian Biaya',
+                    'url' => '/user/rincian',
+                    'icon' => 'table-cells',
+                ],
+                [
+                    'label' => 'Kwitansi Saya',
+                    'url' => '/user/kwitansi',
+                    'icon' => 'document-check',
+                ],
+            ]
         ],
 
         // --- GRUP: OPERASIONAL (Input & Verifikasi) ---

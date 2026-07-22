@@ -58,6 +58,11 @@ class Rincian extends Model
         return $this->belongsTo(User::class, 'verifikator_id');
     }
 
+    public function kwitansi()
+    {
+        return $this->hasOne(Kwitansi::class, 'rincian_id');
+    }
+
     // -------------------------------------------------------------------------
     // Accessors untuk kolom virtual dari relasi SPD
     // -------------------------------------------------------------------------

@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('data_uang_harian', function (Blueprint $table) {
+        Schema::create('kwitansis', function (Blueprint $table) {
             $table->id();
-            $table->string('provinsi')->unique();
-            $table->integer('luar_kota')->default(0);
-            $table->integer('dalam_kota_lebih_8_jam')->default(0);
-            $table->integer('diklat')->default(0);
+            $table->foreignId('rincian_id')->constrained('data_rincian')->onDelete('cascade');
+            $table->string('nomor_kwitansi');
+            $table->text('untuk_pembayaran')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('data_uang_harian');
+        Schema::dropIfExists('kwitansis');
     }
 };

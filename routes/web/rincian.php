@@ -13,4 +13,10 @@ Route::middleware(['auth'])
         Route::get('rincian/{rincian}/print-lampiran', [RincianController::class, 'printLampiran'])->name('rincian.printLampiran');
         Route::post('rincian/{rincian}/submit', [RincianController::class, 'submit'])->name('rincian.submit');
         Route::resource('rincian', RincianController::class);
+
+        // Kwitansi Routes
+        Route::get('kwitansi', [\App\Http\Controllers\Kwitansi\KwitansiController::class, 'index'])->name('kwitansi.index');
+        Route::get('kwitansi/{kwitansi}/edit', [\App\Http\Controllers\Kwitansi\KwitansiController::class, 'edit'])->name('kwitansi.edit');
+        Route::put('kwitansi/{kwitansi}', [\App\Http\Controllers\Kwitansi\KwitansiController::class, 'update'])->name('kwitansi.update');
+        Route::get('kwitansi/{kwitansi}/print', [\App\Http\Controllers\Kwitansi\KwitansiController::class, 'print'])->name('kwitansi.print');
     });

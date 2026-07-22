@@ -3,6 +3,8 @@
     $isPembuatSptMenuOpen = request()->routeIs('pembuat_spt.*')
         || request()->routeIs('user.spt.create')
         || request()->routeIs('user.spt.edit');
+    $isRincianMenuOpen = request()->routeIs('user.rincian.*')
+        || request()->routeIs('user.kwitansi.*');
 @endphp
 
 <aside class="bg-surface border-r border-border-custom flex flex-col sticky top-0 h-screen w-64 transition-all duration-300">
@@ -117,13 +119,48 @@
             <span class="truncate">Data SPD</span>
         </a>
 
-        {{-- Data Rincian --}}
-        <a href="{{ route('user.rincian.index') }}"
-            class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
-                {{ request()->routeIs('user.rincian.*') ? 'bg-primary text-white' : 'text-muted hover:bg-primary-light hover:text-primary' }}">
-            <x-utility.icon name="document-text" class="w-5 h-5 shrink-0" />
-            <span class="truncate">Data Rincian</span>
-        </a>
+        {{-- Rincian Saya Dropdown --}}
+        <div x-data="{ open: {{ $isRincianMenuOpen ? 'true' : 'false' }} }">
+            <button
+                @click="open = !open"
+                class="w-full flex items-center justify-between gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
+                    {{ $isRincianMenuOpen ? 'bg-primary/10 text-primary' : 'text-muted hover:bg-primary-light hover:text-primary' }}"
+            >
+                <span class="flex items-center gap-3">
+                    <x-utility.icon name="document-text" class="w-5 h-5 shrink-0" />
+                    <span class="truncate">Rincian Saya</span>
+                </span>
+                <x-utility.icon
+                    name="chevron-down"
+                    class="w-4 h-4 shrink-0 transition-transform duration-200"
+                    ::class="open ? 'rotate-180' : ''"
+                />
+            </button>
+
+            <div
+                x-show="open"
+                x-transition:enter="transition ease-out duration-150"
+                x-transition:enter-start="opacity-0 -translate-y-1"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100 translate-y-0"
+                x-transition:leave-end="opacity-0 -translate-y-1"
+                class="mt-1 ml-4 pl-3 border-l-2 border-primary-light space-y-0.5"
+            >
+                <a href="{{ route('user.rincian.index') }}"
+                    class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
+                        {{ request()->routeIs('user.rincian.*') ? 'bg-primary/10 text-primary font-semibold' : 'text-muted hover:bg-primary-light hover:text-primary' }}">
+                    <x-utility.icon name="table-cells" class="w-4 h-4 shrink-0" />
+                    <span>Rincian Biaya</span>
+                </a>
+                <a href="{{ route('user.kwitansi.index') }}"
+                    class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150
+                        {{ request()->routeIs('user.kwitansi.*') ? 'bg-primary/10 text-primary font-semibold' : 'text-muted hover:bg-primary-light hover:text-primary' }}">
+                    <x-utility.icon name="document-check" class="w-4 h-4 shrink-0" />
+                    <span>Kwitansi Saya</span>
+                </a>
+            </div>
+        </div>
 
     </nav>
 

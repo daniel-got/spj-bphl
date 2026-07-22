@@ -3,6 +3,7 @@
 namespace App\Services\Rincian;
 
 use App\Models\Pegawai;
+use App\Models\Kwitansi;
 use App\Models\Rincian;
 use App\Models\Spd;
 use App\Models\UangHarian;
@@ -149,6 +150,8 @@ class RincianService
 
             session()->flash('success', 'Rincian biaya berhasil disimpan sebagai Draft.');
 
+            $this->generateKwitansi($rincian);
+
             return $rincian;
         });
     }
@@ -179,6 +182,8 @@ class RincianService
             }
 
             $rincian->update($updateData);
+
+            $this->generateKwitansi($rincian);
 
             return $rincian;
         });
@@ -452,5 +457,41 @@ class RincianService
         }
 
         return (int) $rate;
+    }
+
+    private function generateKwitansi(Rincian $rincian)
+    {
+        $nomorSpd = $rincian->spd?->nomor_spd ?? '000';
+        $tahun = date('Y');
+        $nomorKwitansi = "{$nomorSpd}/kw/693523/{$tahun}";
+        
+        $golongan = $rincian->spd?->pegawai?->golongan ?? '-';
+        $tujuan = $rincian->spd?->spt?->tujuan_kegiatan ?? '-';
+        $sptNomor = $rincian->spd?->spt?->nomor_surat ?? '-';
+        
+        $sptTanggal = '-';
+        if ($rincian->spd?->spt?->tanggal_surat) {
+            $sptTanggal = \Carbon\Carbon::parse($rincian->spd->spt->tanggal_surat)->translatedFormat('d F Y');
+        }
+        
+        $spdTanggal = '-';
+        if ($rincian->spd?->tgl_spd) {
+            $spdTanggal = \Carbon\Carbon::parse($rincian->spd->tgl_spd)->translatedFormat('d F Y');
+        }
+
+        $defaultUntukPembayaran = "Biaya Perjalanan Dinas {$golongan} dalam rangka {$tujuan} Tugas Nomor : {$sptNomor} tanggal {$sptTanggal} dan SPD Nomor : {$nomorSpd} tanggal {$spdTanggal}. (Rincian terlampir)";
+
+        $kwitansi = Kwitansi::where('rincian_id', $rincian->id)->first();
+        if ($kwitansi) {
+            $kwitansi->update([
+                'nomor_kwitansi' => $nomorKwitansi,
+            ]);
+        } else {
+            Kwitansi::create([
+                'rincian_id' => $rincian->id,
+                'nomor_kwitansi' => $nomorKwitansi,
+                'untuk_pembayaran' => $defaultUntukPembayaran,
+            ]);
+        }
     }
 }
