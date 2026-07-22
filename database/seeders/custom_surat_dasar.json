@@ -18,5 +18,20 @@
         "teks": "AYAM BAKAR",
         "jenis_spt": "pelatihan",
         "aktif": true
+    },
+    {
+        "teks": "test",
+        "jenis_spt": "keuangan",
+        "aktif": true
+    },
+    {
+        "teks": "main",
+        "jenis_spt": "keuangan",
+        "aktif": true
+    },
+    {
+        "teks": "keren",
+        "jenis_spt": "keuangan",
+        "aktif": true
     }
 ]

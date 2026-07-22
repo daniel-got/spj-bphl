@@ -41,7 +41,7 @@
             height: 35pt !important;
         }
         .sheet-2 tr[style*="56.25pt"] {
-            height: 25pt !important;
+            height: 42pt !important;
         }
         /* Give text rows roughly 2px extra height to make them less tight */
         .sheet-1 tr[style*="14.4pt"] { height: 17.5pt !important; }
@@ -165,7 +165,7 @@
                 padding: 1.5px 3px !important;
             }
 
-            body.paper-a4 .sheet-1 tr[style*="56.25pt"] { height: 35pt !important; } body.paper-a4 .sheet-2 tr[style*="56.25pt"] { height: 25pt !important; }
+            body.paper-a4 .sheet-1 tr[style*="56.25pt"] { height: 35pt !important; } body.paper-a4 .sheet-2 tr[style*="56.25pt"] { height: 42pt !important; }
 
             body.paper-f4 .sheet {
                 /* height: 310mm; */
@@ -181,7 +181,7 @@
                 padding: 1.5px 3px !important;
             }
 
-            body.paper-f4 .sheet-1 tr[style*="56.25pt"] { height: 35pt !important; } body.paper-f4 .sheet-2 tr[style*="56.25pt"] { height: 25pt !important; }
+            body.paper-f4 .sheet-1 tr[style*="56.25pt"] { height: 35pt !important; } body.paper-f4 .sheet-2 tr[style*="56.25pt"] { height: 42pt !important; }
         }
     </style>
 </head>
@@ -4046,7 +4046,7 @@
                 <col style="width:7.5760%;" />
             </colgroup>
             <tbody>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4111,7 +4111,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4173,7 +4173,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4238,7 +4238,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4292,7 +4292,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4353,7 +4353,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4413,7 +4413,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4478,7 +4478,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4543,7 +4543,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4608,7 +4608,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4673,7 +4673,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4733,7 +4733,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4793,14 +4793,14 @@
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                         II.</td>
                     <td colspan="3"
                         style="border-top:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
                         <div class="labelrow"><span class="label-col">Tiba di</span><span class="value-col">:
-                                                            <span class="print-value">{{ is_array($spd->tempat_tujuan) ? implode(', ', $spd->tempat_tujuan) : $spd->tempat_tujuan }}</span></span>
+                                                            <span class="print-value">{{ !empty($spd->destinasi[0]['tiba_di']) ? $spd->destinasi[0]['tiba_di'] : (is_array($spd->tempat_tujuan) ? implode(', ', $spd->tempat_tujuan) : $spd->tempat_tujuan) }}</span></span>
 </span></div>
                     </td>
                     <td
@@ -4822,7 +4822,7 @@
                     <td colspan="3"
                         style="border-top:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
                         <div class="labelrow"><span class="label-col">Berangkat dari</span><span class="value-col">:
-                                                            <span class="print-value">{{ is_array($spd->tempat_tujuan) ? implode(', ', $spd->tempat_tujuan) : $spd->tempat_tujuan }}</span></span>
+                                                            <span class="print-value">{{ !empty($spd->destinasi[0]['berangkat_dari']) ? $spd->destinasi[0]['berangkat_dari'] : (is_array($spd->tempat_tujuan) ? implode(', ', $spd->tempat_tujuan) : $spd->tempat_tujuan) }}</span></span>
 </span></div>
                     </td>
                     <td
@@ -4853,7 +4853,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -4861,7 +4861,7 @@
 
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Pada Tgl.</span><span class="value-col">: <span class="print-value">{{ $spd->tgl_berangkat ? \Carbon\Carbon::parse($spd->tgl_berangkat)->locale('id')->translatedFormat('d F Y') : '-' }}</span></span></div>
+                        <div class="labelrow"><span class="label-col">Pada Tgl.</span><span class="value-col">: <span class="print-value">{{ !empty($spd->destinasi[0]['tgl_tiba']) ? \Carbon\Carbon::parse($spd->destinasi[0]['tgl_tiba'])->locale('id')->translatedFormat('d F Y') : ($spd->tgl_berangkat ? \Carbon\Carbon::parse($spd->tgl_berangkat)->locale('id')->translatedFormat('d F Y') : '-') }}</span></span></div>
                     </td>
                     <td colspan="2"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
@@ -4879,7 +4879,7 @@
 
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Ke</span><span class="value-col">:<span class="print-value">{{ is_array($spd->berangkat_dari) ? implode(', ', $spd->berangkat_dari) : $spd->berangkat_dari }}</span></span></div>
+                        <div class="labelrow"><span class="label-col">Ke</span><span class="value-col">:<span class="print-value">{{ !empty($spd->destinasi[0]['tujuan_selanjutnya']) ? $spd->destinasi[0]['tujuan_selanjutnya'] : (is_array($spd->berangkat_dari) ? implode(', ', $spd->berangkat_dari) : $spd->berangkat_dari) }}</span></span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -4916,7 +4916,7 @@
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
                         {{--Berisi inputan siapa kepala yang ditemui di tempat tujuan / Pejabat Instansi/ Perusahaan--}}
-                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">:<span class="print-value">{{ $spd->pejabat_instansi_perusahaan }}</span></span></div>
+                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">:<span class="print-value">{{ $spd->destinasi[0]["pejabat_jabatan"] ?? "" }}</span></span></div>
                     </td>
                     <td colspan="4" rowspan="2"
                         style="font-size:11.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:normal;overflow:visible;">
@@ -4965,7 +4965,7 @@
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                                             {{--kolom kanan untuk kepulangan--}}
 
-                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">: <span class="print-value">{{ $spd->pejabat_instansi_perusahaan }}</span></span></div>
+                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">: <span class="print-value">{{ $spd->destinasi[0]["pejabat_jabatan"] ?? "" }}</span></span></div>
                     </td>
                     <td colspan="1" rowspan="2"
                         style="font-size:11.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:normal;overflow:visible;">
@@ -4977,7 +4977,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -5018,7 +5018,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -5083,7 +5083,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -5148,7 +5148,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -5213,13 +5213,13 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <span style="padding-left: 3.5em; text-decoration: underline; "><span class="print-value">{{ $spd->pejabat_instansi_perusahaan_nama }}</span></span>
+                        <span style="padding-left: 3.5em; text-decoration: underline; "><span class="print-value">{{ $spd->destinasi[0]["pejabat_nama"] ?? "" }}</span></span>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5238,7 +5238,7 @@
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <span style="padding-left: 3.5em; text-decoration: underline; "><span class="print-value">{{ $spd->pejabat_instansi_perusahaan_nama }}</span></span>
+                        <span style="padding-left: 3.5em; text-decoration: underline; "><span class="print-value">{{ $spd->destinasi[0]["pejabat_nama"] ?? "" }}</span></span>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5268,13 +5268,13 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                     <td colspan="3"
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        @if($spd->pejabat_instansi_perusahaan_nip)<span style="padding-left: 3.5em; "><span class="print-value">NIP. {{ $spd->pejabat_instansi_perusahaan_nip }}</span></span>@endif
+                        @if(($spd->destinasi[0]["pejabat_nip"] ?? "") !== "")<span style="padding-left: 3.5em; "><span class="print-value">NIP. {{ $spd->destinasi[0]["pejabat_nip"] }}</span></span>@endif
                     </td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5293,7 +5293,7 @@
                     </td>
                     <td colspan="3"
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        @if($spd->pejabat_instansi_perusahaan_nip)<span style="padding-left: 3.5em; "><span class="print-value">NIP. {{ $spd->pejabat_instansi_perusahaan_nip }}</span></span>@endif
+                        @if(($spd->destinasi[0]["pejabat_nip"] ?? "") !== "")<span style="padding-left: 3.5em; "><span class="print-value">NIP. {{ $spd->destinasi[0]["pejabat_nip"] }}</span></span>@endif
                     </td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:10.0pt;font-family:'Arial',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5323,13 +5323,13 @@
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                         III.</td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Tiba di</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Tiba di</span><span class="value-col">:@if(!empty($spd->destinasi[1]["tiba_di"]))<span class="print-value">{{ $spd->destinasi[1]["tiba_di"] }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5348,7 +5348,7 @@
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Berangkat dari</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Berangkat dari</span><span class="value-col">:@if(!empty($spd->destinasi[1]["berangkat_dari"]))<span class="print-value">{{ $spd->destinasi[1]["berangkat_dari"] }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5378,68 +5378,13 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Pada Tgl.</span><span class="value-col">:</span></div>
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
-                    </td>
-                    <td colspan="3"
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Ke</span><span class="value-col">:</span></div>
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                </tr>
-                <tr style="height:14.4pt;">
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td colspan="3"
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Pada Tgl.</span><span class="value-col">:@if(!empty($spd->destinasi[1]["tgl_tiba"]))<span class="print-value">{{ \Carbon\Carbon::parse($spd->destinasi[1]["tgl_tiba"])->locale("id")->translatedFormat("d F Y") }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5458,7 +5403,7 @@
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Pada Tanggal</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Ke</span><span class="value-col">:@if(!empty($spd->destinasi[1]["tujuan_selanjutnya"]))<span class="print-value">{{ $spd->destinasi[1]["tujuan_selanjutnya"] }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5488,7 +5433,62 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td colspan="3"
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
+                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">:@if(!empty($spd->destinasi[1]["pejabat_jabatan"]))<span class="print-value">{{ $spd->destinasi[1]["pejabat_jabatan"] }}</span>@endif</span></div>
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
+                    </td>
+                    <td colspan="3"
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
+                        <div class="labelrow"><span class="label-col">Pada Tanggal</span><span class="value-col">:@if(!empty($spd->destinasi[1]["tgl_berangkat"]))<span class="print-value">{{ \Carbon\Carbon::parse($spd->destinasi[1]["tgl_berangkat"])->locale("id")->translatedFormat("d F Y") }}</span>@endif</span></div>
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                </tr>
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -5518,7 +5518,7 @@
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">:@if(!empty($spd->destinasi[1]["pejabat_jabatan"]))<span class="print-value">{{ $spd->destinasi[1]["pejabat_jabatan"] }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5548,7 +5548,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -5613,7 +5613,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -5678,7 +5678,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -5743,7 +5743,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -5808,13 +5808,12 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                     <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">@if(!empty($spd->destinasi[1]["pejabat_nama"]))<span style="padding-left: 3.5em; text-decoration: underline; "><span class="print-value">{{ $spd->destinasi[1]["pejabat_nama"] }}</span></span>@endif</td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -5837,8 +5836,7 @@
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
                     </td>
                     <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">@if(!empty($spd->destinasi[1]["pejabat_nama"]))<span style="padding-left: 3.5em; text-decoration: underline; "><span class="print-value">{{ $spd->destinasi[1]["pejabat_nama"] }}</span></span>@endif</td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -5873,13 +5871,12 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                     <td
-                        style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
+                        style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">@if(!empty($spd->destinasi[1]["pejabat_nip"]))<span style="padding-left: 3.5em; "><span class="print-value">NIP. {{ $spd->destinasi[1]["pejabat_nip"] }}</span></span>@endif</td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -5902,8 +5899,7 @@
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
                     </td>
                     <td
-                        style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
+                        style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">@if(!empty($spd->destinasi[1]["pejabat_nip"]))<span style="padding-left: 3.5em; "><span class="print-value">NIP. {{ $spd->destinasi[1]["pejabat_nip"] }}</span></span>@endif</td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -5938,13 +5934,13 @@
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                         IV.</td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Tiba di</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Tiba di</span><span class="value-col">:@if(!empty($spd->destinasi[2]["tiba_di"]))<span class="print-value">{{ $spd->destinasi[2]["tiba_di"] }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5963,7 +5959,7 @@
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Berangkat dari</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Berangkat dari</span><span class="value-col">:@if(!empty($spd->destinasi[2]["berangkat_dari"]))<span class="print-value">{{ $spd->destinasi[2]["berangkat_dari"] }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -5993,68 +5989,13 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Pada Tgl.</span><span class="value-col">:</span></div>
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
-                    </td>
-                    <td colspan="3"
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Ke</span><span class="value-col">:</span></div>
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                </tr>
-                <tr style="height:14.4pt;">
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td colspan="3"
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Pada Tgl.</span><span class="value-col">:@if(!empty($spd->destinasi[2]["tgl_tiba"]))<span class="print-value">{{ \Carbon\Carbon::parse($spd->destinasi[2]["tgl_tiba"])->locale("id")->translatedFormat("d F Y") }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -6073,7 +6014,7 @@
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Pada Tanggal</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Ke</span><span class="value-col">:@if(!empty($spd->destinasi[2]["tujuan_selanjutnya"]))<span class="print-value">{{ $spd->destinasi[2]["tujuan_selanjutnya"] }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -6103,7 +6044,62 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td colspan="3"
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
+                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">:@if(!empty($spd->destinasi[2]["pejabat_jabatan"]))<span class="print-value">{{ $spd->destinasi[2]["pejabat_jabatan"] }}</span>@endif</span></div>
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
+                    </td>
+                    <td colspan="3"
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
+                        <div class="labelrow"><span class="label-col">Pada Tanggal</span><span class="value-col">:@if(!empty($spd->destinasi[2]["tgl_berangkat"]))<span class="print-value">{{ \Carbon\Carbon::parse($spd->destinasi[2]["tgl_berangkat"])->locale("id")->translatedFormat("d F Y") }}</span>@endif</span></div>
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                </tr>
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -6133,7 +6129,7 @@
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">:@if(!empty($spd->destinasi[2]["pejabat_jabatan"]))<span class="print-value">{{ $spd->destinasi[2]["pejabat_jabatan"] }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -6163,7 +6159,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -6228,7 +6224,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -6293,7 +6289,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -6358,7 +6354,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -6423,13 +6419,12 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                     <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">@if(!empty($spd->destinasi[2]["pejabat_nama"]))<span style="padding-left: 3.5em; text-decoration: underline; "><span class="print-value">{{ $spd->destinasi[2]["pejabat_nama"] }}</span></span>@endif</td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -6452,8 +6447,7 @@
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
                     </td>
                     <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">@if(!empty($spd->destinasi[2]["pejabat_nama"]))<span style="padding-left: 3.5em; text-decoration: underline; "><span class="print-value">{{ $spd->destinasi[2]["pejabat_nama"] }}</span></span>@endif</td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -6488,13 +6482,12 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                     <td
-                        style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
+                        style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">@if(!empty($spd->destinasi[2]["pejabat_nip"]))<span style="padding-left: 3.5em; "><span class="print-value">NIP. {{ $spd->destinasi[2]["pejabat_nip"] }}</span></span>@endif</td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -6517,8 +6510,7 @@
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
                     </td>
                     <td
-                        style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
+                        style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">@if(!empty($spd->destinasi[2]["pejabat_nip"]))<span style="padding-left: 3.5em; "><span class="print-value">NIP. {{ $spd->destinasi[2]["pejabat_nip"] }}</span></span>@endif</td>
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -6553,13 +6545,13 @@
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                         V.</td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Tiba di</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Tiba di</span><span class="value-col">:@if(!empty($spd->destinasi[3]["tiba_di"]))<span class="print-value">{{ $spd->destinasi[3]["tiba_di"] }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -6578,7 +6570,7 @@
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Berangkat dari</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Berangkat dari</span><span class="value-col">:@if(!empty($spd->destinasi[3]["berangkat_dari"]))<span class="print-value">{{ $spd->destinasi[3]["berangkat_dari"] }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -6608,68 +6600,13 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td colspan="3"
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Pada Tgl.</span><span class="value-col">:</span></div>
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
-                    </td>
-                    <td colspan="3"
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Ke</span><span class="value-col">:</span></div>
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                    <td
-                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                    </td>
-                </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Pada Tgl.</span><span class="value-col">:@if(!empty($spd->destinasi[3]["tgl_tiba"]))<span class="print-value">{{ \Carbon\Carbon::parse($spd->destinasi[3]["tgl_tiba"])->locale("id")->translatedFormat("d F Y") }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -6688,7 +6625,7 @@
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Pada Tanggal</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Ke</span><span class="value-col">:@if(!empty($spd->destinasi[3]["tujuan_selanjutnya"]))<span class="print-value">{{ $spd->destinasi[3]["tujuan_selanjutnya"] }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -6718,7 +6655,62 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td colspan="3"
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;text-align:left;white-space:nowrap;overflow:visible;">
+                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">:@if(!empty($spd->destinasi[3]["pejabat_jabatan"]))<span class="print-value">{{ $spd->destinasi[3]["pejabat_jabatan"] }}</span>@endif</span></div>
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
+                    </td>
+                    <td colspan="3"
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                        <div class="labelrow"><span class="label-col">Pada Tanggal</span><span class="value-col">:@if(!empty($spd->destinasi[3]["tgl_berangkat"]))<span class="print-value">{{ \Carbon\Carbon::parse($spd->destinasi[3]["tgl_berangkat"])->locale("id")->translatedFormat("d F Y") }}</span>@endif</span></div>
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                    <td
+                        style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
+                    </td>
+                </tr>
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -6748,7 +6740,7 @@
                     </td>
                     <td colspan="3"
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">:</span></div>
+                        <div class="labelrow"><span class="label-col">Kepala</span><span class="value-col">:@if(!empty($spd->destinasi[3]["pejabat_jabatan"]))<span class="print-value">{{ $spd->destinasi[3]["pejabat_jabatan"] }}</span>@endif</span></div>
                     </td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
@@ -6778,7 +6770,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -6843,7 +6835,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -6908,7 +6900,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -6973,7 +6965,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -7103,7 +7095,7 @@
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                         VI.</td>
@@ -7131,7 +7123,7 @@
                         Telah diperiksa keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk
                         kepentingan jabatan dan waktu yang sesingkat-singkatnya.</td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -7160,7 +7152,7 @@
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -7185,7 +7177,7 @@
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;border-right:0.75pt solid #000;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -7236,7 +7228,7 @@
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -7253,7 +7245,7 @@
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                         <span style=""><span class="print-value">{{ $spd->nama_ppk }}</span></span></td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -7287,7 +7279,7 @@
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -7352,7 +7344,7 @@
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                         VII.</td>
@@ -7417,7 +7409,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:8.9pt;">
+                <tr style="height:5.5pt;">
                     <td
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -7482,7 +7474,7 @@
                         style="border-bottom:0.75pt solid #000;font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:10.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                         VIII.</td>
@@ -7545,7 +7537,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -7611,7 +7603,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
@@ -7677,7 +7669,7 @@
                         style="font-size:11.0pt;font-family:'Calibri',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
                 </tr>
-                <tr style="height:14.4pt;">
+                <tr style="height:13.0pt;">
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
