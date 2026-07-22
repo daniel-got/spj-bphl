@@ -304,7 +304,7 @@ class RincianService
         // Jangan tampilkan SPD yang sudah memiliki rincian
         $q->whereDoesntHave('rincian');
 
-        if ($user && ! $user->isAdmin() && ! $user->isMonitoring()) {
+        if ($user) {
             $pegawai = Pegawai::where('user_id', $user->id)->first();
             $nip = $pegawai?->nip;
 
