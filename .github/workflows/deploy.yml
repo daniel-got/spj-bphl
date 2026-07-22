@@ -23,7 +23,9 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             cd /var/www/spj-bphl4.dniel.my.id/spj-bphl
-            git pull origin main
+            # Paksa hapus semua perubahan lokal/divergent di VPS dan samakan 100% dengan branch main di GitHub
+            git fetch origin
+            git reset --hard origin/main
 
             # Restart podman containers dengan build ulang
             podman-compose -f docker-compose.prod.yml up -d --build
