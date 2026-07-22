@@ -2,7 +2,7 @@
     <style id="page-style">
         @page {
             size: A4 portrait;
-            margin: 1cm;
+            margin: 0.5cm 1cm 0.75cm 2cm;
         }
     </style>
     <style>
@@ -11,6 +11,13 @@
         }
 
         @media print {
+
+            html,
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
             .no-print {
                 display: none !important;
             }
@@ -18,11 +25,11 @@
 
 
         .spt-container {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 10pt;
+            font-family: "Bookman Old Style", serif;
+            font-size: 12pt;
             /* Default */
             color: #000;
-            line-height: 1.25;
+            line-height: 1.15;
             padding: 0;
             position: relative;
             word-wrap: break-word;
@@ -31,25 +38,16 @@
         }
 
         body.paper-a4 .spt-container {
-            font-size: 10pt;
-            line-height: 1.25;
+            font-size: 12pt;
+            line-height: 1.15;
         }
 
         body.paper-f4 .spt-container {
-            font-size: 11pt;
-            line-height: 1.4;
+            font-size: 12pt;
+            line-height: 1.2;
         }
 
-        .footer-bssn {
-            margin-top: 10px;
-            width: 100%;
-            text-align: center;
-            font-size: 8pt;
-            line-height: 1.2;
-            color: #333;
-            padding-top: 8px;
-            page-break-inside: avoid;
-        }
+        {{-- .footer-bssn { --}} {{--    margin-top: 10px; --}} {{--    width: 100%; --}} {{--    text-align: center; --}} {{--    font-size: 8pt; --}} {{--    line-height: 1.2; --}} {{--    color: #333; --}} {{--    padding-top: 8px; --}} {{--    page-break-inside: avoid; --}} {{-- } --}}
 
         /* Kop Surat Resmi Dinas */
         .header-table {
@@ -65,31 +63,32 @@
         }
 
         .logo-col img {
-            width: 110px;
-            height: auto;
+            width: auto;
+            height: 2.57cm;
             display: block;
             margin: 0 auto;
         }
 
         .kop-col {
+            font-family: Arial, Helvetica, sans-serif;
             text-align: center;
             vertical-align: middle;
-            padding-left: 10px;
+            padding-left: 5px;
         }
 
         .kop1 {
-            font-size: 13pt;
+            font-size: 12pt;
             font-weight: bold;
         }
 
         .kop2 {
-            font-size: 10pt;
+            font-size: 12pt;
             font-weight: bold;
             margin-top: 1px;
         }
 
         .kop3 {
-            font-size: 11pt;
+            font-size: 13pt;
             font-weight: bold;
             margin-top: 1px;
         }
@@ -108,32 +107,31 @@
         .garis2 {
             border-top: 1px solid black;
             margin-top: 1.5px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         /* Judul Dokumen */
         .judul-blok {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .judul-blok h2 {
-            font-size: 13pt;
-            text-decoration: underline;
+            font-size: 12pt;
             font-weight: bold;
             margin: 0;
         }
 
         .nomor-surat {
-            margin-top: 4px;
-            font-size: 10pt;
+            margin-top: -3px;
+            font-size: 12pt;
             text-align: center;
         }
 
         .kepala {
             font-weight: bold;
-            font-size: 10pt;
-            margin-top: 8px;
+            font-size: 12pt;
+            margin-top: 5px;
         }
 
         /* Tabel Utama */
@@ -141,17 +139,17 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
+            margin-top: 1px;
             margin-bottom: 5px;
         }
 
         .surat-table td {
             vertical-align: top;
-            padding: 5px 0;
+            padding: 2px 0;
         }
 
         .lbl {
             width: 85px;
-            font-weight: bold;
         }
 
         .ttk {
@@ -176,15 +174,14 @@
 
         .memberi {
             text-align: center;
-            font-weight: bold;
-            font-size: 11pt;
-            margin: 6px 0;
+            font-size: 12pt;
+            margin: 2px 0;
             letter-spacing: 1px;
         }
 
         /* Sub Tabel Looping Pegawai */
         .pegawai-item-box {
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .sub-table {
@@ -211,32 +208,40 @@
         }
 
         .penutup {
-            margin-top: 10px;
+            margin-top: 5px;
             text-align: justify;
         }
 
         .ttd-table {
-            margin-top: 15px;
+            margin-top: 5px;
             width: 100%;
             border-collapse: collapse;
             page-break-inside: avoid;
         }
 
         .ttd-space {
-            height: 75px;
+            height: 65px;
+            display: flex;
+            align-items: center;
         }
 
         .tembusan {
             clear: both;
-            margin-top: 15px;
+            margin-top: 5px;
             page-break-inside: avoid;
         }
     </style>
 
-    <div class="no-print" style="margin-bottom: 20px; text-align: center; padding: 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-        <button type="button" onclick="printA4()" style="padding: 8px 16px; background-color: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold;">🖨️ Cetak (A4)</button>
-        <button type="button" onclick="printF4()" style="padding: 8px 16px; background-color: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🖨️ Cetak (F4)</button>
-        <p style="font-size: 12px; color: #64748b; margin-top: 8px;">Pilih ukuran kertas sebelum mencetak. Jendela cetak akan otomatis terbuka.</p>
+    <div class="no-print"
+        style="margin-bottom: 20px; text-align: center; padding: 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+        <button type="button" onclick="printA4()"
+            style="padding: 8px 16px; background-color: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold;">🖨️
+            Cetak (A4)</button>
+        <button type="button" onclick="printF4()"
+            style="padding: 8px 16px; background-color: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🖨️
+            Cetak (F4)</button>
+        <p style="font-size: 12px; color: #64748b; margin-top: 8px;">Pilih ukuran kertas sebelum mencetak. Jendela cetak
+            akan otomatis terbuka.</p>
     </div>
 
     <div class="spt-container">
@@ -249,10 +254,6 @@
                     <div class="kop1">KEMENTERIAN KEHUTANAN</div>
                     <div class="kop2">DIREKTORAT JENDERAL PENGELOLAAN HUTAN LESTARI</div>
                     <div class="kop3">BALAI PENGELOLAAN HUTAN LESTARI WILAYAH IV JAMBI</div>
-                    <div class="alamat">
-                        Jl. Arif Rahman Hakim No.10 Telanaipura Kota Jambi 36124<br>
-                        Telepon (0741) 60415
-                    </div>
                 </td>
             </tr>
         </table>
@@ -319,7 +320,9 @@
                 <td class="ttk">:</td>
                 <td class="cnt">
                     @php
-                        $pegawais = is_string($spt->pegawai_ditugaskan) ? json_decode($spt->pegawai_ditugaskan, true) : $spt->pegawai_ditugaskan;
+                        $pegawais = is_string($spt->pegawai_ditugaskan)
+                            ? json_decode($spt->pegawai_ditugaskan, true)
+                            : $spt->pegawai_ditugaskan;
                         $pegawais = is_array($pegawais) ? $pegawais : [];
                     @endphp
                     @forelse($pegawais as $index => $pegawai)
@@ -332,7 +335,8 @@
                                         @endif Nama/NIP
                                     </td>
                                     <td class="sub-ttk">:</td>
-                                    <td class="sub-cnt">{{ $pegawai['nama_pegawai'] ?? '-' }} / {{ $pegawai['nip'] ?? '-' }}</td>
+                                    <td class="sub-cnt">{{ $pegawai['nama_pegawai'] ?? '-' }} /
+                                        {{ $pegawai['nip'] ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td class="sub-lbl">&nbsp;&nbsp;&nbsp;&nbsp;Pangkat/Gol</td>
@@ -379,7 +383,7 @@
                 <td class="lbl">Waktu</td>
                 <td class="ttk">:</td>
                 <td class="cnt">
-                    <div>Selama <strong>{{ $spt->lama_kegiatan }} hari</strong> pada tanggal
+                    <div>Selama {{ $spt->lama_kegiatan }} hari pada tanggal
                         {{ \Carbon\Carbon::parse($spt->tgl_berangkat)->translatedFormat('d') }} s.d
                         {{ \Carbon\Carbon::parse($spt->tgl_kembali)->translatedFormat('d F Y') }}.</div>
                 </td>
@@ -407,24 +411,27 @@
             @endif penuh tanggung jawab.
         </p>
 
-        <table class="ttd-table">
-            <tr>
-                <td style="width: 50%;"></td>
-                <td style="width: 50%; padding-left: 30px;">
-                    <div>Jambi, {{ \Carbon\Carbon::parse($spt->tgl_spt)->translatedFormat('d F Y') }}</div>
-                    <div style="margin-top: 4px;">Kepala Balai,</div>
-                    <div class="ttd-space"></div>
-                    <div style="font-weight: bold; text-decoration: underline;">Andi Rohaendi, M.Si.</div>
-                    <div>NIP. 19720302199403 1 003</div>
-                </td>
-            </tr>
-        </table>
+        <div class="footer-block" style="page-break-inside: avoid; margin-top: 15px;">
+            <table class="ttd-table">
+                <tr>
+                    <td style="width: 50%;"></td>
+                    <td style="width: 50%; padding-left: 30px;">
+                        <div>Jambi, {{ \Carbon\Carbon::parse($spt->tgl_spt)->translatedFormat('d F Y') }}</div>
+                        {{-- menggunakan variable srikandi agar support bsre --}}
+                        <div style="margin-top: 4px;">Plh. Kepala Balai,</div>
+                        <div class="ttd-space"> ${ttd_pengirim}</div>
+                        <div>${nama_pengirim}</div>
+                        <div>NIP.${nip_pengirim}</div>
+                    </td>
+                </tr>
+            </table>
 
-        <div class="tembusan">
-            <strong>Tembusan :</strong>
-            <ol style="padding-left: 15px; margin-top: 4px;">
-                <li>Sekretaris Direktorat Jenderal PHL</li>
-            </ol>
+            <div class="tembusan">
+                Tembusan :
+                <ol style="padding-left: 15px; margin-top: 4px;">
+                    <li>Sekretaris Direktorat Jenderal PHL</li>
+                </ol>
+            </div>
         </div>
 
         {{-- <div class="footer-bssn"> --}}
@@ -439,7 +446,7 @@
             document.body.classList.add('paper-a4');
             const styleEl = document.getElementById('page-style');
             if (styleEl) {
-                styleEl.innerHTML = `@page { size: A4 portrait; margin: 1cm; }`;
+                styleEl.innerHTML = `@page { size: A4 portrait; margin: 0.5cm 1cm 0.75cm 2cm; }`;
             }
             window.print();
         }
@@ -449,7 +456,7 @@
             document.body.classList.add('paper-f4');
             const styleEl = document.getElementById('page-style');
             if (styleEl) {
-                styleEl.innerHTML = `@page { size: 215.9mm 330.2mm portrait; margin: 1cm; }`;
+                styleEl.innerHTML = `@page { size: 215.9mm 330.2mm portrait; margin: 0.5cm 1cm 0.75cm 2cm; }`;
             }
             window.print();
         }
