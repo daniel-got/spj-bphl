@@ -6,7 +6,7 @@ FROM docker.io/library/composer:latest AS composer
 # ==========================================
 # STAGE 1: BASE (Dependencies & Extensions)
 # ==========================================
-FROM docker.io/library/php:8.3-fpm AS base
+FROM docker.io/library/php:8.4-fpm AS base
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
