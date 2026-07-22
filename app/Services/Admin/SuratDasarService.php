@@ -26,15 +26,17 @@ class SuratDasarService
 
     /**
      * Simpan surat dasar baru ke tabel master.
-     * Jika teks sudah ada (dari hasil input manual SPT), update saja agar tidak duplikat.
+     * Jika teks dan jenis_spt sudah ada, update saja agar tidak duplikat.
      */
     public function createOrUpdate(array $data): SuratDasar
     {
         return SuratDasar::updateOrCreate(
-            ['teks' => $data['teks']],
+            [
+                'teks' => $data['teks'],
+                'jenis_spt' => $data['jenis_spt'] ?? null,
+            ],
             [
                 'aktif' => $data['aktif'] ?? true,
-                'jenis_spt' => $data['jenis_spt'] ?? null,
             ]
         );
     }
@@ -80,13 +82,17 @@ class SuratDasarService
         $teksFromSpt = DB::table('data_spt')
             ->whereNotNull('surat_dasar')
             ->where('surat_dasar', '!=', '')
+            ->select('surat_dasar', 'jenis_spt')
             ->distinct()
-            ->pluck('surat_dasar');
+            ->get();
 
         $imported = 0;
-        foreach ($teksFromSpt as $teks) {
+        foreach ($teksFromSpt as $row) {
             $created = SuratDasar::firstOrCreate(
-                ['teks' => $teks],
+                [
+                    'teks' => $row->surat_dasar,
+                    'jenis_spt' => $row->jenis_spt,
+                ],
                 ['aktif' => true]
             );
             if ($created->wasRecentlyCreated) {
