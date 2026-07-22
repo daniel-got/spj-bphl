@@ -25,6 +25,7 @@ class Spd extends Model
         'nama_ppk',            // Nama PPK
         'nip_ppk',             // NIP PPK
         'pejabat_ditugaskan',  // Kolom tambahan untuk pejabat dinamis
+        'destinasi',           // Array destinasi multi-tujuan (pejabat instansi per lokasi)
         'spt_id',              // Referensi SPT
         'pembuat_id',          // Pembuat SPD
         'kepala_seksi_jabatan',
@@ -38,6 +39,7 @@ class Spd extends Model
     protected $casts = [
         'pejabat_ditugaskan' => 'array', // Mendukung penambahan pejabat secara dinamis
         'alat_angkut' => 'array',
+        'destinasi' => 'array',
         'tgl_spd' => 'date',
     ];
 

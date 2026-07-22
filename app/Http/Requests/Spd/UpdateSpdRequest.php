@@ -57,9 +57,15 @@ class UpdateSpdRequest extends FormRequest
             'kepala_seksi_jabatan' => 'nullable|string|max:255',
             'kepala_seksi_nama' => 'nullable|string|max:255',
             'kepala_seksi_nip' => 'nullable|string|max:255',
-            'pejabat_instansi_perusahaan' => 'nullable|string|max:255',
-            'pejabat_instansi_perusahaan_nama' => 'nullable|string|max:255',
-            'pejabat_instansi_perusahaan_nip' => 'nullable|string|max:255',
+            'destinasi' => 'nullable|array',
+            'destinasi.*.tiba_di' => 'nullable|string|max:255',
+            'destinasi.*.tgl_tiba' => 'nullable|date',
+            'destinasi.*.berangkat_dari' => 'nullable|string|max:255',
+            'destinasi.*.tujuan_selanjutnya' => 'nullable|string|max:255',
+            'destinasi.*.tgl_berangkat' => 'nullable|date',
+            'destinasi.*.pejabat_jabatan' => 'nullable|string|max:255',
+            'destinasi.*.pejabat_nama' => 'nullable|string|max:255',
+            'destinasi.*.pejabat_nip' => 'nullable|string|max:255',
         ];
     }
 }

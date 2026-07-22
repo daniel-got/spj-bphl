@@ -68,19 +68,21 @@
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-sm font-bold text-text-main">Pegawai yang Ditugaskan</h3>
                             <div id="spt-info-badge" class="hidden">
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    Data dari SPT
-                                </span>
+                                <x-data.badge label="Data dari SPT" color="blue" />
                             </div>
                         </div>
 
-                        <div id="assigned-pegawai-list" class="hidden mb-6 bg-background/50 border border-border-custom rounded-lg overflow-hidden">
+                        <div id="assigned-pegawai-list"
+                            class="hidden mb-6 bg-background/50 border border-border-custom rounded-lg overflow-hidden">
                             <table class="min-w-full divide-y divide-border-custom">
                                 <thead class="bg-surface">
                                     <tr>
-                                        <th class="px-4 py-2 text-left text-xs font-semibold text-muted uppercase">Nama</th>
-                                        <th class="px-4 py-2 text-left text-xs font-semibold text-muted uppercase">NIP</th>
-                                        <th class="px-4 py-2 text-left text-xs font-semibold text-muted uppercase">Peran</th>
+                                        <th class="px-4 py-2 text-left text-xs font-semibold text-muted uppercase">Nama
+                                        </th>
+                                        <th class="px-4 py-2 text-left text-xs font-semibold text-muted uppercase">NIP
+                                        </th>
+                                        <th class="px-4 py-2 text-left text-xs font-semibold text-muted uppercase">Peran
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody id="assigned-pegawai-body" class="divide-y divide-border-custom">
@@ -93,20 +95,25 @@
                             {{-- SPD dibuat per akun: identitas pegawai otomatis dari akun yang login --}}
                             <input type="hidden" name="nip_pegawai" value="{{ $myPegawai->nip }}">
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <x-form.input name="nama_pegawai_display" label="Nama Pegawai"
-                                    :value="$myPegawai->nama_pegawai" :disabled="true" />
-                                <x-form.input name="nip_display" label="NIP"
-                                    :value="$myPegawai->nip" :disabled="true" />
-                                <x-form.input name="pangkat_display" label="Pangkat/Golongan"
-                                    :value="trim(($myPegawai->pangkat ?? '').' / '.($myPegawai->golongan ?? ''), ' /')" :disabled="true" />
-                                <x-form.input name="jabatan_display" label="Jabatan"
-                                    :value="$myPegawai->jabatan" :disabled="true" />
+                                <x-form.input name="nama_pegawai_display" label="Nama Pegawai" :value="$myPegawai->nama_pegawai"
+                                    :disabled="true" />
+                                <x-form.input name="nip_display" label="NIP" :value="$myPegawai->nip" :disabled="true" />
+                                <x-form.input name="pangkat_display" label="Pangkat/Golongan" :value="trim(
+                                    ($myPegawai->pangkat ?? '') . ' / ' . ($myPegawai->golongan ?? ''),
+                                    ' /',
+                                )"
+                                    :disabled="true" />
+                                <x-form.input name="jabatan_display" label="Jabatan" :value="$myPegawai->jabatan"
+                                    :disabled="true" />
                             </div>
-                            <p class="text-[10px] text-muted mt-2">* SPD dibuat untuk akun Anda sendiri. Identitas terisi otomatis dan tidak dapat diubah.</p>
+                            <p class="text-[10px] text-muted mt-2">* SPD dibuat untuk akun Anda sendiri. Identitas
+                                terisi otomatis dan tidak dapat diubah.</p>
                         @else
                             <div class="rounded-lg border border-danger/40 bg-danger/5 px-4 py-3">
-                                <p class="text-sm font-medium text-danger">Akun Anda belum tertaut dengan data pegawai.</p>
-                                <p class="text-xs text-muted mt-1">SPD tidak dapat dibuat sampai akun Anda dihubungkan dengan data pegawai. Silakan hubungi admin.</p>
+                                <p class="text-sm font-medium text-danger">Akun Anda belum tertaut dengan data pegawai.
+                                </p>
+                                <p class="text-xs text-muted mt-1">SPD tidak dapat dibuat sampai akun Anda dihubungkan
+                                    dengan data pegawai. Silakan hubungi admin.</p>
                             </div>
                         @endif
                     </div>
@@ -114,24 +121,24 @@
                     {{-- Tujuan & Tempat (otomatis dari SPT yang dipilih, tidak dapat diubah) --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-border-custom pt-6">
                         <x-form.textarea name="tujuan_kegiatan" label="Tujuan Kegiatan" :rows="3"
-                            hint="Isi tujuan kegiatan."  :required="true" :error="$errors->first('tujuan_kegitan')"/>
+                            hint="Terisi otomatis dari SPT yang dipilih." :error="$errors->first('tujuan_kegitan')" />
 
-                        <x-form.input name="tempat_tujuan" label="Tempat Tujuan" :value="old('tempat_tujuan')"
-                            :disabled="true" hint="Terisi otomatis dari SPT yang dipilih."  />
+                        <x-form.input name="tempat_tujuan" label="Tempat Tujuan" :value="old('tempat_tujuan')" :disabled="true"
+                            hint="Terisi otomatis dari SPT yang dipilih." />
                     </div>
 
                     {{-- Tanggal & Lama --}}
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-border-custom pt-6">
                         <x-form.date-picker name="tgl_berangkat" label="Tanggal Berangkat" :value="old('tgl_berangkat')"
-                            :required="true" :error="$errors->first('tgl_berangkat')" />
+                            :disabled="true" :error="$errors->first('tgl_berangkat')" />
                         <x-form.date-picker name="tgl_kembali" label="Tanggal Kembali" :value="old('tgl_kembali')"
-                            :required="true" :error="$errors->first('tgl_kembali')" />
+                            :disabled="true" :error="$errors->first('tgl_kembali')" />
                         <x-form.input name="lama_kegiatan" label="Durasi Penugasan (hari)" type="number"
-                            placeholder="Jumlah hari" :value="old('lama_kegiatan')" :required="true" :error="$errors->first('lama_kegiatan')" />
+                            placeholder="Jumlah hari" :value="old('lama_kegiatan')" :disabled="true" :error="$errors->first('lama_kegiatan')" />
                     </div> {{-- Kode, Jenis, Berangkat, Alat Angkut --}}
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 border-t border-border-custom pt-6">
                         <x-form.input name="kode_mak" label="Kode MAK" placeholder="Kode MAK" :value="old('kode_mak')"
-                            :required="true" :error="$errors->first('kode_mak')" />
+                            :disabled="true" :error="$errors->first('kode_mak')" />
                         <x-form.select name="jenis_perjalanan" label="Jenis Perjalanan Dinas" :options="[
                             'Dalam Kota' => 'Dalam Kota',
                             'Luar Kota' => 'Luar Kota',
@@ -225,18 +232,121 @@
                             :required="true" :error="$errors->first('ppk')" placeholder="Pilih Pejabat Pembuat" />
                         <x-form.input name="nama_ppk" label="Nama Pejabat PPK" placeholder="Nama Pejabat"
                             :value="old('nama_ppk')" :required="true" :error="$errors->first('nama_ppk')" />
-                        <x-form.input name="nip_ppk" label="NIP Pejabat PPK" placeholder="NIP Pejabat" id="nip_ppk"
-                            :value="old('nip_ppk')" :required="true" :error="$errors->first('nip_ppk')" />
+                        <x-form.input name="nip_ppk" label="NIP Pejabat PPK" placeholder="NIP Pejabat"
+                            id="nip_ppk" :value="old('nip_ppk')" :required="true" :error="$errors->first('nip_ppk')" />
                     </div>
 
-                    {{-- Pejabat Instansi/Perusahaan (Tujuan) --}}
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-border-custom pt-6">
-                        <x-form.input name="pejabat_instansi_perusahaan" label="Jabatan Pejabat Tujuan" placeholder="Contoh: Kepala Desa"
-                            :value="old('pejabat_instansi_perusahaan')" :error="$errors->first('pejabat_instansi_perusahaan')" />
-                        <x-form.input name="pejabat_instansi_perusahaan_nama" label="Nama Pejabat Tujuan" placeholder="Contoh: Budi Santoso"
-                            :value="old('pejabat_instansi_perusahaan_nama')" :error="$errors->first('pejabat_instansi_perusahaan_nama')" />
-                        <x-form.input name="pejabat_instansi_perusahaan_nip" label="NIP Pejabat Tujuan" placeholder="Opsional"
-                            :value="old('pejabat_instansi_perusahaan_nip')" :error="$errors->first('pejabat_instansi_perusahaan_nip')" />
+                    {{-- Destinasi & Pejabat Instansi (Dinamis Multi-Tujuan) --}}
+                    @php
+                        $defaultDestinasi = [
+                            [
+                                'tiba_di' => '',
+                                'tgl_tiba' => '',
+                                'berangkat_dari' => '',
+                                'tujuan_selanjutnya' => '',
+                                'tgl_berangkat' => '',
+                                'pejabat_jabatan' => '',
+                                'pejabat_nama' => '',
+                                'pejabat_nip' => '',
+                            ],
+                        ];
+                        $destinasiData = old('destinasi', $defaultDestinasi);
+                    @endphp
+                    <div id="destinasi-container" class="border-t border-border-custom pt-6"
+                        x-data='{
+                        destinasi: @json($destinasiData),
+                        addDestinasi() {
+                            if (this.destinasi.length >= 6) return;
+                            this.destinasi.push({tiba_di: "", tgl_tiba: "", berangkat_dari: "", tujuan_selanjutnya: "", tgl_berangkat: "", pejabat_jabatan: "", pejabat_nama: "", pejabat_nip: ""});
+                        },
+                        removeDestinasi(index) {
+                            if (this.destinasi.length <= 1) return;
+                            this.destinasi.splice(index, 1);
+                        }
+                    }'
+                        @update-destinasi.window="destinasi = $event.detail">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-semibold text-text-main">Destinasi & Pejabat Instansi Tujuan</h3>
+                            <x-action.button type="button" x-show="destinasi.length < 6" @click="addDestinasi()"
+                                class="border-primary text-primary text-sm hover:bg-primary hover:text-white px-3 py-1.5 gap-1.5">
+                                <x-utility.icon name="plus" class="w-4 h-4" />
+                                Tambah Tujuan
+                            </x-action.button>
+                        </div>
+
+                        <template x-for="(dest, index) in destinasi" :key="index">
+                            <div class="relative border border-border-custom rounded-lg p-4 mb-4 bg-surface-light">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-xs font-bold text-text-muted uppercase"
+                                        x-text="'Tujuan ' + (index + 1) + ' (Baris ' + ['II','III','IV','V','VI','VII'][index] + ')'"></span>
+                                    <button type="button" x-show="destinasi.length > 1"
+                                        @click="removeDestinasi(index)"
+                                        class="text-danger hover:text-red-700 text-xs font-semibold">✕ Hapus</button>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="text-sm font-semibold text-text-main mb-1 block">Jabatan Pejabat
+                                            Tujuan</label>
+                                        <input type="text" :name="'destinasi[' + index + '][pejabat_jabatan]'"
+                                            x-model="dest.pejabat_jabatan" placeholder="Contoh: Kepala Desa"
+                                            class="w-full rounded-md border border-border-custom bg-surface-light px-3 py-2 text-sm text-text-main focus:ring-2 focus:ring-primary focus:border-primary" />
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-semibold text-text-main mb-1 block">Nama Pejabat
+                                            Tujuan</label>
+                                        <input type="text" :name="'destinasi[' + index + '][pejabat_nama]'"
+                                            x-model="dest.pejabat_nama" placeholder="Contoh: Budi Santoso"
+                                            class="w-full rounded-md border border-border-custom bg-surface-light px-3 py-2 text-sm text-text-main focus:ring-2 focus:ring-primary focus:border-primary" />
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-semibold text-text-main mb-1 block">NIP Pejabat
+                                            Tujuan</label>
+                                        <input type="text" :name="'destinasi[' + index + '][pejabat_nip]'"
+                                            x-model="dest.pejabat_nip" placeholder="Opsional"
+                                            class="w-full rounded-md border border-border-custom bg-surface-light px-3 py-2 text-sm text-text-main focus:ring-2 focus:ring-primary focus:border-primary" />
+                                    </div>
+                                </div>
+                                {{-- Fields for destinasi location data (auto-filled but editable) --}}
+                                <div
+                                    class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-border-custom/50">
+                                    <div>
+                                        <label class="text-xs font-semibold text-text-main mb-1 block">Tiba Di</label>
+                                        <input type="text" :name="'destinasi[' + index + '][tiba_di]'"
+                                            x-model="dest.tiba_di"
+                                            class="w-full rounded-md border border-border-custom bg-surface-light px-3 py-2 text-sm text-text-main focus:ring-2 focus:ring-primary focus:border-primary" />
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-semibold text-text-main mb-1 block">Tgl Tiba</label>
+                                        <input type="date" :name="'destinasi[' + index + '][tgl_tiba]'"
+                                            x-model="dest.tgl_tiba"
+                                            class="w-full rounded-md border border-border-custom bg-surface-light px-3 py-2 text-sm text-text-main focus:ring-2 focus:ring-primary focus:border-primary" />
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                    <div>
+                                        <label class="text-xs font-semibold text-text-main mb-1 block">Berangkat
+                                            Dari</label>
+                                        <input type="text" :name="'destinasi[' + index + '][berangkat_dari]'"
+                                            x-model="dest.berangkat_dari"
+                                            class="w-full rounded-md border border-border-custom bg-surface-light px-3 py-2 text-sm text-text-main focus:ring-2 focus:ring-primary focus:border-primary" />
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-semibold text-text-main mb-1 block">Tujuan
+                                            Selanjutnya</label>
+                                        <input type="text" :name="'destinasi[' + index + '][tujuan_selanjutnya]'"
+                                            x-model="dest.tujuan_selanjutnya"
+                                            class="w-full rounded-md border border-border-custom bg-surface-light px-3 py-2 text-sm text-text-main focus:ring-2 focus:ring-primary focus:border-primary" />
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-semibold text-text-main mb-1 block">Tgl
+                                            Berangkat</label>
+                                        <input type="date" :name="'destinasi[' + index + '][tgl_berangkat]'"
+                                            x-model="dest.tgl_berangkat"
+                                            class="w-full rounded-md border border-border-custom bg-surface-light px-3 py-2 text-sm text-text-main focus:ring-2 focus:ring-primary focus:border-primary" />
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
                     </div>
 
                     {{-- Kepala Seksi --}}
@@ -247,24 +357,28 @@
                             </label>
                             <select id="kepala_seksi_select" class="w-full">
                                 <option value="">Pilih Pegawai...</option>
-                                @foreach($pegawaiData as $pegawai)
-                                    <option value="{{ $pegawai->id }}" data-nama="{{ $pegawai->nama_pegawai }}" data-nip="{{ $pegawai->nip }}" data-jabatan="{{ $pegawai->jabatan }}">
+                                @foreach ($pegawaiData as $pegawai)
+                                    <option value="{{ $pegawai->id }}" data-nama="{{ $pegawai->nama_pegawai }}"
+                                        data-nip="{{ $pegawai->nip }}" data-jabatan="{{ $pegawai->jabatan }}">
                                         {{ $pegawai->nama_pegawai }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="md:col-span-1">
-                            <x-form.input name="kepala_seksi_jabatan" id="kepala_seksi_jabatan" label="Jabatan Kepala Seksi" placeholder="Jabatan"
-                                :value="old('kepala_seksi_jabatan')" :error="$errors->first('kepala_seksi_jabatan')" readonly class="bg-background text-muted cursor-not-allowed" />
+                            <x-form.input name="kepala_seksi_jabatan" id="kepala_seksi_jabatan"
+                                label="Jabatan Kepala Seksi" placeholder="Jabatan" :value="old('kepala_seksi_jabatan')"
+                                :error="$errors->first('kepala_seksi_jabatan')" readonly class="bg-background text-muted cursor-not-allowed" />
                         </div>
                         <div class="md:col-span-1">
-                            <x-form.input name="kepala_seksi_nama" id="kepala_seksi_nama" label="Nama Kepala Seksi" placeholder="Nama"
-                                :value="old('kepala_seksi_nama')" :error="$errors->first('kepala_seksi_nama')" readonly class="bg-background text-muted cursor-not-allowed" />
+                            <x-form.input name="kepala_seksi_nama" id="kepala_seksi_nama" label="Nama Kepala Seksi"
+                                placeholder="Nama" :value="old('kepala_seksi_nama')" :error="$errors->first('kepala_seksi_nama')" readonly
+                                class="bg-background text-muted cursor-not-allowed" />
                         </div>
                         <div class="md:col-span-1">
-                            <x-form.input name="kepala_seksi_nip" id="kepala_seksi_nip" label="NIP Kepala Seksi" placeholder="NIP"
-                                :value="old('kepala_seksi_nip')" :error="$errors->first('kepala_seksi_nip')" readonly class="bg-background text-muted cursor-not-allowed" />
+                            <x-form.input name="kepala_seksi_nip" id="kepala_seksi_nip" label="NIP Kepala Seksi"
+                                placeholder="NIP" :value="old('kepala_seksi_nip')" :error="$errors->first('kepala_seksi_nip')" readonly
+                                class="bg-background text-muted cursor-not-allowed" />
                         </div>
                     </div>
 
@@ -344,9 +458,42 @@
                             }
 
                             if (data.tempat_tujuan) {
-                                const tempatTujuanInput = document.getElementById('tempat_tujuan');
+                                const tempatTujuanInput = document.getElementById(
+                                    'tempat_tujuan');
                                 if (tempatTujuanInput) {
                                     tempatTujuanInput.value = data.tempat_tujuan;
+                                }
+
+                                let rawStr = data.tempat_tujuan;
+                                let tempatArray = [];
+                                if (Array.isArray(rawStr)) {
+                                    tempatArray = rawStr;
+                                } else {
+                                    tempatArray = rawStr.split(',').map(item => item.trim())
+                                        .filter(item => item !== '');
+                                }
+
+                                if (tempatArray.length > 0) {
+                                    let newDestinasi = tempatArray.map((tempat, index) => {
+                                        return {
+                                            tiba_di: tempat,
+                                            tgl_tiba: '',
+                                            berangkat_dari: tempat,
+                                            tujuan_selanjutnya: tempatArray[index +
+                                                1] || '',
+                                            tgl_berangkat: '',
+                                            pejabat_jabatan: '',
+                                            pejabat_nama: '',
+                                            pejabat_nip: ''
+                                        };
+                                    });
+                                    // Batasi maksimal 6 destinasi sesuai UI limit
+                                    newDestinasi = newDestinasi.slice(0, 6);
+
+                                    // Dispatch to window so Alpine's .window listener catches it
+                                    window.dispatchEvent(new CustomEvent('update-destinasi', {
+                                        detail: newDestinasi
+                                    }));
                                 }
                             }
 
@@ -354,8 +501,10 @@
                             // Identitas pelaksana SPD tetap mengikuti akun yang login.
                             if (data.pegawai_list && data.pegawai_list.length > 0) {
                                 const badge = document.getElementById('spt-info-badge');
-                                const listContainer = document.getElementById('assigned-pegawai-list');
-                                const tableBody = document.getElementById('assigned-pegawai-body');
+                                const listContainer = document.getElementById(
+                                    'assigned-pegawai-list');
+                                const tableBody = document.getElementById(
+                                    'assigned-pegawai-body');
 
                                 badge.classList.remove('hidden');
                                 listContainer.classList.remove('hidden');
@@ -376,8 +525,10 @@
                                     tableBody.insertAdjacentHTML('beforeend', row);
                                 });
                             } else {
-                                document.getElementById('spt-info-badge').classList.add('hidden');
-                                document.getElementById('assigned-pegawai-list').classList.add('hidden');
+                                document.getElementById('spt-info-badge').classList.add(
+                                    'hidden');
+                                document.getElementById('assigned-pegawai-list').classList.add(
+                                    'hidden');
                             }
 
                             // Nomor SPD di-shared per SPT.
@@ -387,14 +538,17 @@
                             if (data.nomor_spd_existing) {
                                 nomorSpdInput.value = data.nomor_spd_existing;
                                 nomorSpdInput.setAttribute('readonly', 'readonly');
-                                nomorSpdInput.classList.add('bg-background', 'text-muted', 'cursor-not-allowed');
+                                nomorSpdInput.classList.add('bg-background', 'text-muted',
+                                    'cursor-not-allowed');
                                 if (nomorSpdHint) {
-                                    nomorSpdHint.textContent = 'Nomor SPD diambil otomatis dari SPD yang sudah ada dalam SPT ini.';
+                                    nomorSpdHint.textContent =
+                                        'Nomor SPD diambil otomatis dari SPD yang sudah ada dalam SPT ini.';
                                     nomorSpdHint.classList.remove('hidden');
                                 }
                             } else {
                                 nomorSpdInput.removeAttribute('readonly');
-                                nomorSpdInput.classList.remove('bg-background', 'text-muted', 'cursor-not-allowed');
+                                nomorSpdInput.classList.remove('bg-background', 'text-muted',
+                                    'cursor-not-allowed');
                                 if (nomorSpdHint) {
                                     nomorSpdHint.classList.add('hidden');
                                 }

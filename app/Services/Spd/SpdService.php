@@ -80,7 +80,7 @@ class SpdService
             $user = auth()->user();
 
             // Validasi keamanan: Pastikan SPT yang dipilih boleh diakses oleh user
-            if ($user && ! $user->isAdmin() && ! $user->isMonitoring()) {
+            if ($user) {
                 $pegawai = Pegawai::where('user_id', $user->id)->first();
                 $nip = $pegawai?->nip;
 
@@ -178,8 +178,8 @@ class SpdService
             $pegawai = Pegawai::where('user_id', $user->id)->first();
         }
 
-        // Terapkan filter berdasarkan role/penugasan
-        if ($user && ! $user->isAdmin() && ! $user->isMonitoring()) {
+        // Terapkan filter penugasan (hanya SPT milik user)
+        if ($user) {
             $query->where(function ($q) use ($user, $pegawai) {
                 $q->where('pembuat_id', $user->id);
                 if ($pegawai) {
@@ -224,8 +224,8 @@ class SpdService
         $user = auth()->user();
         $query = Spt::query();
 
-        // Keamanan: Pastikan user hanya bisa mengambil detail SPT yang boleh mereka akses
-        if ($user && ! $user->isAdmin() && ! $user->isMonitoring()) {
+        // Keamanan: Pastikan user hanya bisa mengambil detail SPT yang ditugaskan padanya
+        if ($user) {
             $pegawai = Pegawai::where('user_id', $user->id)->first();
             $query->where(function ($q) use ($user, $pegawai) {
                 $q->where('pembuat_id', $user->id);

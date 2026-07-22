@@ -109,7 +109,7 @@ class RincianService
             $user = auth()->user();
 
             // Validasi keamanan: Pastikan SPD yang dipilih boleh diakses oleh user
-            if ($user && ! $user->isAdmin() && ! $user->isMonitoring() && ! $user->isVerifikator()) {
+            if ($user && ! $user->isAdmin() && ! $user->isMonitoring()) {
                 $pegawai = Pegawai::where('user_id', $user->id)->first();
                 $nip = $pegawai?->nip;
 
@@ -299,7 +299,7 @@ class RincianService
         // Jangan tampilkan SPD yang sudah memiliki rincian
         $q->whereDoesntHave('rincian');
 
-        if ($user && ! $user->isAdmin() && ! $user->isMonitoring() && ! $user->isVerifikator()) {
+        if ($user && ! $user->isAdmin() && ! $user->isMonitoring()) {
             $pegawai = Pegawai::where('user_id', $user->id)->first();
             $nip = $pegawai?->nip;
 
@@ -330,7 +330,7 @@ class RincianService
         $user = auth()->user();
         $q = Spd::with(['spt', 'pegawai']);
 
-        if ($user && ! $user->isAdmin() && ! $user->isMonitoring() && ! $user->isVerifikator()) {
+        if ($user && ! $user->isAdmin() && ! $user->isMonitoring()) {
             $pegawai = Pegawai::where('user_id', $user->id)->first();
             $nip = $pegawai?->nip;
 
