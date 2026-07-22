@@ -26,6 +26,14 @@ jobs:
             git pull origin main
 
             # Restart podman containers dengan build ulang
-            # (Karena kita menggunakan multi-stage build, container akan membaca file statis
-            #  yang baru saja di-pull dan mem-build ulang image)
             podman-compose -f docker-compose.prod.yml up -d --build
+
+            # Tunggu beberapa detik agar container siap
+            sleep 5
+
+            # Eksekusi migrasi database (Wajib karena ada kolom baru destinasi)
+            podman exec spj-bphl-app-prod php artisan migrate --force
+
+            # Bersihkan dan segarkan cache Laravel (config, routes, views)
+            podman exec spj-bphl-app-prod php artisan optimize:clear
+            podman exec spj-bphl-app-prod php artisan optimize
