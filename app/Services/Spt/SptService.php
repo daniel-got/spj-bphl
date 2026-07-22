@@ -142,13 +142,8 @@ class SptService
 
             $spt = Spt::create($data);
 
-            // Sinkron surat_dasar ke tabel master jika diisi
-            if (! empty($data['surat_dasar'])) {
-                SuratDasar::firstOrCreate(
-                    ['teks' => $data['surat_dasar']],
-                    ['aktif' => true]
-                );
-            }
+            // Sinkronisasi poin acuan surat_dasar ke tabel master secara otomatis
+            $this->syncSuratDasarMaster($data['surat_dasar'] ?? null, $data['jenis_tugas'] ?? null);
 
             session()->flash('success', 'SPT berhasil dibuat dan disimpan sebagai Draft.');
 
@@ -180,16 +175,66 @@ class SptService
 
             $spt->update($data);
 
-            // Sinkron surat_dasar ke tabel master jika diisi
-            if (! empty($data['surat_dasar'])) {
-                SuratDasar::firstOrCreate(
-                    ['teks' => $data['surat_dasar']],
-                    ['aktif' => true]
-                );
-            }
+            // Sinkronisasi poin acuan surat_dasar ke tabel master secara otomatis
+            $this->syncSuratDasarMaster($spt->surat_dasar, $spt->jenis_tugas);
 
             return $spt;
         });
+    }
+
+    /**
+     * Sinkronisasi setiap poin acuan ke tabel master data jika belum ada.
+     */
+    private function syncSuratDasarMaster(?string $suratDasarText, ?string $jenisSpt): void
+    {
+        if (empty($suratDasarText)) {
+            return;
+        }
+
+        $customJsonPath = database_path('seeders/custom_surat_dasar.json');
+        $customPoints = file_exists($customJsonPath)
+            ? json_decode(file_get_contents($customJsonPath), true) ?: []
+            : [];
+
+        $jsonChanged = false;
+        $points = explode("\n", $suratDasarText);
+
+        foreach ($points as $point) {
+            $cleanPoint = trim(preg_replace('/^\d+\.\s*/', '', $point));
+            if ($cleanPoint === '') {
+                continue;
+            }
+
+            $record = SuratDasar::firstOrCreate(
+                [
+                    'teks' => $cleanPoint,
+                    'jenis_spt' => $jenisSpt,
+                ],
+                [
+                    'aktif' => true,
+                ]
+            );
+
+            if ($record->wasRecentlyCreated) {
+                // Tambahkan ke file persistence json agar tidak hilang saat migrate:fresh
+                $alreadyInJson = collect($customPoints)->contains(function ($item) use ($cleanPoint, $jenisSpt) {
+                    return ($item['teks'] ?? '') === $cleanPoint && ($item['jenis_spt'] ?? null) === $jenisSpt;
+                });
+
+                if (! $alreadyInJson) {
+                    $customPoints[] = [
+                        'teks' => $cleanPoint,
+                        'jenis_spt' => $jenisSpt,
+                        'aktif' => true,
+                    ];
+                    $jsonChanged = true;
+                }
+            }
+        }
+
+        if ($jsonChanged) {
+            file_put_contents($customJsonPath, json_encode(array_values($customPoints), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        }
     }
 
     /**

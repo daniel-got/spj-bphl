@@ -14,7 +14,8 @@ class StoreSuratDasarRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'teks' => 'required|string|unique:data_surat_dasar,teks',
+            'teks' => 'required|string',
+            'jenis_spt' => 'nullable|string|max:50',
             'aktif' => 'boolean',
         ];
     }
@@ -22,8 +23,7 @@ class StoreSuratDasarRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'teks.required' => 'Isi teks surat dasar wajib diisi.',
-            'teks.unique' => 'Teks surat dasar ini sudah ada di database.',
+            'teks.required' => 'Isi surat dasar tidak boleh kosong.',
         ];
     }
 }

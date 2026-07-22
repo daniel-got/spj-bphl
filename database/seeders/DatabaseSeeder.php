@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             PegawaiSeeder::class,
             UangHarianSeeder::class,
             UangPenginapanSeeder::class,
+            SuratDasarSeeder::class,
         ]);
         User::factory()->create([
             'name' => 'test',

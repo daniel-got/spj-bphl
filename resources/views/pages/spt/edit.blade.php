@@ -138,32 +138,65 @@
                             placeholder="-- Pilih Kategori Tugas --"
                         />
 
-                        {{-- Surat Dasar: TomSelect creatable dropdown --}}
+                        {{-- Surat Dasar: Dynamic Repeater --}}
                         <div class="md:col-span-2 flex flex-col">
-                            <label for="surat_dasar" class="text-sm font-medium text-text-main mb-2 block">
-                                Surat Dasar / Acuan Poin 3 <span class="text-muted text-xs">(Opsional)</span>
+                            <label class="text-sm font-medium text-text-main mb-2 block">
+                                Surat Dasar / Acuan Poin <span class="text-muted text-xs">(Opsional)</span>
                             </label>
 
-                            @php
-                                $currentSuratDasar = old('surat_dasar', $spt->surat_dasar);
-                            @endphp
-                            <select id="surat_dasar_select" name="surat_dasar"
-                                class="surat-dasar-tomselect w-full">
-                                <option value="">-- Pilih atau ketik surat dasar --</option>
-                                @foreach($riwayatSuratDasar as $riwayat)
-                                    <option value="{{ $riwayat }}"
-                                        {{ $currentSuratDasar === $riwayat ? 'selected' : '' }}>
-                                        {{ $riwayat }}
-                                    </option>
-                                @endforeach
-                                {{-- Jika nilai saat ini tidak ada di riwayat, tambahkan sebagai option terpilih --}}
-                                @if($currentSuratDasar && !in_array($currentSuratDasar, $riwayatSuratDasar->toArray()))
-                                    <option value="{{ $currentSuratDasar }}" selected>{{ $currentSuratDasar }}</option>
-                                @endif
-                            </select>
+                            <style>
+                                #surat-dasar-list .ts-wrapper,
+                                #surat-dasar-list .ts-wrapper.single,
+                                #surat-dasar-list .ts-wrapper.multi {
+                                    height: auto !important;
+                                    max-height: none !important;
+                                    overflow: visible !important;
+                                }
+                                #surat-dasar-list .ts-control,
+                                #surat-dasar-list .ts-wrapper.single .ts-control,
+                                #surat-dasar-list .ts-wrapper.multi .ts-control {
+                                    height: auto !important;
+                                    max-height: none !important;
+                                    min-height: 38px !important;
+                                    overflow: visible !important;
+                                    flex-wrap: wrap !important;
+                                    padding: 6px 12px !important;
+                                }
+                                #surat-dasar-list .ts-control > div,
+                                #surat-dasar-list .ts-control > .item,
+                                #surat-dasar-list .ts-control > div.item {
+                                    white-space: normal !important;
+                                    overflow: visible !important;
+                                    text-overflow: unset !important;
+                                    word-break: break-word !important;
+                                    max-width: 100% !important;
+                                    line-height: 1.5 !important;
+                                    display: block !important;
+                                }
+                                #surat-dasar-list .ts-control > input {
+                                    width: 100% !important;
+                                }
+                                #surat-dasar-list .ts-dropdown .option {
+                                    white-space: normal !important;
+                                    word-break: break-word !important;
+                                    line-height: 1.5 !important;
+                                    padding: 8px 12px !important;
+                                }
+                            </style>
+                            <div id="surat-dasar-list" class="space-y-3">
+                                <!-- Dynamic rows added by JS -->
+                            </div>
+                            
+                            <div class="mt-3">
+                                <x-action.button type="button" id="btn-add-surat-dasar"
+                                    class="border-primary text-primary text-sm hover:bg-primary hover:text-white px-3 py-1.5 gap-1.5">
+                                    <x-utility.icon name="plus" class="w-4 h-4" />
+                                    Tambah Poin Acuan
+                                </x-action.button>
+                            </div>
 
                             <small class="text-xs text-muted mt-1">
-                                Pilih dari riwayat atau ketik surat baru &amp; tekan <kbd class="bg-surface border border-border-custom rounded px-1 py-0.5 text-xs">Enter</kbd> untuk menyimpan sebagai pilihan baru.
+                                Teks ini dapat dipilih dari daftar master atau diketik langsung sesuai kebutuhan.
                             </small>
                             @if ($errors->has('surat_dasar'))
                                 <p class="text-xs text-danger mt-1">{{ $errors->first('surat_dasar') }}</p>
@@ -252,18 +285,53 @@
                             placeholder="Tuliskan tujuan kegiatan perjalanan dinas..." :rows="3"
                             :value="old('tujuan_kegiatan', $spt->tujuan_kegiatan)" :required="true" :error="$errors->first('tujuan_kegiatan')" />
 
-                        @php
-                            // Antisipasi jika tempat_tujuan tersimpan sebagai JSON array (multi tujuan)
-                            $tempatTujuanValue = $spt->tempat_tujuan;
-                            if (is_array($tempatTujuanValue)) {
-                                $tempatTujuanValue = implode(', ', $tempatTujuanValue);
-                            } else {
-                                $decodedTujuan = json_decode($tempatTujuanValue, true);
-                                $tempatTujuanValue = is_array($decodedTujuan) ? implode(', ', $decodedTujuan) : $tempatTujuanValue;
-                            }
-                        @endphp
-                        <x-form.input name="tempat_tujuan" label="Tempat Tujuan" placeholder="Contoh: Jakarta"
-                            :value="old('tempat_tujuan', $tempatTujuanValue)" :required="true" :error="$errors->first('tempat_tujuan')" />
+                        {{-- Tempat Tujuan --}}
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-text-main mb-2 block">
+                                Tempat Tujuan <span class="text-danger">*</span>
+                            </label>
+
+                            <div id="tempat-tujuan-list" class="space-y-2">
+                                @php
+                                    $oldTempat = old('tempat_tujuan', $spt->tempat_tujuan ?? []);
+                                    if (is_string($oldTempat)) {
+                                        $parsedTempat = array_filter(array_map('trim', explode(',', $oldTempat)));
+                                    } elseif (is_array($oldTempat)) {
+                                        $parsedTempat = array_filter(array_map('trim', $oldTempat));
+                                    } else {
+                                        $parsedTempat = [];
+                                    }
+                                    if (empty($parsedTempat)) {
+                                        $parsedTempat = [''];
+                                    }
+                                @endphp
+
+                                @foreach($parsedTempat as $index => $val)
+                                    <div class="tempat-tujuan-item flex gap-2 items-center">
+                                        <div class="grow relative">
+                                            <input type="text" name="tempat_tujuan[]" value="{{ $val }}" required
+                                                placeholder="Contoh: Jakarta"
+                                                class="w-full px-3 py-2 text-sm border border-border-custom rounded-md bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" />
+                                        </div>
+                                        <button type="button" class="btn-remove-tempat-tujuan text-danger p-2 hover:bg-danger/10 rounded-md transition-colors" style="{{ count($parsedTempat) > 1 ? '' : 'display: none;' }}">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div class="mt-3">
+                                <x-action.button type="button" id="btn-add-tempat-tujuan"
+                                    class="border-primary text-primary text-sm hover:bg-primary hover:text-white px-3 py-1.5 gap-1.5">
+                                    <x-utility.icon name="plus" class="w-4 h-4" />
+                                    Tambah Tempat Tujuan
+                                </x-action.button>
+                            </div>
+
+                            @if ($errors->has('tempat_tujuan'))
+                                <p class="text-xs text-danger mt-1">{{ $errors->first('tempat_tujuan') }}</p>
+                            @endif
+                        </div>
                     </div>
 
                     {{-- Tanggal Berangkat, Kembali, Durasi Penugasan --}}
@@ -306,6 +374,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            function escapeHtml(str) {
+                if (!str) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
             const container = document.getElementById('pegawai-list');
             const addBtn = document.getElementById('add-pegawai-btn');
             const form = document.getElementById('spt-form');
@@ -553,36 +631,93 @@
              syncAllDropdowns();
 
              // Interseptor form submit untuk membundel data pegawai ke input JSON hidden
-             form.addEventListener('submit', function(e) {
-                 const items = container.querySelectorAll('.pegawai-item');
-                 const pegawaiData = [];
+             // Auto-fill Surat Dasar
+            const suratDasarGrouped = @json($suratDasarGrouped);
+            const jenisTugasSelect = document.querySelector('[name="jenis_tugas"]');
+            const suratDasarTextarea = document.getElementById('surat_dasar_textarea');
+            
+            if (jenisTugasSelect && suratDasarTextarea) {
+                // Check if it's not old input before overwriting
+                let hasOldSuratDasar = !!suratDasarTextarea.value.trim();
 
-                 items.forEach((item) => {
-                     const select = item.querySelector('.pegawai-select');
-                     const peranSelect = item.querySelector('.pegawai-peran');
-                     const nipInput = item.querySelector('.pegawai-nip');
-                     const pangkatInput = item.querySelector('.pegawai-pangkat');
-                     const jabatanInput = item.querySelector('.pegawai-jabatan');
+                jenisTugasSelect.addEventListener('change', function() {
+                    const selectedJenis = this.value;
+                    
+                    let targetSuratDasar = [];
+                    if (selectedJenis && suratDasarGrouped[selectedJenis]) {
+                        targetSuratDasar = suratDasarGrouped[selectedJenis];
+                    } else if (suratDasarGrouped['']) {
+                        targetSuratDasar = suratDasarGrouped[''];
+                    }
 
-                     // Baca nilai dari instance TomSelect (bukan native select.value yang bisa stale)
-                     const selectedId = select && select.tomselect
-                         ? select.tomselect.getValue()
-                         : (select ? select.value : null);
+                    if (targetSuratDasar && targetSuratDasar.length > 0) {
+                        const listTeks = targetSuratDasar.map((item, index) => `${index + 1}. ${item.teks}`);
+                        suratDasarTextarea.value = listTeks.join('\n');
+                    } else {
+                        suratDasarTextarea.value = '';
+                    }
+                });
 
-                     if (selectedId) {
-                         const dataPegawai = cacheOptions[selectedId];
-                         if (dataPegawai) {
-                             pegawaiData.push({
-                                 pegawai_id: selectedId,
-                                 nama_pegawai: dataPegawai.text,
-                                 nip: nipInput && nipInput.value ? nipInput.value : dataPegawai.nip,
-                                 pangkat: pangkatInput && pangkatInput.value ? pangkatInput.value : dataPegawai.pangkat,
-                                 jabatan: jabatanInput && jabatanInput.value ? jabatanInput.value : dataPegawai.jabatan,
-                                 peran: peranSelect ? peranSelect.value : 'Anggota',
-                             });
-                         }
-                     }
-                 });
+                // Trigger auto-fill on page load if a type is pre-selected and textarea is empty
+                if (jenisTugasSelect.value && !hasOldSuratDasar) {
+                    jenisTugasSelect.dispatchEvent(new Event('change'));
+                }
+            }
+
+            // Interseptor form submit untuk membundel data pegawai ke input JSON hidden
+            form.addEventListener('submit', function(e) {
+                if (typeof hitungHari === 'function') {
+                    hitungHari();
+                }
+
+                const items = container.querySelectorAll('.pegawai-item');
+                const pegawaiData = [];
+
+                items.forEach((item) => {
+                    const select = item.querySelector('.pegawai-select');
+                    const peranSelect = item.querySelector('.pegawai-peran');
+                    const nipInput = item.querySelector('.pegawai-nip');
+                    const pangkatInput = item.querySelector('.pegawai-pangkat');
+                    const jabatanInput = item.querySelector('.pegawai-jabatan');
+
+                    const selectedId = select && select.tomselect
+                        ? select.tomselect.getValue()
+                        : (select ? select.value : null);
+
+                    if (selectedId) {
+                        let dataPegawai = (typeof cacheOptions !== 'undefined' && cacheOptions)
+                            ? (cacheOptions[selectedId] || cacheOptions[String(selectedId)])
+                            : null;
+
+                        if (!dataPegawai && select) {
+                            const opt = select.querySelector(`option[value="${selectedId}"]`);
+                            if (opt) {
+                                dataPegawai = {
+                                    text: opt.textContent.trim(),
+                                    nip: opt.getAttribute('data-nip') || '',
+                                    pangkat: opt.getAttribute('data-pangkat') || '',
+                                    jabatan: opt.getAttribute('data-jabatan') || ''
+                                };
+                            }
+                        }
+
+                        let namaPegawai = dataPegawai ? dataPegawai.text : '';
+                        if (!namaPegawai && select && select.tomselect && select.tomselect.options[selectedId]) {
+                            namaPegawai = select.tomselect.options[selectedId].text;
+                        }
+
+                        if (selectedId && (namaPegawai || (nipInput && nipInput.value))) {
+                            pegawaiData.push({
+                                pegawai_id: selectedId,
+                                nama_pegawai: namaPegawai || 'Pegawai',
+                                nip: nipInput && nipInput.value ? nipInput.value : (dataPegawai ? dataPegawai.nip : ''),
+                                pangkat: pangkatInput && pangkatInput.value ? pangkatInput.value : (dataPegawai ? dataPegawai.pangkat : ''),
+                                jabatan: jabatanInput && jabatanInput.value ? jabatanInput.value : (dataPegawai ? dataPegawai.jabatan : ''),
+                                peran: peranSelect ? peranSelect.value : 'Anggota',
+                            });
+                        }
+                    }
+                });
 
                 if (pegawaiData.length === 0) {
                     e.preventDefault();
@@ -592,6 +727,222 @@
 
                 hiddenInput.value = JSON.stringify(pegawaiData);
             });
+
+            function getSuratDasarOptions() {
+                const selectedJenis = jenisTugasSelect ? jenisTugasSelect.value : '';
+                let targetSuratDasar = [];
+                if (selectedJenis && suratDasarGrouped[selectedJenis]) {
+                    targetSuratDasar = suratDasarGrouped[selectedJenis];
+                } else if (suratDasarGrouped['']) {
+                    targetSuratDasar = suratDasarGrouped[''];
+                }
+                return targetSuratDasar.map(item => ({ value: item.teks, text: item.teks }));
+            }
+
+            function syncSuratDasarDropdowns() {
+                const selects = suratDasarContainer.querySelectorAll('select.surat-dasar-select');
+                const selectedValues = Array.from(selects)
+                    .map(s => s.tomselect ? s.tomselect.getValue() : null)
+                    .filter(v => v);
+
+                const allOptions = getSuratDasarOptions();
+
+                selects.forEach((select, index) => {
+                    const row = select.closest('.surat-dasar-item');
+                    const numSpan = row.querySelector('.surat-dasar-number');
+                    if (numSpan) numSpan.textContent = (index + 1) + '.';
+
+                    if (select.tomselect) {
+                        const ts = select.tomselect;
+                        const currentValue = ts.getValue();
+                        
+                        ts.clearOptions();
+                        
+                        const availableOptions = allOptions.filter(opt => 
+                            opt.value === currentValue || !selectedValues.includes(opt.value)
+                        );
+                        
+                        ts.addOption(availableOptions);
+                        
+                        if (currentValue && !availableOptions.find(o => o.value === currentValue)) {
+                            ts.addOption({value: currentValue, text: currentValue});
+                        }
+
+                        if (currentValue) {
+                            ts.setValue(currentValue, true);
+                        }
+                    }
+                });
+            }
+
+            function addSuratDasarRow(value = '') {
+                const div = document.createElement('div');
+                div.className = 'surat-dasar-item flex gap-2 items-start mb-2';
+                div.innerHTML = `
+                    <div class="grow flex rounded-md shadow-sm">
+                        <span class="surat-dasar-number inline-flex items-center px-3 rounded-l-md border border-r-0 border-border-custom bg-background/50 text-muted text-sm font-medium"></span>
+                        <div class="grow" style="min-width: 0;">
+                            <select name="surat_dasar[]" class="surat-dasar-select w-full" placeholder="Pilih atau ketik acuan poin..."></select>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-remove-surat-dasar text-danger p-2 hover:bg-danger/10 rounded-md transition-colors mt-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                `;
+                suratDasarContainer.appendChild(div);
+
+                const select = div.querySelector('.surat-dasar-select');
+                const ts = new TomSelect(select, {
+                    create: true,
+                    createOnBlur: true,
+                    maxItems: 1,
+                    valueField: 'value',
+                    labelField: 'text',
+                    searchField: 'text',
+                    placeholder: 'Pilih atau ketik acuan poin...',
+                    render: {
+                        item: function(data, escape) {
+                            return '<div style="white-space: normal; overflow: visible; word-break: break-word; line-height: 1.5; padding: 2px 0;">' + escape(data.text) + '</div>';
+                        },
+                        option: function(data, escape) {
+                            return '<div style="white-space: normal; word-break: break-word; padding: 6px 10px; line-height: 1.5;">' + escape(data.text) + '</div>';
+                        }
+                    }
+                });
+
+                ts.addOption(getSuratDasarOptions());
+
+                if (value) {
+                    ts.addOption({value: value, text: value});
+                    ts.setValue(value);
+                }
+
+                const tsControl = select.parentElement.querySelector('.ts-control');
+                if (tsControl) {
+                    tsControl.style.borderTopLeftRadius = '0';
+                    tsControl.style.borderBottomLeftRadius = '0';
+                }
+
+                ts.on('change', () => syncSuratDasarDropdowns());
+
+                div.querySelector('.btn-remove-surat-dasar').addEventListener('click', function() {
+                    ts.destroy();
+                    div.remove();
+                    syncSuratDasarDropdowns();
+                });
+
+                syncSuratDasarDropdowns();
+            }
+
+            // Commit any uncommitted typed text in TomSelect inputs on form submit
+            const sptForm = suratDasarContainer ? suratDasarContainer.closest('form') : null;
+            if (sptForm) {
+                sptForm.addEventListener('submit', function() {
+                    suratDasarContainer.querySelectorAll('select.surat-dasar-select').forEach(select => {
+                        if (select.tomselect) {
+                            const ts = select.tomselect;
+                            const typedInput = ts.control_input ? ts.control_input.value.trim() : '';
+                            if (!ts.getValue() && typedInput) {
+                                ts.createItem(typedInput);
+                                ts.setValue(typedInput);
+                            }
+                        }
+                    });
+                });
+            }
+
+            if (btnAddSuratDasar) {
+                btnAddSuratDasar.addEventListener('click', () => addSuratDasarRow());
+            }
+
+            if (jenisTugasSelect) {
+                jenisTugasSelect.addEventListener('change', function(e) {
+                    if (isInitialLoadSurat && suratDasarContainer.querySelectorAll('.surat-dasar-item').length > 0) {
+                        isInitialLoadSurat = false;
+                        syncSuratDasarDropdowns();
+                        return;
+                    }
+
+                    suratDasarContainer.querySelectorAll('.surat-dasar-select').forEach(s => {
+                        if (s.tomselect) s.tomselect.destroy();
+                    });
+                    suratDasarContainer.innerHTML = '';
+                    
+                    addSuratDasarRow();
+                    isInitialLoadSurat = false;
+                });
+            }
+
+            const oldSuratDasar = @json(old('surat_dasar', $spt->surat_dasar ?? []));
+            let parsedOld = [];
+            if (typeof oldSuratDasar === 'string') {
+                parsedOld = oldSuratDasar.split('\n').filter(s => s.trim() !== '');
+            } else if (Array.isArray(oldSuratDasar)) {
+                parsedOld = oldSuratDasar.filter(s => s && s.trim() !== '');
+            }
+
+            if (parsedOld.length > 0) {
+                parsedOld.forEach(val => addSuratDasarRow(val));
+                isInitialLoadSurat = false;
+            } else if (jenisTugasSelect && jenisTugasSelect.value) {
+                jenisTugasSelect.dispatchEvent(new Event('change'));
+            // Dynamic Repeater untuk Tempat Tujuan
+            const tempatTujuanContainer = document.getElementById('tempat-tujuan-list');
+            const btnAddTempatTujuan = document.getElementById('btn-add-tempat-tujuan');
+
+            function addTempatTujuanRow(val = '') {
+                if (!tempatTujuanContainer) return;
+                const div = document.createElement('div');
+                div.className = 'tempat-tujuan-item flex gap-2 items-center';
+                div.innerHTML = `
+                    <div class="grow relative">
+                        <input type="text" name="tempat_tujuan[]" value="${escapeHtml(val)}" required
+                            placeholder="Contoh: Jakarta"
+                            class="w-full px-3 py-2 text-sm border border-border-custom rounded-md bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" />
+                    </div>
+                    <button type="button" class="btn-remove-tempat-tujuan text-danger p-2 hover:bg-danger/10 rounded-md transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                `;
+                tempatTujuanContainer.appendChild(div);
+                bindTempatTujuanRow(div);
+                updateTempatTujuanButtons();
+            }
+
+            function bindTempatTujuanRow(row) {
+                const btn = row.querySelector('.btn-remove-tempat-tujuan');
+                if (btn) {
+                    btn.addEventListener('click', function() {
+                        if (tempatTujuanContainer.querySelectorAll('.tempat-tujuan-item').length > 1) {
+                            row.remove();
+                            updateTempatTujuanButtons();
+                        }
+                    });
+                }
+            }
+
+            function updateTempatTujuanButtons() {
+                if (!tempatTujuanContainer) return;
+                const items = tempatTujuanContainer.querySelectorAll('.tempat-tujuan-item');
+                items.forEach(item => {
+                    const btn = item.querySelector('.btn-remove-tempat-tujuan');
+                    if (btn) {
+                        btn.style.display = items.length > 1 ? 'block' : 'none';
+                    }
+                });
+            }
+
+            if (tempatTujuanContainer) {
+                tempatTujuanContainer.querySelectorAll('.tempat-tujuan-item').forEach(bindTempatTujuanRow);
+                updateTempatTujuanButtons();
+            }
+
+            if (btnAddTempatTujuan) {
+                btnAddTempatTujuan.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    addTempatTujuanRow();
+                });
+            }
 
             function hitungHari() {
                 const tgl1 = tglBerangkat ? new Date(tglBerangkat.value) : null;

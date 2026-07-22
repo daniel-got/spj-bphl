@@ -73,7 +73,7 @@
                                 <tr>
                                     <th class="px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider w-8">#</th>
                                     <th class="px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider">Teks Surat Dasar</th>
-                                    <th class="px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider text-center w-28">Status</th>
+                                    <th class="px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider text-center w-32">Jenis SPT</th>
                                     <th class="px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider text-center w-40">Aksi</th>
                                 </tr>
                             </thead>
@@ -92,32 +92,23 @@
                                             </p>
                                         </td>
                                         <td class="px-6 py-4 text-center">
-                                            @if ($item->aktif)
-                                                <x-data.badge label="Aktif" color="green" />
+                                            @if ($item->jenis_spt)
+                                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs">{{ ucfirst($item->jenis_spt) }}</span>
                                             @else
-                                                <x-data.badge label="Nonaktif" color="gray" />
+                                                <span class="text-xs text-muted">-</span>
                                             @endif
                                         </td>
+
                                         <td class="px-6 py-4 text-center">
                                             <div class="flex items-center justify-center gap-1">
                                                 {{-- Edit --}}
-                                                <x-action.icon-button
-                                                    color="primary"
+                                                <button
+                                                    type="button"
                                                     title="Edit"
-                                                    onclick="openEditModal({{ $item->id }}, {{ json_encode($item->teks) }}, {{ $item->aktif ? 'true' : 'false' }})">
+                                                    onclick="editSuratDasar({{ $item->id }})"
+                                                    class="p-1.5 rounded-md transition-colors text-primary hover:text-primary-hover hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary/50 flex items-center justify-center shrink-0">
                                                     <x-utility.icon name="pencil" class="w-4 h-4" />
-                                                </x-action.icon-button>
-
-                                                {{-- Toggle Aktif --}}
-                                                <form method="POST" action="{{ route('admin.surat-dasar.toggle', $item) }}" class="inline">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <x-action.icon-button type="submit"
-                                                        color="{{ $item->aktif ? 'warning' : 'success' }}"
-                                                        title="{{ $item->aktif ? 'Nonaktifkan' : 'Aktifkan' }}">
-                                                        <x-utility.icon name="{{ $item->aktif ? 'eye-slash' : 'eye' }}" class="w-4 h-4" />
-                                                    </x-action.icon-button>
-                                                </form>
+                                                </button>
 
                                                 {{-- Hapus --}}
                                                 <x-action.icon-button
@@ -159,6 +150,17 @@
             @csrf
             <div class="space-y-4 p-1">
                 <div>
+                    <label for="jenis_spt_baru" class="text-sm font-medium text-text-main mb-2 block">
+                        Jenis SPT <span class="text-xs text-muted">(Opsional)</span>
+                    </label>
+                    <select name="jenis_spt" id="jenis_spt_baru" class="w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background border-border-custom focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                        <option value="">-- Semua Jenis --</option>
+                        <option value="pelatihan">Pelatihan</option>
+                        <option value="keuangan">Keuangan</option>
+                        <option value="administrasi">Administrasi</option>
+                    </select>
+                </div>
+                <div>
                     <label for="teks_baru" class="text-sm font-medium text-text-main mb-2 block">
                         Teks Surat Dasar <span class="text-danger">*</span>
                     </label>
@@ -171,12 +173,7 @@
                         class="w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background border-border-custom focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary resize-none"
                     ></textarea>
                 </div>
-                <div class="flex items-center gap-2">
-                    <input type="hidden" name="aktif" value="0">
-                    <input type="checkbox" name="aktif" id="aktif_baru" value="1" checked
-                        class="w-4 h-4 text-primary border-border-custom rounded focus:ring-primary">
-                    <label for="aktif_baru" class="text-sm text-text-main">Langsung aktif (tampil di dropdown form SPT)</label>
-                </div>
+
             </div>
 
             <x-slot:footer>
@@ -201,6 +198,17 @@
             @method('PUT')
             <div class="space-y-4 p-1">
                 <div>
+                    <label for="jenis_spt_edit" class="text-sm font-medium text-text-main mb-2 block">
+                        Jenis SPT <span class="text-xs text-muted">(Opsional)</span>
+                    </label>
+                    <select name="jenis_spt" id="jenis_spt_edit" class="w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background border-border-custom focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                        <option value="">-- Semua Jenis --</option>
+                        <option value="pelatihan">Pelatihan</option>
+                        <option value="keuangan">Keuangan</option>
+                        <option value="administrasi">Administrasi</option>
+                    </select>
+                </div>
+                <div>
                     <label for="teks_edit" class="text-sm font-medium text-text-main mb-2 block">
                         Teks Surat Dasar <span class="text-danger">*</span>
                     </label>
@@ -212,12 +220,7 @@
                         class="w-full px-3 py-2 text-sm border rounded-md shadow-sm bg-background border-border-custom focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary resize-none"
                     ></textarea>
                 </div>
-                <div class="flex items-center gap-2">
-                    <input type="hidden" name="aktif" value="0">
-                    <input type="checkbox" name="aktif" id="aktif_edit" value="1"
-                        class="w-4 h-4 text-primary border-border-custom rounded focus:ring-primary">
-                    <label for="aktif_edit" class="text-sm text-text-main">Aktif (tampil di dropdown form SPT)</label>
-                </div>
+
             </div>
 
             <x-slot:footer>
@@ -235,22 +238,31 @@
         </form>
     </x-feedback.modal>
 
-    @push('scripts')
     <script>
-        /**
-         * Buka modal edit dan isi data dari baris yang dipilih.
-         */
-        function openEditModal(id, teks, aktif) {
-            const form = document.getElementById('form-edit-surat-dasar');
-            form.action = `/admin/surat-dasar/${id}`;
+        // Data surat dasar disimpan sebagai object JavaScript
+        var suratDasarData = {!! json_encode($suratDasars->keyBy('id')->map(function($item) {
+            return ['teks' => $item->teks, 'jenis_spt' => $item->jenis_spt];
+        })) !!};
 
-            document.getElementById('teks_edit').value = teks;
+        function editSuratDasar(id) {
+            var data = suratDasarData[id];
+            if (!data) {
+                alert('Data tidak ditemukan');
+                return;
+            }
 
-            const aktifCheckbox = document.getElementById('aktif_edit');
-            aktifCheckbox.checked = aktif;
+            var form = document.getElementById('form-edit-surat-dasar');
+            form.action = '/admin/surat-dasar/' + id;
 
-            openModal('modal-edit');
+            document.getElementById('teks_edit').value = data.teks;
+            document.getElementById('jenis_spt_edit').value = data.jenis_spt || '';
+
+            // Buka modal
+            var modal = document.getElementById('modal-edit');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
         }
     </script>
-    @endpush
 </x-layout.app>

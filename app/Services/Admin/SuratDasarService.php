@@ -32,7 +32,10 @@ class SuratDasarService
     {
         return SuratDasar::updateOrCreate(
             ['teks' => $data['teks']],
-            ['aktif' => $data['aktif'] ?? true]
+            [
+                'aktif' => $data['aktif'] ?? true,
+                'jenis_spt' => $data['jenis_spt'] ?? null,
+            ]
         );
     }
 
@@ -44,6 +47,7 @@ class SuratDasarService
         $suratDasar->update([
             'teks' => $data['teks'],
             'aktif' => $data['aktif'] ?? $suratDasar->aktif,
+            'jenis_spt' => array_key_exists('jenis_spt', $data) ? $data['jenis_spt'] : $suratDasar->jenis_spt,
         ]);
 
         return $suratDasar->fresh();
