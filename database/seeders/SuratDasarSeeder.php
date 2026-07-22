@@ -28,7 +28,7 @@ class SuratDasarSeeder extends Seeder
         SuratDasar::create(['teks' => $pt2_satker, 'jenis_spt' => 'administrasi', 'aktif' => true]);
 
         // Seed any custom master points created by users from custom_surat_dasar.json
-        $customJsonPath = database_path('seeders/custom_surat_dasar.json');
+        $customJsonPath = storage_path('app/custom_surat_dasar.json');
         if (file_exists($customJsonPath)) {
             $customPoints = json_decode(file_get_contents($customJsonPath), true);
             if (is_array($customPoints)) {

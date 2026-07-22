@@ -191,7 +191,7 @@ class SptService
             return;
         }
 
-        $customJsonPath = database_path('seeders/custom_surat_dasar.json');
+        $customJsonPath = storage_path('app/custom_surat_dasar.json');
         $customPoints = file_exists($customJsonPath)
             ? json_decode(file_get_contents($customJsonPath), true) ?: []
             : [];
