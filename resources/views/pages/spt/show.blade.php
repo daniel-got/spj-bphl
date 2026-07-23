@@ -94,27 +94,31 @@
 
                 {{-- Status & Validasi Card --}}
                 <x-layout.card title="Status & Validasi Pertanggungjawaban">
-                    <div class="overflow-x-auto mt-4">
-                        @php
-                            $statusBadge = '<x-data.status-badge status="' . ($spt->status ?? 'draft') . '" />';
-
-                            $keterangan = '';
-                            if ($spt->status === 'disetujui') {
-                                $keterangan = '<span class="text-xs text-muted italic">Tidak membutuhkan catatan alasan tambahan (Disetujui penuh oleh PPK).</span>';
-                            } elseif (in_array($spt->status, ['direvisi', 'ditolak']) && !empty($spt->catatan_verifikator)) {
-                                $keterangan = '<span class="font-bold text-xs text-text-main bg-background border border-border-custom px-3 py-2 rounded-lg block max-w-2xl leading-relaxed">' . e($spt->catatan_verifikator) . '</span>';
-                            } else {
-                                $keterangan = '<span class="text-xs text-muted italic">Belum ada rincian catatan status.</span>';
-                            }
-
-                            $headersStatus = ['Status SPT', 'Detail Alasan / Keterangan'];
-                            $rowsStatus = [
-                                [
-                                    'cells' => [$statusBadge, $keterangan]
-                                ]
-                            ];
-                        @endphp
-                        <x-data.table :headers="$headersStatus" :rows="$rowsStatus" :striped="false" />
+                    <div class="overflow-x-auto mt-4 border border-border-custom rounded-lg">
+                        <table class="min-w-full divide-y divide-border-custom text-sm">
+                            <thead class="bg-background">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-muted uppercase tracking-wider whitespace-nowrap">Status SPT</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-muted uppercase tracking-wider whitespace-nowrap">Detail Alasan / Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-surface divide-y divide-border-custom">
+                                <tr class="hover:bg-background transition-colors">
+                                    <td class="px-4 py-3 text-text-main whitespace-nowrap w-48">
+                                        <x-data.status-badge status="{{ $spt->status ?? 'draft' }}" />
+                                    </td>
+                                    <td class="px-4 py-3 text-text-main whitespace-normal">
+                                        @if ($spt->status === 'disetujui')
+                                            <span class="text-xs text-muted italic">Tidak membutuhkan catatan alasan tambahan (Disetujui penuh oleh PPK).</span>
+                                        @elseif (in_array($spt->status, ['direvisi', 'ditolak']) && !empty($spt->catatan_verifikator))
+                                            <span class="font-bold text-xs text-text-main bg-background border border-border-custom px-3 py-2 rounded-lg block max-w-2xl leading-relaxed">{{ $spt->catatan_verifikator }}</span>
+                                        @else
+                                            <span class="text-xs text-muted italic">Belum ada rincian catatan status.</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </x-layout.card>
 
