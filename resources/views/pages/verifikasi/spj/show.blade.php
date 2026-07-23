@@ -124,27 +124,51 @@
                             @php
                                 $headersBiaya = [
                                     '#', 
-                                    'Biaya Transport', 
-                                    'Penginapan (%)', 
-                                    ['label' => 'Biaya Hotel / Penginapan', 'class' => 'text-right']
+                                    'Jenis Biaya', 
+                                    'Detail', 
+                                    ['label' => 'Total', 'class' => 'text-right']
                                 ];
                                 
                                 $rowsBiaya = [];
                                 $totalTransport = 0;
                                 $totalPenginapan = 0;
+                                $no = 1;
                                 
-                                foreach ($rincianBiaya as $i => $baris) {
-                                    $totalTransport += (int) ($baris['biaya_transport'] ?? 0);
-                                    $totalPenginapan += (int) ($baris['hotel_ril'] ?? 0);
-                                    
-                                    $rowsBiaya[] = [
-                                        'cells' => [
-                                            '<span class="text-muted font-medium">' . ($i + 1) . '</span>',
-                                            'Rp ' . number_format($baris['biaya_transport'] ?? 0, 0, ',', '.'),
-                                            ($baris['penginapan'] ?? '-') . '%',
-                                            '<div class="text-right">Rp ' . number_format($baris['hotel_ril'] ?? 0, 0, ',', '.') . '</div>'
-                                        ]
-                                    ];
+                                if (isset($rincianBiaya['transport']) && is_array($rincianBiaya['transport'])) {
+                                    foreach ($rincianBiaya['transport'] as $kategori => $items) {
+                                        if (is_array($items)) {
+                                            foreach ($items as $item) {
+                                                $biaya = (float) ($item['biaya'] ?? 0);
+                                                $totalTransport += $biaya;
+                                                $rowsBiaya[] = [
+                                                    'cells' => [
+                                                        '<span class="text-muted font-medium">' . $no++ . '</span>',
+                                                        'Transport - ' . ucfirst($kategori),
+                                                        ($item['asal'] ?? '-') . ' ke ' . ($item['tujuan'] ?? '-'),
+                                                        '<div class="text-right">Rp ' . number_format($biaya, 0, ',', '.') . '</div>'
+                                                    ]
+                                                ];
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (isset($rincianBiaya['penginapan']) && is_array($rincianBiaya['penginapan'])) {
+                                    foreach ($rincianBiaya['penginapan'] as $item) {
+                                        if (is_array($item)) {
+                                            $biaya = (float) ($item['hotel_ril'] ?? 0);
+                                            $totalPenginapan += $biaya;
+                                            $persen = $item['penginapan'] ?? '30';
+                                            $rowsBiaya[] = [
+                                                'cells' => [
+                                                    '<span class="text-muted font-medium">' . $no++ . '</span>',
+                                                    'Penginapan',
+                                                    'Persentase: ' . $persen . '%',
+                                                    '<div class="text-right">Rp ' . number_format($biaya, 0, ',', '.') . '</div>'
+                                                ]
+                                            ];
+                                        }
+                                    }
                                 }
                             @endphp
                             

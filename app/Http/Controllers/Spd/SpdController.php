@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Spd;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Spd\StoreSpdRequest;
 use App\Http\Requests\Spd\UpdateSpdRequest;
@@ -44,7 +45,19 @@ class SpdController extends Controller
         // SPD dibuat per akun: identitas pegawai otomatis dari akun yang login.
         $myPegawai = Pegawai::where('user_id', auth()->id())->first();
         $ppkData = $this->getPpkData();
-        $pegawaiData = Pegawai::select('id', 'nama_pegawai', 'nip', 'jabatan')->get();
+        $petinggiRoles = [
+            UserRole::KEPALA_BALAI->value,
+            UserRole::KEPALA_TU->value,
+            UserRole::KEPALA_SEKSI_PEPHPHL->value,
+            UserRole::KEPALA_SEKSI_PPPHPHL->value,
+        ];
+        $pegawaiData = Pegawai::whereHas('user', function ($q) use ($petinggiRoles) {
+            $q->where(function ($query) use ($petinggiRoles) {
+                foreach ($petinggiRoles as $role) {
+                    $query->orWhereJsonContains('roles', $role);
+                }
+            });
+        })->select('id', 'nama_pegawai', 'nip', 'jabatan')->get();
 
         return view('pages.spd.create', compact('myPegawai', 'ppkData', 'pegawaiData'));
     }
@@ -85,7 +98,19 @@ class SpdController extends Controller
         // Identitas pegawai pada SPD tetap mengikuti akun pemilik (tidak dapat diubah).
         $spd->load('pegawai');
         $ppkData = $this->getPpkData();
-        $pegawaiData = Pegawai::select('id', 'nama_pegawai', 'nip', 'jabatan')->get();
+        $petinggiRoles = [
+            UserRole::KEPALA_BALAI->value,
+            UserRole::KEPALA_TU->value,
+            UserRole::KEPALA_SEKSI_PEPHPHL->value,
+            UserRole::KEPALA_SEKSI_PPPHPHL->value,
+        ];
+        $pegawaiData = Pegawai::whereHas('user', function ($q) use ($petinggiRoles) {
+            $q->where(function ($query) use ($petinggiRoles) {
+                foreach ($petinggiRoles as $role) {
+                    $query->orWhereJsonContains('roles', $role);
+                }
+            });
+        })->select('id', 'nama_pegawai', 'nip', 'jabatan')->get();
 
         return view('pages.spd.edit', compact('spd', 'ppkData', 'pegawaiData'));
     }

@@ -101,8 +101,8 @@
                             $keterangan = '';
                             if ($spt->status === 'disetujui') {
                                 $keterangan = '<span class="text-xs text-muted italic">Tidak membutuhkan catatan alasan tambahan (Disetujui penuh oleh PPK).</span>';
-                            } elseif (in_array($spt->status, ['direvisi', 'ditolak']) && !empty($spt->alasan)) {
-                                $keterangan = '<span class="font-bold text-xs text-text-main bg-background border border-border-custom px-3 py-2 rounded-lg block max-w-2xl leading-relaxed">' . e($spt->alasan) . '</span>';
+                            } elseif (in_array($spt->status, ['direvisi', 'ditolak']) && !empty($spt->catatan_verifikator)) {
+                                $keterangan = '<span class="font-bold text-xs text-text-main bg-background border border-border-custom px-3 py-2 rounded-lg block max-w-2xl leading-relaxed">' . e($spt->catatan_verifikator) . '</span>';
                             } else {
                                 $keterangan = '<span class="text-xs text-muted italic">Belum ada rincian catatan status.</span>';
                             }

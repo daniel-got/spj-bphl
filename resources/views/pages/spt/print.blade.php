@@ -325,34 +325,36 @@
                             : $spt->pegawai_ditugaskan;
                         $pegawais = is_array($pegawais) ? $pegawais : [];
                     @endphp
-                    @forelse($pegawais as $index => $pegawai)
-                        <div class="pegawai-item-box">
-                            <table class="sub-table">
-                                <tr>
-                                    <td class="sub-lbl">
-                                        @if (count($pegawais) > 1)
-                                            {{ $index + 1 }}.
-                                        @endif Nama/NIP
-                                    </td>
-                                    <td class="sub-ttk">:</td>
-                                    <td class="sub-cnt">{{ $pegawai['nama_pegawai'] ?? '-' }} /
-                                        {{ $pegawai['nip'] ?? '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="sub-lbl">&nbsp;&nbsp;&nbsp;&nbsp;Pangkat/Gol</td>
-                                    <td class="sub-ttk">:</td>
-                                    <td class="sub-cnt">{{ $pegawai['pangkat'] ?? '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="sub-lbl">&nbsp;&nbsp;&nbsp;&nbsp;Jabatan</td>
-                                    <td class="sub-ttk">:</td>
-                                    <td class="sub-cnt">{{ $pegawai['jabatan'] ?? '-' }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    @empty
-                        <div>Tidak ada pejabat/pegawai yang ditugaskan.</div>
-                    @endforelse
+                    <table style="width: 100%; border-collapse: collapse;">
+                        @forelse($pegawais as $index => $pegawai)
+                            <tr>
+                                @if (count($pegawais) > 1)
+                                    <td style="width: 20px; vertical-align: top; padding: 2px 0;">{{ $index + 1 }}.</td>
+                                @endif
+                                <td style="padding: 0;">
+                                    <table class="sub-table" style="width: 100%; margin-bottom: 4px;">
+                                        <tr>
+                                            <td class="sub-lbl" style="width: 100px;">Nama/NIP</td>
+                                            <td class="sub-ttk" style="width: 20px;">:</td>
+                                            <td class="sub-cnt">{{ $pegawai['nama_pegawai'] ?? '-' }} / {{ $pegawai['nip'] ?? '-' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="sub-lbl">Pangkat/Gol</td>
+                                            <td class="sub-ttk">:</td>
+                                            <td class="sub-cnt">{{ $pegawai['pangkat'] ?? '-' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="sub-lbl">Jabatan</td>
+                                            <td class="sub-ttk">:</td>
+                                            <td class="sub-cnt">{{ $pegawai['jabatan'] ?? '-' }}</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td>Tidak ada pejabat/pegawai yang ditugaskan.</td></tr>
+                        @endforelse
+                    </table>
                 </td>
             </tr>
 
