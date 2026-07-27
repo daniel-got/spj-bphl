@@ -18,10 +18,24 @@
         });
     }
 
+    /**
+     * Helper: cek apakah URL item cocok dengan URL saat ini.
+     * Jika item memiliki 'exact' => true, hanya exact match yang diterima.
+     * Jika tidak, URL saat ini boleh cocok dengan prefix (url atau url/*).
+     */
+    $isUrlActive = function (string $url, bool $exact = false): bool {
+        $pattern = ltrim($url, '/') ?: '/';
+        if ($exact) {
+            return request()->is($pattern);
+        }
+        return request()->is($pattern) || request()->is($pattern . '/*');
+    };
+
     // Tandai item aktif berdasarkan URL saat ini
-    $menuItems = array_map(function ($item) {
+    $menuItems = array_map(function ($item) use ($isUrlActive) {
         if (isset($item['url'])) {
-            $item['active'] = request()->is(ltrim($item['url'], '/') ?: '/');
+            $exact = $item['exact'] ?? false;
+            $item['active'] = $isUrlActive($item['url'], $exact);
         } else {
             $item['active'] = false;
         }
@@ -146,9 +160,10 @@
             @else
                 @php
                     $pattern = isset($item['url']) ? ltrim($item['url'], '/') : '';
+                    $exact   = $item['exact'] ?? false;
                     $isActive = $item['active'] ?? false;
-                    if ($pattern && (request()->is($pattern) || request()->is($pattern . '/*'))) {
-                        $isActive = true;
+                    if ($pattern) {
+                        $isActive = $isUrlActive($item['url'], $exact);
                     }
                 @endphp
                 <a href="{{ $item['url'] ?? '#' }}" :title="sidebarCollapsed ? '{{ $item['label'] }}' : ''"

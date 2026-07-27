@@ -52,12 +52,14 @@ return [
             'label' => 'SPT Saya',
             'url' => '/user/spt',
             'icon' => 'document-text',
+            'exact' => true, // hanya aktif di /user/spt, tidak di /user/spt/kelola
             'roles' => ['admin', 'user', 'ppk_1', 'ppk_2', 'ppk_3', 'bendahara_pengeluaran', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
             'label' => 'SPD Saya',
             'url' => '/user/spd',
             'icon' => 'clipboard',
+            'exact' => true, // hanya aktif di /user/spd, tidak di /admin/kelola-spd
             'roles' => ['admin', 'user', 'ppk_1', 'ppk_2', 'ppk_3', 'bendahara_pengeluaran', 'verifikator', 'pembuat_spt', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
@@ -75,7 +77,7 @@ return [
                     'url' => '/user/kwitansi',
                     'icon' => 'document-check',
                 ],
-            ]
+            ],
         ],
 
         // --- GRUP: OPERASIONAL (Input & Verifikasi) ---
@@ -120,6 +122,18 @@ return [
             'roles' => ['admin'],
         ],
         [
+            'label' => 'Kelola SPD',
+            'url' => '/admin/kelola-spd',
+            'icon' => 'clipboard-document-list',
+            'roles' => ['admin'],
+        ],
+        [
+            'label' => 'Kelola Rincian SPJ',
+            'url' => '/admin/kelola-rincian',
+            'icon' => 'calculator',
+            'roles' => ['admin'],
+        ],
+        [
             'label' => 'Data Uang Harian',
             'url' => '/admin/uang-harian',
             'icon' => 'currency-dollar',
@@ -141,6 +155,12 @@ return [
             'label' => 'Master Surat Dasar',
             'url' => '/admin/surat-dasar',
             'icon' => 'document-duplicate',
+            'roles' => ['admin'],
+        ],
+        [
+            'label' => 'Pengaturan Sistem',
+            'url' => '/admin/pengaturan',
+            'icon' => 'cog-6-tooth',
             'roles' => ['admin'],
         ],
     ],

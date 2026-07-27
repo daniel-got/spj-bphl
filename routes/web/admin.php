@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaPegawaiController;
+use App\Http\Controllers\Admin\KelolaRincianController;
+use App\Http\Controllers\Admin\KelolaSpdController;
+use App\Http\Controllers\Admin\PengaturanController;
 use App\Http\Controllers\Admin\SuratDasarController;
 use App\Http\Controllers\Admin\UangHarianController;
 use App\Http\Controllers\Admin\UangPenginapanController;
@@ -67,4 +70,18 @@ Route::middleware(['auth', 'role:admin'])
         Route::delete('/surat-dasar/{surat_dasar}', [SuratDasarController::class, 'destroy'])->name('surat-dasar.destroy');
         Route::patch('/surat-dasar/{surat_dasar}/toggle', [SuratDasarController::class, 'toggle'])->name('surat-dasar.toggle');
         Route::post('/surat-dasar/sinkron', [SuratDasarController::class, 'sinkron'])->name('surat-dasar.sinkron');
+
+        // Pengaturan Sistem (R2 Storage)
+        Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
+        Route::put('/pengaturan/r2', [PengaturanController::class, 'updateR2'])->name('pengaturan.r2.update');
+
+        // Kelola SPD (CRUD All)
+        Route::get('/kelola-spd', [KelolaSpdController::class, 'index'])->name('kelola-spd.index');
+        Route::get('/kelola-spd/{spd}', [KelolaSpdController::class, 'show'])->name('kelola-spd.show');
+        Route::delete('/kelola-spd/{spd}', [KelolaSpdController::class, 'destroy'])->name('kelola-spd.destroy');
+
+        // Kelola Rincian SPJ (CRUD All)
+        Route::get('/kelola-rincian', [KelolaRincianController::class, 'index'])->name('kelola-rincian.index');
+        Route::get('/kelola-rincian/{rincian}', [KelolaRincianController::class, 'show'])->name('kelola-rincian.show');
+        Route::delete('/kelola-rincian/{rincian}', [KelolaRincianController::class, 'destroy'])->name('kelola-rincian.destroy');
     });
