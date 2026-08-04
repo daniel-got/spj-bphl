@@ -65,6 +65,9 @@
         .logo-col img {
             width: auto;
             height: 2.57cm;
+            max-width: 100px;
+            /* Batasi max width agar tidak kebesaran di safari */
+            object-fit: contain;
             display: block;
             margin: 0 auto;
         }
@@ -325,36 +328,34 @@
                             : $spt->pegawai_ditugaskan;
                         $pegawais = is_array($pegawais) ? $pegawais : [];
                     @endphp
-                    <table style="width: 100%; border-collapse: collapse;">
-                        @forelse($pegawais as $index => $pegawai)
-                            <tr>
-                                @if (count($pegawais) > 1)
-                                    <td style="width: 20px; vertical-align: top; padding: 2px 0;">{{ $index + 1 }}.</td>
-                                @endif
-                                <td style="padding: 0;">
-                                    <table class="sub-table" style="width: 100%; margin-bottom: 4px;">
-                                        <tr>
-                                            <td class="sub-lbl" style="width: 100px;">Nama/NIP</td>
-                                            <td class="sub-ttk" style="width: 20px;">:</td>
-                                            <td class="sub-cnt">{{ $pegawai['nama_pegawai'] ?? '-' }} / {{ $pegawai['nip'] ?? '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="sub-lbl">Pangkat/Gol</td>
-                                            <td class="sub-ttk">:</td>
-                                            <td class="sub-cnt">{{ $pegawai['pangkat'] ?? '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="sub-lbl">Jabatan</td>
-                                            <td class="sub-ttk">:</td>
-                                            <td class="sub-cnt">{{ $pegawai['jabatan'] ?? '-' }}</td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr><td>Tidak ada pejabat/pegawai yang ditugaskan.</td></tr>
-                        @endforelse
-                    </table>
+                    @forelse($pegawais as $index => $pegawai)
+                        <div class="pegawai-item-box">
+                            <table class="sub-table">
+                                <tr>
+                                    <td class="sub-lbl">
+                                        @if (count($pegawais) > 1)
+                                            {{ $index + 1 }}.
+                                        @endif Nama/NIP
+                                    </td>
+                                    <td class="sub-ttk">:</td>
+                                    <td class="sub-cnt">{{ $pegawai['nama_pegawai'] ?? '-' }} /
+                                        {{ $pegawai['nip'] ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="sub-lbl">&nbsp;&nbsp;&nbsp;&nbsp;Pangkat/Gol</td>
+                                    <td class="sub-ttk">:</td>
+                                    <td class="sub-cnt">{{ $pegawai['pangkat'] ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="sub-lbl">&nbsp;&nbsp;&nbsp;&nbsp;Jabatan</td>
+                                    <td class="sub-ttk">:</td>
+                                    <td class="sub-cnt">{{ $pegawai['jabatan'] ?? '-' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    @empty
+                        <div>Tidak ada pejabat/pegawai yang ditugaskan.</div>
+                    @endforelse
                 </td>
             </tr>
 
@@ -448,7 +449,7 @@
             document.body.classList.add('paper-a4');
             const styleEl = document.getElementById('page-style');
             if (styleEl) {
-                styleEl.innerHTML = `@page { size: A4 portrait; margin: 0.5cm 1cm 0.75cm 2cm; }`;
+                styleEl.innerHTML = `@page { size: A4 portrait; margin: 0.5cm 1.5cm 0.75cm 2cm; }`;
             }
             window.print();
         }
@@ -458,7 +459,7 @@
             document.body.classList.add('paper-f4');
             const styleEl = document.getElementById('page-style');
             if (styleEl) {
-                styleEl.innerHTML = `@page { size: 215.9mm 330.2mm portrait; margin: 0.5cm 1cm 0.75cm 2cm; }`;
+                styleEl.innerHTML = `@page { size: 215.9mm 330.2mm portrait; margin: 0.5cm 1.5cm 0.75cm 2cm; }`;
             }
             window.print();
         }
