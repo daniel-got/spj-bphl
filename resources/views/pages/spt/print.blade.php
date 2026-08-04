@@ -149,7 +149,7 @@
         }
 
         .lbl {
-            width: 85px;
+            width: 100px;
         }
 
         .ttk {

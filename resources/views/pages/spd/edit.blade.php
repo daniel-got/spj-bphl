@@ -371,63 +371,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- Destinations Dynamic List ---
-            const destContainer = document.getElementById('destinations-list');
-            const destAddBtn = document.getElementById('add-destination-btn');
 
-            function updateDestRemoveButtons() {
-                const items = destContainer.querySelectorAll('.destination-item');
-                items.forEach((item, index) => {
-                    let removeBtn = item.querySelector('.remove-destination-btn');
-                    if (items.length > 1) {
-                        if (!removeBtn) {
-                            const tempDiv = document.createElement('div');
-                            tempDiv.innerHTML = `
-                                <x-action.icon-button color="danger" class="remove-destination-btn p-2">
-                                    <x-utility.icon name="trash" class="w-5 h-5" />
-                                </x-action.icon-button>
-                            `.trim();
-                            removeBtn = tempDiv.firstChild;
-                            removeBtn.addEventListener('click', function() {
-                                item.remove();
-                                updateDestRemoveButtons();
-                            });
-                            item.appendChild(removeBtn);
-                        }
-                    } else {
-                        if (removeBtn) {
-                            removeBtn.remove();
-                        }
-                    }
-                });
-            }
-
-            destAddBtn.addEventListener('click', function() {
-                const newItem = document.createElement('div');
-                newItem.className = 'flex items-center gap-2 destination-item';
-                newItem.innerHTML = `
-                    <div class="grow">
-                        <input
-                            type="text"
-                            name="tempat_tujuan[]"
-                            placeholder="Contoh: Jakarta"
-                            required
-                            class="w-full px-3 py-2 text-sm border rounded-md shadow-sm placeholder-muted bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-background disabled:text-muted disabled:cursor-not-allowed border-border-custom"
-                        />
-                    </div>
-                `;
-                destContainer.appendChild(newItem);
-                updateDestRemoveButtons();
-            });
-
-            destContainer.querySelectorAll('.remove-destination-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    btn.closest('.destination-item').remove();
-                    updateDestRemoveButtons();
-                });
-            });
-
-            updateDestRemoveButtons();
 
             // --- Kepala Seksi Autofill ---
             $('#kepala_seksi_select').select2({
