@@ -1550,7 +1550,7 @@
                     </td>
                     <td
                         style="border-left:0.75pt solid #000;font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
-                        <span class="print-value">{{ is_array($spd->alat_angkut) ? implode(', ', $spd->alat_angkut) : $spd->alat_angkut }}</span></td>
+                        <span class="print-value">{{ is_array($spd->alat_angkut) && count($spd->alat_angkut) > 0 ? $spd->alat_angkut[0] : (is_string($spd->alat_angkut) ? (json_decode($spd->alat_angkut)[0] ?? $spd->alat_angkut) : $spd->alat_angkut) }}</span></td>
                     <td
                         style="font-size:11.0pt;font-family:'Tahoma',Arial,sans-serif;vertical-align:bottom;white-space:nowrap;overflow:visible;">
                     </td>
