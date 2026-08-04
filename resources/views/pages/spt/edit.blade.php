@@ -631,38 +631,12 @@
              syncAllDropdowns();
 
              // Interseptor form submit untuk membundel data pegawai ke input JSON hidden
-             // Auto-fill Surat Dasar
+            // Auto-fill Surat Dasar (Dynamic Repeater with TomSelect)
             const suratDasarGrouped = @json($suratDasarGrouped);
             const jenisTugasSelect = document.querySelector('[name="jenis_tugas"]');
-            const suratDasarTextarea = document.getElementById('surat_dasar_textarea');
-            
-            if (jenisTugasSelect && suratDasarTextarea) {
-                // Check if it's not old input before overwriting
-                let hasOldSuratDasar = !!suratDasarTextarea.value.trim();
-
-                jenisTugasSelect.addEventListener('change', function() {
-                    const selectedJenis = this.value;
-                    
-                    let targetSuratDasar = [];
-                    if (selectedJenis && suratDasarGrouped[selectedJenis]) {
-                        targetSuratDasar = suratDasarGrouped[selectedJenis];
-                    } else if (suratDasarGrouped['']) {
-                        targetSuratDasar = suratDasarGrouped[''];
-                    }
-
-                    if (targetSuratDasar && targetSuratDasar.length > 0) {
-                        const listTeks = targetSuratDasar.map((item, index) => `${index + 1}. ${item.teks}`);
-                        suratDasarTextarea.value = listTeks.join('\n');
-                    } else {
-                        suratDasarTextarea.value = '';
-                    }
-                });
-
-                // Trigger auto-fill on page load if a type is pre-selected and textarea is empty
-                if (jenisTugasSelect.value && !hasOldSuratDasar) {
-                    jenisTugasSelect.dispatchEvent(new Event('change'));
-                }
-            }
+            const suratDasarContainer = document.getElementById('surat-dasar-list');
+            const btnAddSuratDasar = document.getElementById('btn-add-surat-dasar');
+            let isInitialLoadSurat = true;
 
             // Interseptor form submit untuk membundel data pegawai ke input JSON hidden
             form.addEventListener('submit', function(e) {
@@ -876,7 +850,16 @@
             const oldSuratDasar = @json(old('surat_dasar', $spt->surat_dasar ?? []));
             let parsedOld = [];
             if (typeof oldSuratDasar === 'string') {
-                parsedOld = oldSuratDasar.split('\n').filter(s => s.trim() !== '');
+                try {
+                    let decoded = JSON.parse(oldSuratDasar);
+                    if (Array.isArray(decoded)) {
+                        parsedOld = decoded.filter(s => s && s.trim() !== '');
+                    } else {
+                        parsedOld = oldSuratDasar.split('\n').filter(s => s.trim() !== '');
+                    }
+                } catch(e) {
+                    parsedOld = oldSuratDasar.split('\n').filter(s => s.trim() !== '');
+                }
             } else if (Array.isArray(oldSuratDasar)) {
                 parsedOld = oldSuratDasar.filter(s => s && s.trim() !== '');
             }
@@ -886,6 +869,10 @@
                 isInitialLoadSurat = false;
             } else if (jenisTugasSelect && jenisTugasSelect.value) {
                 jenisTugasSelect.dispatchEvent(new Event('change'));
+            } else {
+                addSuratDasarRow();
+            }
+
             // Dynamic Repeater untuk Tempat Tujuan
             const tempatTujuanContainer = document.getElementById('tempat-tujuan-list');
             const btnAddTempatTujuan = document.getElementById('btn-add-tempat-tujuan');
