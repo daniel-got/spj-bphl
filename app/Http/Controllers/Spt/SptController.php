@@ -8,6 +8,7 @@ use App\Http\Requests\Spt\UpdateSptRequest;
 use App\Models\Pegawai;
 use App\Models\Spt;
 use App\Models\SuratDasar;
+use App\Models\UangHarian;
 use App\Services\Spt\SptService;
 use Illuminate\Http\Request;
 
@@ -43,7 +44,9 @@ class SptController extends Controller
         $riwayatSuratDasar = $this->sptService->getRiwayatSuratDasar(50);
         $suratDasarGrouped = SuratDasar::where('aktif', true)->get()->groupBy('jenis_spt');
 
-        return view('pages.spt.create', compact('pegawaiList', 'riwayatSuratDasar', 'suratDasarGrouped'));
+        $provinsiList = UangHarian::orderBy('provinsi')->pluck('provinsi')->toArray();
+
+        return view('pages.spt.create', compact('pegawaiList', 'riwayatSuratDasar', 'suratDasarGrouped', 'provinsiList'));
     }
 
     public function edit(string $id)
@@ -61,7 +64,9 @@ class SptController extends Controller
         $riwayatSuratDasar = $this->sptService->getRiwayatSuratDasar(50);
         $suratDasarGrouped = SuratDasar::where('aktif', true)->get()->groupBy('jenis_spt');
 
-        return view('pages.spt.edit', compact('spt', 'pegawaiList', 'riwayatSuratDasar', 'suratDasarGrouped'));
+        $provinsiList = UangHarian::orderBy('provinsi')->pluck('provinsi')->toArray();
+
+        return view('pages.spt.edit', compact('spt', 'pegawaiList', 'riwayatSuratDasar', 'suratDasarGrouped', 'provinsiList'));
     }
 
     /**

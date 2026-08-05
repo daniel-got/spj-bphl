@@ -295,13 +295,19 @@
                                 @endphp
 
                                 @foreach($parsedTempat as $index => $val)
-                                    <div class="tempat-tujuan-item flex gap-2 items-center">
-                                        <div class="grow relative">
-                                            <input type="text" name="tempat_tujuan[]" value="{{ $val }}" required
-                                                placeholder="Contoh: Jakarta"
-                                                class="w-full px-3 py-2 text-sm border border-border-custom rounded-md bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" />
+                                    <div class="tempat-tujuan-item flex gap-2 items-start mb-2">
+                                        <div class="grow relative" style="min-width: 0;">
+                                            <select name="tempat_tujuan[]" required class="tempat-tujuan-select w-full" placeholder="Ketik atau pilih Tempat Tujuan...">
+                                                <option value="">Ketik atau pilih Tempat Tujuan...</option>
+                                                @foreach ($provinsiList ?? [] as $prov)
+                                                    <option value="{{ $prov }}" {{ $prov === $val ? 'selected' : '' }}>{{ $prov }}</option>
+                                                @endforeach
+                                                @if($val && !in_array($val, $provinsiList ?? []))
+                                                    <option value="{{ $val }}" selected>{{ $val }}</option>
+                                                @endif
+                                            </select>
                                         </div>
-                                        <button type="button" class="btn-remove-tempat-tujuan text-danger p-2 hover:bg-danger/10 rounded-md transition-colors" style="{{ count($parsedTempat) > 1 ? '' : 'display: none;' }}">
+                                        <button type="button" class="btn-remove-tempat-tujuan text-danger p-2 hover:bg-danger/10 rounded-md transition-colors mt-1" style="{{ count($parsedTempat) > 1 ? '' : 'display: none;' }}">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                         </button>
                                     </div>
@@ -800,18 +806,65 @@
             // Dynamic Repeater untuk Tempat Tujuan
             const tempatTujuanContainer = document.getElementById('tempat-tujuan-list');
             const btnAddTempatTujuan = document.getElementById('btn-add-tempat-tujuan');
+            const provinsiOptions = @json($provinsiList ?? []);
+
+            function initTempatTujuanTomSelect(selectElement) {
+                if (selectElement.tomselect) return;
+                new TomSelect(selectElement, {
+                    create: true,
+                    maxItems: 1,
+                    maxOptions: null,
+                    placeholder: 'Ketik atau pilih Tempat Tujuan...',
+                    createOnBlur: true,
+                    render: {
+                        option_create: function(data, escape) {
+                            return '<div class="create">Tambahkan <strong>' + escape(data.input) + '</strong>&hellip;</div>';
+                        },
+                        no_results: function(data, escape) {
+                            return '<div class="no-results">Tidak ditemukan. Ketik lalu Enter untuk tambah baru.</div>';
+                        }
+                    }
+                });
+                
+                // Commit uncommitted text on form submit
+                const form = selectElement.closest('form');
+                if (form && !form.dataset.tempatTujuanBinded) {
+                    form.dataset.tempatTujuanBinded = 'true';
+                    form.addEventListener('submit', function() {
+                        tempatTujuanContainer.querySelectorAll('select.tempat-tujuan-select').forEach(select => {
+                            if (select.tomselect) {
+                                const ts = select.tomselect;
+                                const typedInput = ts.control_input ? ts.control_input.value.trim() : '';
+                                if (!ts.getValue() && typedInput) {
+                                    ts.createItem(typedInput);
+                                    ts.setValue(typedInput);
+                                }
+                            }
+                        });
+                    });
+                }
+            }
 
             function addTempatTujuanRow(val = '') {
                 if (!tempatTujuanContainer) return;
                 const div = document.createElement('div');
-                div.className = 'tempat-tujuan-item flex gap-2 items-center';
+                div.className = 'tempat-tujuan-item flex gap-2 items-start mb-2';
+                
+                let optionsHtml = '<option value="">Ketik atau pilih Tempat Tujuan...</option>';
+                provinsiOptions.forEach(prov => {
+                    optionsHtml += `<option value="${escapeHtml(prov)}" ${prov === val ? 'selected' : ''}>${escapeHtml(prov)}</option>`;
+                });
+                if (val && !provinsiOptions.includes(val)) {
+                    optionsHtml += `<option value="${escapeHtml(val)}" selected>${escapeHtml(val)}</option>`;
+                }
+
                 div.innerHTML = `
-                    <div class="grow relative">
-                        <input type="text" name="tempat_tujuan[]" value="${escapeHtml(val)}" required
-                            placeholder="Contoh: Jakarta"
-                            class="w-full px-3 py-2 text-sm border border-border-custom rounded-md bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" />
+                    <div class="grow relative" style="min-width: 0;">
+                        <select name="tempat_tujuan[]" required class="tempat-tujuan-select w-full" placeholder="Ketik atau pilih Tempat Tujuan...">
+                            ${optionsHtml}
+                        </select>
                     </div>
-                    <button type="button" class="btn-remove-tempat-tujuan text-danger p-2 hover:bg-danger/10 rounded-md transition-colors">
+                    <button type="button" class="btn-remove-tempat-tujuan text-danger p-2 hover:bg-danger/10 rounded-md transition-colors mt-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </button>
                 `;
@@ -821,10 +874,14 @@
             }
 
             function bindTempatTujuanRow(row) {
+                const select = row.querySelector('.tempat-tujuan-select');
+                if (select) initTempatTujuanTomSelect(select);
+
                 const btn = row.querySelector('.btn-remove-tempat-tujuan');
                 if (btn) {
                     btn.addEventListener('click', function() {
                         if (tempatTujuanContainer.querySelectorAll('.tempat-tujuan-item').length > 1) {
+                            if (select && select.tomselect) select.tomselect.destroy();
                             row.remove();
                             updateTempatTujuanButtons();
                         }
