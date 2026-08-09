@@ -401,5 +401,39 @@
                 inputHotel.value = total > 0 ? total : '';
             }
         });
+
+        // -----------------------------------------------------------------------
+        // Validasi Ukuran File (Max 10MB)
+        // -----------------------------------------------------------------------
+        document.addEventListener('DOMContentLoaded', function () {
+            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+            // Validasi saat file dipilih
+            document.addEventListener('change', function (e) {
+                if (e.target.matches('input[type="file"]')) {
+                    const file = e.target.files[0];
+                    if (file && file.size > MAX_FILE_SIZE) {
+                        alert('Peringatan: Ukuran file "' + file.name + '" terlalu besar (' + (file.size / 1024 / 1024).toFixed(2) + 'MB). Maksimal yang diizinkan adalah 10MB. Silakan pilih file yang lebih kecil.');
+                        e.target.value = ''; // Reset input
+                    }
+                }
+            });
+
+            // Validasi saat form disubmit (pengaman tambahan)
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    const fileInputs = form.querySelectorAll('input[type="file"]');
+                    for (let i = 0; i < fileInputs.length; i++) {
+                        const file = fileInputs[i].files[0];
+                        if (file && file.size > MAX_FILE_SIZE) {
+                            alert('Gagal submit: Ukuran file "' + file.name + '" terlalu besar (' + (file.size / 1024 / 1024).toFixed(2) + 'MB). Maksimal 10MB.');
+                            e.preventDefault();
+                            return;
+                        }
+                    }
+                });
+            }
+        });
     </script>
 </x-layout.app>

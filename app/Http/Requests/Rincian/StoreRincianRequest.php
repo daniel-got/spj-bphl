@@ -29,7 +29,7 @@ class StoreRincianRequest extends FormRequest
             'rincian_biaya.transport.*.*.lokasi_awal' => 'nullable|string',
             'rincian_biaya.transport.*.*.lokasi_tujuan' => 'nullable|string',
             'rincian_biaya.transport.*.*.biaya' => 'nullable|numeric',
-            'rincian_biaya.transport.*.*.lampiran' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:5120',
+            'rincian_biaya.transport.*.*.lampiran' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:10240',
 
             // Validasi field dalam rincian biaya penginapan
             'rincian_biaya.penginapan.*.keterangan' => 'nullable|string',
@@ -38,7 +38,7 @@ class StoreRincianRequest extends FormRequest
             'rincian_biaya.penginapan.*.durasi' => 'nullable|integer',
             'rincian_biaya.penginapan.*.penginapan_persen' => 'nullable|numeric',
             'rincian_biaya.penginapan.*.hotel_ril' => 'nullable|numeric',
-            'rincian_biaya.penginapan.*.lampiran' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:5120',
+            'rincian_biaya.penginapan.*.lampiran' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:10240',
         ];
     }
 }
