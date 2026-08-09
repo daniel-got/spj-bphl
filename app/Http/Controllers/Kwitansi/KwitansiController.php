@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Kwitansi;
 use App\Helpers\TerbilangHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Kwitansi;
+use App\Models\Pegawai;
 use App\Models\User;
 use App\Services\Rincian\RincianService;
 use Illuminate\Http\Request;
@@ -18,8 +19,17 @@ class KwitansiController extends Controller
         $query = Kwitansi::with(['rincian.spd.spt', 'rincian.spd.pegawai', 'rincian.pembuat']);
 
         if ($user && ! $user->isAdmin() && ! $user->isMonitoring()) {
-            $query->whereHas('rincian', function ($q) use ($user) {
-                $q->where('pembuat_id', $user->id);
+            $pegawaiNip = Pegawai::where('user_id', $user->id)->value('nip');
+
+            $query->whereHas('rincian', function ($q) use ($user, $pegawaiNip) {
+                $q->where(function ($query) use ($user, $pegawaiNip) {
+                    $query->where('pembuat_id', $user->id);
+                    if ($pegawaiNip) {
+                        $query->orWhereHas('spd', function ($sq) use ($pegawaiNip) {
+                            $sq->where('nip_pegawai', $pegawaiNip);
+                        });
+                    }
+                });
             });
         }
 
@@ -42,7 +52,13 @@ class KwitansiController extends Controller
     public function edit(Kwitansi $kwitansi)
     {
         $user = auth()->user();
-        if ($user && ! $user->isAdmin() && ! $user->isMonitoring() && $kwitansi->rincian->pembuat_id !== $user->id) {
+        $pegawaiNip = $user ? Pegawai::where('user_id', $user->id)->value('nip') : null;
+
+        $canAccess = $user && ($user->isAdmin() || $user->isMonitoring() ||
+                     $kwitansi->rincian->pembuat_id === $user->id ||
+                     ($pegawaiNip && $kwitansi->rincian->spd?->nip_pegawai === $pegawaiNip));
+
+        if (! $canAccess) {
             abort(403);
         }
 
@@ -52,7 +68,13 @@ class KwitansiController extends Controller
     public function update(Request $request, Kwitansi $kwitansi)
     {
         $user = auth()->user();
-        if ($user && ! $user->isAdmin() && ! $user->isMonitoring() && $kwitansi->rincian->pembuat_id !== $user->id) {
+        $pegawaiNip = $user ? Pegawai::where('user_id', $user->id)->value('nip') : null;
+
+        $canAccess = $user && ($user->isAdmin() || $user->isMonitoring() ||
+                     $kwitansi->rincian->pembuat_id === $user->id ||
+                     ($pegawaiNip && $kwitansi->rincian->spd?->nip_pegawai === $pegawaiNip));
+
+        if (! $canAccess) {
             abort(403);
         }
 
@@ -70,7 +92,13 @@ class KwitansiController extends Controller
     public function print(Kwitansi $kwitansi)
     {
         $user = auth()->user();
-        if ($user && ! $user->isAdmin() && ! $user->isMonitoring() && $kwitansi->rincian->pembuat_id !== $user->id) {
+        $pegawaiNip = $user ? Pegawai::where('user_id', $user->id)->value('nip') : null;
+
+        $canAccess = $user && ($user->isAdmin() || $user->isMonitoring() ||
+                     $kwitansi->rincian->pembuat_id === $user->id ||
+                     ($pegawaiNip && $kwitansi->rincian->spd?->nip_pegawai === $pegawaiNip));
+
+        if (! $canAccess) {
             abort(403);
         }
 

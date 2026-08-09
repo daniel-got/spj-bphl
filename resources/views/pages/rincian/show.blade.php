@@ -222,6 +222,9 @@
                                             <tr>
                                                 <th class="px-4 py-2 border-b border-border-custom w-10 text-center">#</th>
                                                 <th class="px-4 py-2 border-b border-border-custom">Keterangan</th>
+                                                <th class="px-4 py-2 border-b border-border-custom text-center">Tgl Menginap</th>
+                                                <th class="px-4 py-2 border-b border-border-custom text-center">Tgl Keluar</th>
+                                                <th class="px-4 py-2 border-b border-border-custom text-center">Durasi</th>
                                                 <th class="px-4 py-2 border-b border-border-custom text-center">Rate (%)</th>
                                                 <th class="px-4 py-2 border-b border-border-custom text-right">Biaya (Rp)</th>
                                                 <th class="px-4 py-2 border-b border-border-custom text-center">Lampiran</th>
@@ -237,6 +240,9 @@
                                                 <tr class="bg-background border-b border-border-custom hover:bg-surface">
                                                     <td class="px-4 py-2 text-center">{{ $index + 1 }}</td>
                                                     <td class="px-4 py-2">{{ $item['keterangan'] ?? '-' }}</td>
+                                                    <td class="px-4 py-2 text-center">{{ !empty($item['tgl_menginap']) ? \Carbon\Carbon::parse($item['tgl_menginap'])->format('d M Y') : '-' }}</td>
+                                                    <td class="px-4 py-2 text-center">{{ !empty($item['tgl_keluar']) ? \Carbon\Carbon::parse($item['tgl_keluar'])->format('d M Y') : '-' }}</td>
+                                                    <td class="px-4 py-2 text-center">{{ $item['durasi'] ?? '-' }} Malam</td>
                                                     <td class="px-4 py-2 text-center">{{ $item['penginapan_persen'] ?? '-' }}%</td>
                                                     <td class="px-4 py-2 text-right">Rp {{ number_format($biaya, 0, ',', '.') }}</td>
                                                     <td class="px-4 py-2 text-center">
@@ -252,7 +258,7 @@
                                                 </tr>
                                             @endforeach
                                             <tr class="bg-surface font-semibold">
-                                                <td colspan="3" class="px-4 py-2 text-right">Total Penginapan:</td>
+                                                <td colspan="6" class="px-4 py-2 text-right">Total Penginapan:</td>
                                                 <td class="px-4 py-2 text-right">Rp {{ number_format($totalPenginapan, 0, ',', '.') }}</td>
                                                 <td></td>
                                             </tr>

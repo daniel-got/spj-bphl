@@ -32,6 +32,9 @@ class UpdateRincianRequest extends FormRequest
 
             // Validasi field dalam rincian biaya penginapan
             'rincian_biaya.penginapan.*.keterangan' => 'nullable|string',
+            'rincian_biaya.penginapan.*.tgl_menginap' => 'nullable|date',
+            'rincian_biaya.penginapan.*.tgl_keluar' => 'nullable|date|after_or_equal:rincian_biaya.penginapan.*.tgl_menginap',
+            'rincian_biaya.penginapan.*.durasi' => 'nullable|integer',
             'rincian_biaya.penginapan.*.penginapan_persen' => 'nullable|numeric',
             'rincian_biaya.penginapan.*.hotel_ril' => 'nullable|numeric',
             'rincian_biaya.penginapan.*.lampiran' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:5120',

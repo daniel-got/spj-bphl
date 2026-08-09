@@ -144,7 +144,7 @@
                                                     'cells' => [
                                                         '<span class="text-muted font-medium">' . $no++ . '</span>',
                                                         'Transport - ' . ucfirst($kategori),
-                                                        ($item['asal'] ?? '-') . ' ke ' . ($item['tujuan'] ?? '-'),
+                                                        ($item['lokasi_awal'] ?? '-') . ' ke ' . ($item['lokasi_tujuan'] ?? '-'),
                                                         '<div class="text-right">Rp ' . number_format($biaya, 0, ',', '.') . '</div>'
                                                     ]
                                                 ];
@@ -158,12 +158,22 @@
                                         if (is_array($item)) {
                                             $biaya = (float) ($item['hotel_ril'] ?? 0);
                                             $totalPenginapan += $biaya;
-                                            $persen = $item['penginapan'] ?? '30';
+                                            $persen = $item['penginapan_persen'] ?? '30';
+                                            $keterangan = $item['keterangan'] ?? '-';
+                                            $tglMenginap = !empty($item['tgl_menginap']) ? \Carbon\Carbon::parse($item['tgl_menginap'])->format('d M Y') : '';
+                                            $tglKeluar = !empty($item['tgl_keluar']) ? \Carbon\Carbon::parse($item['tgl_keluar'])->format('d M Y') : '';
+                                            $durasi = !empty($item['durasi']) ? $item['durasi'] . ' Malam' : '';
+                                            
+                                            $detailStr = $keterangan . ' (Persentase: ' . $persen . '%)';
+                                            if ($tglMenginap && $tglKeluar) {
+                                                $detailStr .= '<br><span class="text-xs text-muted">Tgl: ' . $tglMenginap . ' s/d ' . $tglKeluar . ' (' . $durasi . ')</span>';
+                                            }
+                                            
                                             $rowsBiaya[] = [
                                                 'cells' => [
                                                     '<span class="text-muted font-medium">' . $no++ . '</span>',
                                                     'Penginapan',
-                                                    'Persentase: ' . $persen . '%',
+                                                    $detailStr,
                                                     '<div class="text-right">Rp ' . number_format($biaya, 0, ',', '.') . '</div>'
                                                 ]
                                             ];

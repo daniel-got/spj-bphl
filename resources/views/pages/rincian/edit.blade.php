@@ -245,10 +245,25 @@
                     <button type="button" class="btn-hapus-penginapan absolute -top-2 -right-2 bg-danger text-white rounded-full p-1.5 shadow-sm hover:bg-red-600 z-10 hidden">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     </button>
-                    <div class="flex flex-col gap-1">
+                    <div class="flex flex-col gap-1 md:col-span-1">
                         <label class="text-sm font-semibold text-text-main">Keterangan</label>
                         <input type="text" name="rincian_biaya[penginapan][${index}][keterangan]" value="${ket}" required placeholder="Cth: Hotel ABC"
                             class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-sm font-semibold text-text-main">Tgl Menginap</label>
+                        <input type="date" name="rincian_biaya[penginapan][${index}][tgl_menginap]" value="${itemData.tgl_menginap || ''}" required
+                            class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary tgl-menginap-input" />
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-sm font-semibold text-text-main">Tgl Keluar</label>
+                        <input type="date" name="rincian_biaya[penginapan][${index}][tgl_keluar]" value="${itemData.tgl_keluar || ''}" required
+                            class="block w-full rounded-md border border-border-custom bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary tgl-keluar-input" />
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-sm font-semibold text-text-main">Durasi (Malam)</label>
+                        <input type="number" name="rincian_biaya[penginapan][${index}][durasi]" value="${itemData.durasi || ''}" readonly placeholder="0"
+                            class="block w-full rounded-md border border-border-custom bg-surface-muted px-3 py-2 text-sm focus:outline-none durasi-input" />
                     </div>
                     <div class="flex flex-col gap-1">
                         <label class="text-sm font-semibold text-text-main">Penginapan (%)</label>
@@ -264,7 +279,7 @@
                         <input type="number" name="rincian_biaya[penginapan][${index}][hotel_ril]" value="${hotelRil}" min="0" readonly placeholder="Otomatis"
                             class="block w-full rounded-md border border-border-custom bg-surface-muted px-3 py-2 text-sm focus:outline-none" />
                     </div>
-                    <div class="flex flex-col gap-1">
+                    <div class="flex flex-col gap-1 md:col-span-2">
                         <label class="text-sm font-semibold text-text-main">Lampiran (Opsional)</label>
                         <input type="file" name="rincian_biaya[penginapan][${index}][lampiran]" accept=".pdf,.png,.jpg,.jpeg"
                             class="block w-full text-sm text-text-main file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:font-medium file:bg-primary file:text-white hover:file:bg-primary-dark" />
@@ -349,7 +364,7 @@
 
             // Kalkulasi Penginapan
             penginapanContainer.addEventListener('change', function(e) {
-                if (e.target.matches('select[name*="[penginapan_persen]"]')) {
+                if (e.target.matches('select[name*="[penginapan_persen]"]') || e.target.matches('.tgl-menginap-input') || e.target.matches('.tgl-keluar-input')) {
                     calculateRowPenginapan(e.target.closest('.penginapan-row'));
                 }
             });
@@ -357,12 +372,30 @@
             window.calculateRowPenginapan = function(row) {
                 const select = row.querySelector('select[name*="[penginapan_persen]"]');
                 const inputHotel = row.querySelector('input[name*="[hotel_ril]"]');
+                const tglMenginap = row.querySelector('.tgl-menginap-input')?.value;
+                const tglKeluar = row.querySelector('.tgl-keluar-input')?.value;
+                const durasiInput = row.querySelector('.durasi-input');
+                
                 const persentase = parseInt(select.value) || 0;
                 const rate = window.currentPenginapanRate || 0;
-                const lamaKegiatan = parseInt(document.getElementById('lama_kegiatan').value) || 0;
                 
-                let hariMenginap = lamaKegiatan > 1 ? lamaKegiatan - 1 : 1;
-                if (lamaKegiatan === 0) hariMenginap = 1; // fallback
+                let hariMenginap = 1;
+                
+                if (tglMenginap && tglKeluar) {
+                    const start = new Date(tglMenginap);
+                    const end = new Date(tglKeluar);
+                    const diffTime = end - start;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (diffDays > 0) {
+                        hariMenginap = diffDays;
+                    }
+                } else {
+                    const lamaKegiatan = parseInt(document.getElementById('lama_kegiatan').value) || 0;
+                    hariMenginap = lamaKegiatan > 1 ? lamaKegiatan - 1 : 1;
+                    if (lamaKegiatan === 0) hariMenginap = 1; // fallback
+                }
+                
+                if (durasiInput) durasiInput.value = hariMenginap;
                 
                 const total = Math.round((rate * (persentase / 100)) * hariMenginap);
                 inputHotel.value = total > 0 ? total : '';

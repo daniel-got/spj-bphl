@@ -179,18 +179,26 @@
                             <tr><td style="border: none; padding: 5px;"><strong>Uang Penginapan</strong></td></tr>
                             @php
                                 $penginapanData = $rincian->rincian_biaya['penginapan'] ?? [];
-                                $durasi = $lamaKegiatan > 1 ? $lamaKegiatan - 1 : 1;
+                                $defaultDurasi = $lamaKegiatan > 1 ? $lamaKegiatan - 1 : 1;
                             @endphp
                             @foreach($penginapanData as $item)
                                 @php
                                     $persen = $item['penginapan_persen'] ?? 100;
                                     $hotelRil = $item['hotel_ril'] ?? 0;
-                                    $nilaiPerHari = $hotelRil / $durasi;
+                                    
+                                    $durasiInap = !empty($item['durasi']) ? (int) $item['durasi'] : $defaultDurasi;
+                                    if ($durasiInap <= 0) $durasiInap = 1;
+                                    
+                                    $nilaiPerHari = $hotelRil / $durasiInap;
                                     $rateDbup = $persen > 0 ? $nilaiPerHari / ($persen / 100) : 0;
+                                    
+                                    $tglMenginap = !empty($item['tgl_menginap']) ? \Carbon\Carbon::parse($item['tgl_menginap'])->format('d/m/Y') : '';
+                                    $tglKeluar = !empty($item['tgl_keluar']) ? \Carbon\Carbon::parse($item['tgl_keluar'])->format('d/m/Y') : '';
+                                    $tglStr = ($tglMenginap && $tglKeluar) ? " ($tglMenginap - $tglKeluar)" : "";
                                 @endphp
                                 <tr>
                                     <td style="border: none; padding: 2px 5px 2px 15px; font-size: 0.9em;">
-                                        - {{ $durasi }} x Rp. {{ number_format($nilaiPerHari, 0, ',', '.') }}
+                                        - {{ $durasiInap }} x Rp. {{ number_format($nilaiPerHari, 0, ',', '.') }}{{ $tglStr }}
                                     </td>
                                 </tr>
                                 <tr>
