@@ -20,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Percayai semua Reverse Proxy agar Laravel otomatis mendeteksi HTTPS
         $middleware->trustProxies(at: '*');
 
+        $middleware->web(append: [
+            \App\Http\Middleware\ForcePasswordChange::class,
+        ]);
+
         // Daftarkan alias middleware 'role' untuk digunakan di route group
         // Contoh pemakaian: Route::middleware(['auth', 'role:admin'])->...
         $middleware->alias([

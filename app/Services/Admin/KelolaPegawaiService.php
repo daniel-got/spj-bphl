@@ -110,8 +110,15 @@ class KelolaPegawaiService
      */
     public function importCsv(UploadedFile $file): array
     {
-        $handle = fopen($file->getRealPath(), 'r');
-        $header = fgetcsv($handle, 1000, ',');
+        $sheets = \Maatwebsite\Excel\Facades\Excel::toArray(new \App\Imports\RawDataImport, $file);
+        if (empty($sheets) || empty($sheets[0])) {
+            throw new Exception('File kosong atau format tidak didukung.');
+        }
+
+        $data = $sheets[0];
+        $header = array_shift($data); // Ambil baris pertama sebagai header
+
+        // Pastikan format kolom sesuai dengan template
 
         // Pastikan format kolom sesuai dengan template
         $expectedHeader = ['nama_pegawai', 'nip', 'pangkat', 'golongan', 'jabatan', 'sub_seksi', 'email', 'password', 'roles'];
@@ -120,8 +127,7 @@ class KelolaPegawaiService
         $header[0] = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $header[0]);
 
         if ($header !== $expectedHeader) {
-            fclose($handle);
-            throw new Exception('Format kolom CSV tidak sesuai. Gunakan template yang disediakan.');
+            throw new Exception('Format kolom CSV/Excel tidak sesuai. Gunakan template yang disediakan.');
         }
 
         $berhasil = 0;
@@ -132,19 +138,19 @@ class KelolaPegawaiService
         DB::beginTransaction();
 
         try {
-            while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+            foreach ($data as $row) {
                 // Lewati baris kosong
-                if (empty(array_filter($row))) {
+                if (empty(array_filter($row, fn($val) => $val !== null && trim($val) !== ''))) {
                     continue;
                 }
 
-                if (count($row) !== count($header)) {
-                    $errors[] = "Baris $rowNum: Jumlah kolom tidak sesuai.";
-                    $gagal++;
-                    $rowNum++;
-
-                    continue;
+                // Normalisasi jumlah elemen baris agar sesuai dengan header (isi null jika kosong)
+                $row = array_pad($row, count($header), null);
+                if (count($row) > count($header)) {
+                    $row = array_slice($row, 0, count($header));
                 }
+
+                $rowData = array_combine($header, $row);
 
                 // Sanitize CSV Injection
                 foreach ($row as &$cell) {
@@ -154,14 +160,24 @@ class KelolaPegawaiService
                 }
                 unset($cell);
 
-                $data = array_combine($header, $row);
+                $rowData = array_combine($header, $row);
+                
+                // AUTO-CLEANUP NIP (hapus spasi dll)
+                $rowData['nip'] = preg_replace('/\D/', '', (string)$rowData['nip']);
+                // AUTO-CLEANUP Pangkat (ambil nilai IV/b dari string seperti "Pembina / IV.b")
+                if (!empty($rowData['pangkat']) && preg_match('/([I|V|X]+)[.\/]([a-e])/i', $rowData['pangkat'], $matches)) {
+                    $rowData['pangkat'] = strtoupper($matches[1]) . '/' . strtolower($matches[2]);
+                }
+
+                $nip = $rowData['nip'];
+                $email = strtolower(trim($rowData['email']));
 
                 // Cek NIP atau Email apakah sudah ada
-                $existingNip = Pegawai::where('nip', $data['nip'])->exists();
-                $existingEmail = User::where('email', $data['email'])->exists();
+                $existingNip = Pegawai::where('nip', $nip)->exists();
+                $existingEmail = User::where('email', $email)->exists();
 
                 if ($existingNip || $existingEmail) {
-                    $errors[] = "Baris $rowNum: NIP ({$data['nip']}) atau Email ({$data['email']}) sudah terdaftar.";
+                    $errors[] = "Baris $rowNum: NIP ({$nip}) atau Email ({$email}) sudah terdaftar.";
                     $gagal++;
                     $rowNum++;
 
@@ -169,7 +185,7 @@ class KelolaPegawaiService
                 }
 
                 // Parsing roles (comma separated or single)
-                $rawRoles = array_map('trim', explode(',', $data['roles']));
+                $rawRoles = array_map('trim', explode(',', $rowData['roles']));
                 $parsedRoles = [];
                 $validRoles = UserRole::values();
                 $hasInvalidRole = false;
@@ -191,7 +207,7 @@ class KelolaPegawaiService
 
                 // Cek role valid
                 if ($hasInvalidRole) {
-                    $errors[] = "Baris $rowNum: Salah satu Role dalam '{$data['roles']}' tidak valid.";
+                    $errors[] = "Baris $rowNum: Salah satu Role dalam '{$rowData['roles']}' tidak valid.";
                     $gagal++;
                     $rowNum++;
 
@@ -200,40 +216,38 @@ class KelolaPegawaiService
 
                 // Cek pangkat dan golongan valid
                 $validPangkat = Pangkat::values();
-                if (! empty($data['pangkat']) && ! in_array($data['pangkat'], $validPangkat)) {
-                    $errors[] = "Baris $rowNum: Pangkat '{$data['pangkat']}' tidak valid.";
-                    $gagal++;
-                    $rowNum++;
-
-                    continue;
+                if (! empty($rowData['pangkat']) && ! in_array($rowData['pangkat'], $validPangkat)) {
+                    $rowData['pangkat'] = null;
                 }
 
                 $validGolongan = Golongan::values();
-                if (! empty($data['golongan']) && ! in_array($data['golongan'], $validGolongan)) {
-                    $errors[] = "Baris $rowNum: Golongan '{$data['golongan']}' tidak valid.";
+                if (! empty($nip) && strlen($nip) !== 18) {
+                    $errors[] = "Baris $rowNum: NIP harus 18 digit.";
                     $gagal++;
                     $rowNum++;
-
                     continue;
+                }
+                if (! empty($rowData['golongan']) && ! in_array($rowData['golongan'], $validGolongan)) {
+                    $rowData['golongan'] = null;
                 }
 
                 // Insert User
                 $user = User::create([
-                    'name' => $data['nama_pegawai'],
-                    'email' => $data['email'],
-                    'password' => Hash::make($data['password']),
+                    'name' => trim($rowData['nama_pegawai']),
+                    'email' => $email,
+                    'password' => Hash::make($rowData['password'] ?: $nip),
                     'roles' => $parsedRoles,
                 ]);
 
                 // Insert Pegawai
                 Pegawai::create([
                     'user_id' => $user->id,
-                    'nama_pegawai' => $data['nama_pegawai'],
-                    'nip' => $data['nip'],
-                    'pangkat' => $data['pangkat'] ?: null,
-                    'golongan' => $data['golongan'] ?: null,
-                    'jabatan' => $data['jabatan'] ?: null,
-                    'sub_seksi' => $data['sub_seksi'] ?: null,
+                    'nama_pegawai' => $rowData['nama_pegawai'],
+                    'nip' => $nip,
+                    'pangkat' => $rowData['pangkat'] ?: null,
+                    'golongan' => $rowData['golongan'] ?: null,
+                    'jabatan' => $rowData['jabatan'] ?: null,
+                    'sub_seksi' => $rowData['sub_seksi'] ?: null,
                 ]);
 
                 $berhasil++;
@@ -243,11 +257,8 @@ class KelolaPegawaiService
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
-            fclose($handle);
             throw new Exception("Gagal memproses baris $rowNum: ".$e->getMessage());
         }
-
-        fclose($handle);
 
         return [
             'berhasil' => $berhasil,
@@ -262,20 +273,30 @@ class KelolaPegawaiService
      */
     public function validateCsvOnly(UploadedFile $file): array
     {
-        $handle = fopen($file->getRealPath(), 'r');
-        $header = fgetcsv($handle, 1000, ',');
+        $sheets = \Maatwebsite\Excel\Facades\Excel::toArray(new \App\Imports\RawDataImport, $file);
+        if (empty($sheets) || empty($sheets[0])) {
+            return [
+                'valid' => false,
+                'berhasil' => 0,
+                'gagal' => 0,
+                'errors' => ['File kosong atau format tidak didukung.'],
+                'token' => null,
+                'preview' => [],
+            ];
+        }
+
+        $dataInput = $sheets[0];
+        $header = array_shift($dataInput);
 
         $expectedHeader = ['nama_pegawai', 'nip', 'pangkat', 'golongan', 'jabatan', 'sub_seksi', 'email', 'password', 'roles'];
         $header[0] = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $header[0]);
 
         if ($header !== $expectedHeader) {
-            fclose($handle);
-
             return [
                 'valid' => false,
                 'berhasil' => 0,
                 'gagal' => 0,
-                'errors' => ['Format kolom CSV tidak sesuai. Pastikan header CSV sesuai template.'],
+                'errors' => ['Format kolom tidak sesuai. Pastikan header sesuai template.'],
                 'token' => null,
                 'preview' => [],
             ];
@@ -291,20 +312,26 @@ class KelolaPegawaiService
         $seenNips = [];
         $seenEmails = [];
 
-        while (($row = fgetcsv($handle, 1000, ',')) !== false) {
-            if (empty(array_filter($row))) {
+        foreach ($dataInput as $row) {
+            if (empty(array_filter($row, fn($val) => $val !== null && trim($val) !== ''))) {
                 continue;
             }
 
-            if (count($row) !== count($header)) {
-                $errors[] = "Baris $rowNum: Jumlah kolom tidak sesuai.";
-                $gagal++;
-                $rowNum++;
-
-                continue;
+            // Normalisasi jumlah elemen baris agar sesuai dengan header (isi null jika kosong)
+            $row = array_pad($row, count($header), null);
+            if (count($row) > count($header)) {
+                $row = array_slice($row, 0, count($header));
             }
 
             $data = array_combine($header, $row);
+            
+            // AUTO-CLEANUP NIP (hapus spasi dll)
+            $data['nip'] = preg_replace('/\D/', '', (string)$data['nip']);
+            // AUTO-CLEANUP Pangkat (ambil nilai IV/b dari string seperti "Pembina / IV.b")
+            if (!empty($data['pangkat']) && preg_match('/([I|V|X]+)[.\/]([a-e])/i', $data['pangkat'], $matches)) {
+                $data['pangkat'] = strtoupper($matches[1]) . '/' . strtolower($matches[2]);
+            }
+            
             $rowErrors = [];
 
             if (Pegawai::where('nip', $data['nip'])->exists() || in_array($data['nip'], $seenNips)) {
@@ -330,12 +357,14 @@ class KelolaPegawaiService
             if ($hasInvalidRole) {
                 $rowErrors[] = 'Role tidak valid.';
             }
+
             if (! empty($data['pangkat']) && ! in_array($data['pangkat'], Pangkat::values())) {
-                $rowErrors[] = 'Pangkat tidak valid.';
+                $data['pangkat'] = null;
             }
             if (! empty($data['golongan']) && ! in_array($data['golongan'], Golongan::values())) {
-                $rowErrors[] = 'Golongan tidak valid.';
+                $data['golongan'] = null;
             }
+
             if (empty($data['nama_pegawai'])) {
                 $rowErrors[] = 'Nama kosong.';
             }
@@ -361,14 +390,13 @@ class KelolaPegawaiService
             $rowNum++;
         }
 
-        fclose($handle);
-
         // Jika ada data valid, simpan file sementara dengan token unik
         $token = null;
         if ($berhasil > 0) {
             $token = Str::random(40);
             $userId = auth()->id();
-            $file->storeAs('tmp/csv-import', $userId.'_'.$token.'.csv', 'local');
+            $extension = $file->getClientOriginalExtension() ?: 'csv';
+            $file->storeAs('tmp/excel-import', $userId.'_'.$token.'.'.$extension, 'local');
         }
 
         return [
@@ -388,14 +416,25 @@ class KelolaPegawaiService
     public function importFromToken(string $token): array
     {
         $userId = auth()->id();
-        // Pada Laravel versi terbaru, disk 'local' default menunjuk ke storage/app/private
-        $path = storage_path('app/private/tmp/csv-import/'.$userId.'_'.$token.'.csv');
+        
+        // Cari ekstensi yang ada (bisa .csv, .xlsx, .xls)
+        $dirPath = storage_path('app/private/tmp/excel-import/');
+        $files = glob($dirPath . $userId.'_'.$token.'.*');
 
-        if (! file_exists($path)) {
+        if (empty($files)) {
             throw new Exception('Token tidak valid atau sudah kadaluarsa. Silakan upload ulang.');
         }
 
-        $uploadedFile = new UploadedFile($path, basename($path), 'text/csv', null, true);
+        $path = $files[0];
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        $mimeType = match($extension) {
+            'csv' => 'text/csv',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'xls' => 'application/vnd.ms-excel',
+            default => 'application/octet-stream',
+        };
+
+        $uploadedFile = new UploadedFile($path, basename($path), $mimeType, null, true);
         $result = $this->importCsv($uploadedFile);
 
         // Hapus file sementara setelah berhasil diimport

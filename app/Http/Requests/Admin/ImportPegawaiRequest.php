@@ -14,7 +14,7 @@ class ImportPegawaiRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => ['required_without:import_token', 'file', 'mimes:csv,txt', 'max:5120'], // Max 5MB
+            'file' => ['required_without:import_token', 'file', 'mimes:csv,txt,xlsx,xls', 'max:5120'], // Max 5MB
             'import_token' => ['nullable', 'string'],
         ];
     }
@@ -23,7 +23,7 @@ class ImportPegawaiRequest extends FormRequest
     {
         return [
             'file.required' => 'File CSV wajib diunggah.',
-            'file.mimes' => 'Format file harus berupa CSV.',
+            'file.mimes' => 'Format file harus berupa CSV atau Excel (.xlsx/.xls).',
             'file.max' => 'Ukuran file maksimal adalah 5MB.',
         ];
     }

@@ -46,21 +46,15 @@ class UangHarianService
      */
     public function validateCsvOnly(UploadedFile $file): array
     {
-        $path = $file->store('temp_imports');
-        $fullPath = Storage::path($path);
-
-        $lines = file($fullPath);
-        if (count($lines) < 2) {
-            throw new \Exception('File CSV kosong atau tidak memiliki baris data (hanya header).');
+        $sheets = \Maatwebsite\Excel\Facades\Excel::toArray(new \App\Imports\RawDataImport, $file);
+        if (empty($sheets) || empty($sheets[0])) {
+            throw new \Exception('File kosong atau format tidak didukung.');
         }
 
-        // Hapus UTF-8 BOM dari baris pertama jika ada
-        $lines[0] = preg_replace('/^\xEF\xBB\xBF/', '', $lines[0]);
-        $delimiter = strpos($lines[0], ';') !== false ? ';' : ',';
-
-        $data = array_map(function ($line) use ($delimiter) {
-            return str_getcsv($line, $delimiter);
-        }, $lines);
+        $data = $sheets[0];
+        if (count($data) < 2) {
+            throw new \Exception('File kosong atau tidak memiliki baris data (hanya header).');
+        }
 
         $headers = array_map(function ($h) {
             $h = strtolower(trim($h));
@@ -92,8 +86,9 @@ class UangHarianService
 
         for ($i = 1; $i < count($data); $i++) {
             $row = $data[$i];
-            if (count($row) < count($headers)) {
-                continue;
+            $row = array_pad($row, count($headers), null);
+            if (count($row) > count($headers)) {
+                $row = array_slice($row, 0, count($headers));
             }
 
             // Skip if row is completely empty
@@ -130,9 +125,6 @@ class UangHarianService
         ];
     }
 
-    /**
-     * Memproses import dari token file sementara yang sudah divalidasi.
-     */
     public function importFromToken(string $token): array
     {
         $fullPath = Storage::path('temp_imports/'.$token);
@@ -140,18 +132,25 @@ class UangHarianService
         if (! file_exists($fullPath)) {
             throw new \Exception('File import kadaluarsa atau tidak ditemukan. Silakan ulangi proses upload.');
         }
+        
+        $extension = pathinfo($fullPath, PATHINFO_EXTENSION);
+        $mimeType = match($extension) {
+            'csv' => 'text/csv',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'xls' => 'application/vnd.ms-excel',
+            default => 'application/octet-stream',
+        };
+        $uploadedFile = new UploadedFile($fullPath, basename($fullPath), $mimeType, null, true);
 
-        $lines = file($fullPath);
-        if (count($lines) < 2) {
-            throw new \Exception('File CSV kosong atau tidak memiliki baris data (hanya header).');
+        $sheets = \Maatwebsite\Excel\Facades\Excel::toArray(new \App\Imports\RawDataImport, $uploadedFile);
+        if (empty($sheets) || empty($sheets[0])) {
+            throw new \Exception('File kosong atau format tidak didukung.');
         }
 
-        $lines[0] = preg_replace('/^\xEF\xBB\xBF/', '', $lines[0]);
-        $delimiter = strpos($lines[0], ';') !== false ? ';' : ',';
-
-        $data = array_map(function ($line) use ($delimiter) {
-            return str_getcsv($line, $delimiter);
-        }, $lines);
+        $data = $sheets[0];
+        if (count($data) < 2) {
+            throw new \Exception('File kosong atau tidak memiliki baris data (hanya header).');
+        }
 
         $headers = array_map(function ($h) {
             $h = strtolower(trim($h));
@@ -175,8 +174,9 @@ class UangHarianService
 
         for ($i = 1; $i < count($data); $i++) {
             $row = $data[$i];
-            if (count($row) < count($headers)) {
-                continue;
+            $row = array_pad($row, count($headers), null);
+            if (count($row) > count($headers)) {
+                $row = array_slice($row, 0, count($headers));
             }
 
             // Skip if row is completely empty

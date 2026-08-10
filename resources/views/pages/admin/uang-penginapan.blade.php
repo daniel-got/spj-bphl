@@ -11,7 +11,7 @@
                     <x-action.button onclick="openModal('modal-import')"
                         class="border border-border-custom text-text-main hover:bg-background px-4 py-2 text-sm rounded-md transition-colors flex items-center gap-2">
                         <x-utility.icon name="arrow-up-tray" class="w-4 h-4" />
-                        Import CSV
+                        Import CSV / Excel
                     </x-action.button>
                     <x-action.button-primary onclick="openModal('modal-tambah')"
                         class="flex items-center gap-2">
@@ -187,13 +187,13 @@
                         <ul class="list-disc pl-4 space-y-1 text-blue-600">
                             <li>Format header kolom wajib: <code class="text-xs bg-blue-100 px-1 rounded">provinsi, gol_iv, gol_iii_ii_i</code></li>
                             <li>Kolom angka (uang) pastikan tidak menggunakan titik pemisah ribuan.</li>
-                            <li>Klik <strong>Cek Data CSV</strong> untuk memvalidasi sebelum diimpor.</li>
+                            <li>Klik <strong>Cek Data CSV / Excel</strong> untuk memvalidasi sebelum diimpor.</li>
                         </ul>
                     </div>
                 </div>
                 <div class="flex flex-col gap-1">
-                    <label class="text-sm font-medium text-text-main">Upload File CSV <span class="text-danger">*</span></label>
-                    <input id="csv-file-input" type="file" accept=".csv"
+                    <label class="text-sm font-medium text-text-main">Upload File CSV / Excel <span class="text-danger">*</span></label>
+                    <input id="csv-file-input" type="file" accept=".csv, .xlsx, .xls"
                         onchange="document.getElementById('csv-file-name').innerText = this.files[0] ? '📄 ' + this.files[0].name : 'Maksimal 5MB'"
                         class="w-full px-3 py-2 text-sm border border-border-custom rounded-md shadow-sm bg-surface text-text-main file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer">
                     <p id="csv-file-name" class="text-xs text-muted mt-1">Maksimal 5MB</p>

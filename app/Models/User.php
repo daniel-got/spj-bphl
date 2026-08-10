@@ -18,7 +18,7 @@ class User extends Authenticatable
 
     use Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'roles'];
+    protected $fillable = ['name', 'email', 'password', 'roles', 'must_change_password'];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -32,6 +32,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'roles' => 'array',
+            'must_change_password' => 'boolean',
         ];
     }
 

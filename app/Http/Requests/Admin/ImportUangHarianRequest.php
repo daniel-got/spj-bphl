@@ -25,7 +25,7 @@ class ImportUangHarianRequest extends FormRequest
 
         // Jika tidak, berarti ini proses validasi/upload awal
         return [
-            'file' => 'required|file|mimes:csv,txt|max:5120',
+            'file' => 'required|file|mimes:csv,txt,xlsx,xls|max:5120',
         ];
     }
 }
