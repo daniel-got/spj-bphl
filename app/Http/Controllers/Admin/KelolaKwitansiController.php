@@ -15,10 +15,12 @@ class KelolaKwitansiController extends Controller
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('nomor_kwitansi', 'like', "%{$search}%")
+                $q->where('nomor_kwitansi', 'ilike', "%{$search}%")
                     ->orWhereHas('rincian.spd', function ($sq) use ($search) {
-                        $sq->where('nomor_spd', 'like', "%{$search}%")
-                            ->orWhere('pegawai_ditugaskan', 'like', "%{$search}%");
+                        $sq->where('nomor_spd', 'ilike', "%{$search}%")
+                            ->orWhereHas('pegawai', function ($pq) use ($search) {
+                                $pq->where('nama_pegawai', 'ilike', "%{$search}%");
+                            });
                     });
             });
         }
