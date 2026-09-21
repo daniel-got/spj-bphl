@@ -180,7 +180,7 @@
                                         e($spt->lama_kegiatan ?? '') . ' Hari',
                                         e($spt->kode_mak ?? '-'),
                                         $statusBadge,
-                                        $editLink,
+                                        '<div class="flex items-center gap-2">' . $editLink . $deleteForm . '</div>',
                                     ];
                                 })->filter()->toArray();
                             @endphp
