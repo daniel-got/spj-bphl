@@ -18,7 +18,7 @@ class KwitansiController extends Controller
 
         $query = Kwitansi::with(['rincian.spd.spt', 'rincian.spd.pegawai', 'rincian.pembuat']);
 
-        if ($user && ! $user->isAdmin() && ! $user->isMonitoring()) {
+        if ($user) {
             $pegawaiNip = Pegawai::where('user_id', $user->id)->value('nip');
 
             $query->whereHas('rincian', function ($q) use ($user, $pegawaiNip) {

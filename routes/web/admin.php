@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\KelolaKwitansiController;
 use App\Http\Controllers\Admin\KelolaPegawaiController;
 use App\Http\Controllers\Admin\KelolaRincianController;
 use App\Http\Controllers\Admin\KelolaSpdController;
+use App\Http\Controllers\Admin\KelolaSptController;
 use App\Http\Controllers\Admin\PengaturanController;
 use App\Http\Controllers\Admin\SuratDasarController;
 use App\Http\Controllers\Admin\UangHarianController;
@@ -75,6 +77,9 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
         Route::put('/pengaturan/r2', [PengaturanController::class, 'updateR2'])->name('pengaturan.r2.update');
 
+        // Kelola SPT (CRUD All)
+        Route::get('/kelola-spt', [KelolaSptController::class, 'index'])->name('kelola-spt.index');
+
         // Kelola SPD (CRUD All)
         Route::get('/kelola-spd', [KelolaSpdController::class, 'index'])->name('kelola-spd.index');
         Route::get('/kelola-spd/{spd}', [KelolaSpdController::class, 'show'])->name('kelola-spd.show');
@@ -84,4 +89,8 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/kelola-rincian', [KelolaRincianController::class, 'index'])->name('kelola-rincian.index');
         Route::get('/kelola-rincian/{rincian}', [KelolaRincianController::class, 'show'])->name('kelola-rincian.show');
         Route::delete('/kelola-rincian/{rincian}', [KelolaRincianController::class, 'destroy'])->name('kelola-rincian.destroy');
+
+        // Kelola Kwitansi (CRUD All)
+        Route::get('/kelola-kwitansi', [KelolaKwitansiController::class, 'index'])->name('kelola-kwitansi.index');
+        Route::get('/kelola-kwitansi/{kwitansi}', [KelolaKwitansiController::class, 'show'])->name('kelola-kwitansi.show');
     });

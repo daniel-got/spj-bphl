@@ -15,7 +15,29 @@
         'label' => 'Kelola Dokumen',
         'url' => '#',
         'icon' => 'document-text',
-        'active' => request()->routeIs('admin.dokumen.*'),
+        'active' => request()->routeIs('admin.kelola-spt.*') || request()->routeIs('admin.kelola-spd.*') || request()->routeIs('admin.kelola-rincian.*') || request()->routeIs('admin.kelola-kwitansi.*'),
+        'sub_items' => [
+            [
+                'label' => 'Kelola SPT',
+                'url' => route('admin.kelola-spt.index'),
+                'icon' => 'document-text',
+            ],
+            [
+                'label' => 'Kelola SPD',
+                'url' => route('admin.kelola-spd.index'),
+                'icon' => 'document-text',
+            ],
+            [
+                'label' => 'Kelola Rincian SPJ',
+                'url' => route('admin.kelola-rincian.index'),
+                'icon' => 'table-cells',
+            ],
+            [
+                'label' => 'Kelola Kwitansi',
+                'url' => route('admin.kelola-kwitansi.index'),
+                'icon' => 'document-check',
+            ],
+        ],
     ],
 ]">
     <x-slot:footer>
