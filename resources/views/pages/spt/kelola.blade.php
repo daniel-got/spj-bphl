@@ -158,12 +158,12 @@
                                         ? '<a href="' . route('user.spt.edit', $spt->id) . '" class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover" title="Edit SPT">Edit</a>'
                                         : '';
 
-                                    $deleteForm = $canEdit
-                                        ? '<form action="' . route('user.spt.destroy', $spt->id) . '" method="POST" class="inline-block" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus SPT ini?\')">
-                                            ' . csrf_field() . method_field("DELETE") . '
-                                            ' . \Illuminate\Support\Facades\Blade::render('<x-action.button type="submit" class="!px-2 !py-1 text-xs font-semibold text-danger hover:text-red-700 bg-transparent border-0" title="Hapus SPT">Hapus</x-action.button>') . '
-                                           </form>'
-                                        : '<span class="text-muted text-xs">-</span>';
+                                     $deleteForm = $canEdit
+                                         ? '<form action="' . route('user.spt.destroy', $spt->id) . '" method="POST" class="inline-block" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus SPT ini?\')">
+                                             ' . csrf_field() . method_field("DELETE") . '
+                                             <button type="submit" class="!px-2 !py-1 text-xs font-semibold text-danger hover:text-red-700 bg-transparent border-0 cursor-pointer" title="Hapus SPT">Hapus</button>
+                                            </form>'
+                                         : '<span class="text-muted text-xs">-</span>';
 
                                     return [
                                         $iteration++,

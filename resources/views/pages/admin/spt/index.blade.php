@@ -161,7 +161,8 @@
                                     $deleteForm = $canEdit
                                         ? '<form action="' . route('user.spt.destroy', $spt->id) . '" method="POST" class="inline-block" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus SPT ini?\')">
                                             ' . csrf_field() . method_field("DELETE") . '
-                                            ' . \Illuminate\Support\Facades\Blade::render('<x-action.button type="submit" class="!px-2 !py-1 text-xs font-semibold text-danger hover:text-red-700 bg-transparent border-0" title="Hapus SPT">Hapus</x-action.button>') . '
+                                            //agar server tidak perlu melakukan render Blade sama sekali, yang jauh lebih ringan dan cepat
+                                            <button type="submit" class="!px-2 !py-1 text-xs font-semibold text-danger hover:text-red-700 bg-transparent border-0 cursor-pointer" title="Hapus SPT">Hapus</button>
                                            </form>'
                                         : '<span class="text-muted text-xs">-</span>';
 
