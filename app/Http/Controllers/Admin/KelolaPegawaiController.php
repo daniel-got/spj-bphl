@@ -18,10 +18,10 @@ class KelolaPegawaiController extends Controller
         private KelolaPegawaiService $kelolaPegawaiService
     ) {}
 
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
         // Delegasi pengambilan data ke Service
-        $data = $this->kelolaPegawaiService->getPegawaiData();
+        $data = $this->kelolaPegawaiService->getPegawaiData($request->query('search'));
 
         return view('pages.admin.kelolaPegawai', $data);
     }

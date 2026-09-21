@@ -51,11 +51,28 @@
 
             <div class="mt-6">
                 <div class="bg-surface border border-border-custom rounded-xl overflow-hidden shadow-sm">
-                    <div class="flex justify-between items-center px-6 py-4 border-b border-border-custom bg-surface">
-                        <h3 class="text-lg font-semibold text-text-main">Daftar Pegawai</h3>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center px-6 py-4 border-b border-border-custom bg-surface gap-4">
+                        <h3 class="text-lg font-semibold text-text-main shrink-0">Daftar Pegawai</h3>
+                        
+                        <form id="form-search-pegawai" onsubmit="event.preventDefault(); performSearch();" class="flex items-center gap-2 w-full sm:w-auto">
+                            <div class="relative w-full sm:w-72">
+                                <x-utility.icon name="magnifying-glass" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+                                <input type="text" id="input-search-pegawai" name="search" value="{{ request('search') }}" placeholder="Cari NIP, nama, role, jabatan..."
+                                    class="w-full pl-9 pr-3 py-2 text-sm border border-border-custom rounded-md shadow-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-text-main"
+                                    oninput="debounceSearch()">
+                            </div>
+                            <x-action.button type="button" onclick="performSearch()" class="border border-border-custom px-3 py-2 text-sm rounded-md hover:bg-background transition-colors whitespace-nowrap hidden sm:block">
+                                Cari
+                            </x-action.button>
+                            <a href="#" onclick="event.preventDefault(); document.getElementById('input-search-pegawai').value=''; performSearch();" id="reset-search-btn" class="text-sm text-muted hover:text-danger ml-1 whitespace-nowrap" style="display: {{ request('search') ? 'inline' : 'none' }}">Reset</a>
+                        </form>
                     </div>
 
-                    <div class="p-0 overflow-x-auto border-t border-border-custom">
+                    <div id="table-container" class="p-0 overflow-x-auto border-t border-border-custom relative min-h-[200px]">
+                        <div id="search-loading-overlay" class="absolute inset-0 bg-surface/50 backdrop-blur-sm z-10 hidden flex items-center justify-center">
+                            <div class="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                        <div id="table-content">
                         @php
                             $headers = [
                                 'NIP',
@@ -117,13 +134,16 @@
                         @endphp
                         
                         <x-data.table :headers="$headers" :rows="$rows" :striped="false" class="border-0 rounded-none" />
+                        </div>
                     </div>
 
+                    <div id="pagination-container">
                     @if ($pegawais->hasPages())
                         <div class="px-6 py-4 border-t border-border-custom bg-surface">
                             {{ $pegawais->links('components.navigation.pagination') }}
                         </div>
                     @endif
+                    </div>
                 </div>
             </div>
         </main>
@@ -785,5 +805,109 @@
             document.getElementById('import-token-input').value = currentImportToken;
             document.getElementById('form-import-token').submit();
         }
+
+        // ================================================================
+        // Script: Debounce & AJAX Search
+        // ================================================================
+        let debounceTimer;
+        
+        function debounceSearch() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                performSearch();
+            }, 500); // 500ms delay
+        }
+
+        async function performSearch(url = null) {
+            const searchInput = document.getElementById('input-search-pegawai');
+            const searchVal = searchInput.value;
+            const resetBtn = document.getElementById('reset-search-btn');
+            const loadingOverlay = document.getElementById('search-loading-overlay');
+            
+            // Update URL dynamically
+            let fetchUrl = url;
+            if (!fetchUrl) {
+                const urlObj = new URL('{{ route('admin.kelolaPegawai') }}', window.location.origin);
+                if (searchVal.trim() !== '') {
+                    urlObj.searchParams.set('search', searchVal);
+                }
+                fetchUrl = urlObj.toString();
+                window.history.pushState({}, '', fetchUrl);
+            }
+
+            // Toggle reset button
+            if (searchVal.trim() !== '') {
+                resetBtn.style.display = 'inline';
+            } else {
+                resetBtn.style.display = 'none';
+            }
+
+            // Show loading
+            if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+
+            try {
+                // Fetch the page with an additional header to let server know if needed (though we just parse HTML)
+                const response = await fetch(fetchUrl, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (response.ok) {
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    // Replace table content
+                    const newTableContent = doc.getElementById('table-content');
+                    if (newTableContent) {
+                        document.getElementById('table-content').innerHTML = newTableContent.innerHTML;
+                    }
+                    
+                    // Replace pagination
+                    const newPagination = doc.getElementById('pagination-container');
+                    if (newPagination) {
+                        document.getElementById('pagination-container').innerHTML = newPagination.innerHTML;
+                    }
+
+                    // Rebind pagination links to use AJAX
+                    bindPaginationAjax();
+                }
+            } catch (error) {
+                console.error('Search failed:', error);
+            } finally {
+                if (loadingOverlay) loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        function bindPaginationAjax() {
+            const paginationContainer = document.getElementById('pagination-container');
+            if (!paginationContainer) return;
+
+            const links = paginationContainer.querySelectorAll('a');
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = this.getAttribute('href');
+                    if (url) {
+                        window.history.pushState({}, '', url);
+                        performSearch(url);
+                    }
+                });
+            });
+        }
+
+        // Handle back/forward buttons
+        window.addEventListener('popstate', function() {
+            const urlObj = new URL(window.location.href);
+            const searchVal = urlObj.searchParams.get('search') || '';
+            document.getElementById('input-search-pegawai').value = searchVal;
+            performSearch(window.location.href);
+        });
+
+        // Initialize pagination binding on load
+        document.addEventListener('DOMContentLoaded', () => {
+            bindPaginationAjax();
+        });
     </script>
 </x-layout.app>

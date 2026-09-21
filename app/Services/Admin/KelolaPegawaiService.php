@@ -19,9 +19,26 @@ class KelolaPegawaiService
     /**
      * Mendapatkan data pegawai untuk ditampilkan di halaman kelola pegawai.
      */
-    public function getPegawaiData(): array
+    public function getPegawaiData(?string $search = null): array
     {
-        $pegawais = Pegawai::with('user')->latest()->paginate(10);
+        $query = Pegawai::with('user')->latest();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_pegawai', 'ilike', "%{$search}%")
+                  ->orWhere('nip', 'ilike', "%{$search}%")
+                  ->orWhere('jabatan', 'ilike', "%{$search}%")
+                  ->orWhere('sub_seksi', 'ilike', "%{$search}%")
+                  ->orWhere('pangkat', 'ilike', "%{$search}%")
+                  ->orWhere('golongan', 'ilike', "%{$search}%")
+                  ->orWhereHas('user', function ($qUser) use ($search) {
+                      $qUser->whereRaw('CAST(roles AS TEXT) ILIKE ?', ["%{$search}%"])
+                            ->orWhere('email', 'ilike', "%{$search}%");
+                  });
+            });
+        }
+
+        $pegawais = $query->paginate(10)->withQueryString();
 
         return [
             'pegawais' => $pegawais,
