@@ -6,45 +6,27 @@ use App\Helpers\TerbilangHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Kwitansi;
 use App\Models\Pegawai;
-use App\Models\User;
 use App\Services\Rincian\RincianService;
+use App\Services\Kwitansi\KwitansiService;
 use Illuminate\Http\Request;
 
 class KwitansiController extends Controller
 {
+    protected KwitansiService $kwitansiService;
+
+    public function __construct(KwitansiService $kwitansiService)
+    {
+        $this->kwitansiService = $kwitansiService;
+    }
+
     public function index(Request $request)
     {
-        $user = auth()->user();
+        $filters = $request->only(['search']);
+        $perPage = (int) $request->input('per_page', 10);
 
-        $query = Kwitansi::with(['rincian.spd.spt', 'rincian.spd.pegawai', 'rincian.pembuat']);
-
-        if ($user && ! $user->isAdmin() && ! $user->isMonitoring()) {
-            $pegawaiNip = Pegawai::where('user_id', $user->id)->value('nip');
-
-            $query->whereHas('rincian', function ($q) use ($user, $pegawaiNip) {
-                $q->where(function ($query) use ($user, $pegawaiNip) {
-                    $query->where('pembuat_id', $user->id);
-                    if ($pegawaiNip) {
-                        $query->orWhereHas('spd', function ($sq) use ($pegawaiNip) {
-                            $sq->where('nip_pegawai', $pegawaiNip);
-                        });
-                    }
-                });
-            });
-        }
-
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('nomor_kwitansi', 'like', "%{$search}%")
-                    ->orWhereHas('rincian.spd', function ($sq) use ($search) {
-                        $sq->where('nomor_spd', 'like', "%{$search}%")
-                            ->orWhere('pegawai_ditugaskan', 'like', "%{$search}%");
-                    });
-            });
-        }
-
-        $kwitansis = $query->latest()->paginate((int) $request->input('per_page', 10));
+        // Set strictPersonal = true agar halaman ini murni menjadi "Kwitansi Saya"
+        // sehingga Admin sekalipun hanya melihat kwitansi miliknya sendiri di sini.
+        $kwitansis = $this->kwitansiService->getAllLatest($filters, $perPage, true);
 
         return view('pages.kwitansi.index', compact('kwitansis'));
     }

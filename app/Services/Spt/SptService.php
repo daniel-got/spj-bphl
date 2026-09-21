@@ -57,10 +57,10 @@ class SptService
         if (! empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('nomor_spt', 'like', '%'.$search.'%')
-                    ->orWhere('pegawai_ditugaskan', 'like', '%'.$search.'%')
-                    ->orWhere('tujuan_kegiatan', 'like', '%'.$search.'%')
-                    ->orWhere('tempat_tujuan', 'like', '%'.$search.'%');
+                $q->where('nomor_spt', 'ilike', '%'.$search.'%')
+                    ->orWhereRaw('pegawai_ditugaskan::text ILIKE ?', ['%'.$search.'%'])
+                    ->orWhere('tujuan_kegiatan', 'ilike', '%'.$search.'%')
+                    ->orWhere('tempat_tujuan', 'ilike', '%'.$search.'%');
             });
         }
 

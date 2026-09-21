@@ -83,7 +83,7 @@ return [
         // --- GRUP: OPERASIONAL (Input & Verifikasi) ---
         [
             'header' => 'Operasional',
-            'roles' => ['admin', 'pembuat_spt', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
+            'roles' => [ 'pembuat_spt', 'verifikator', 'kepala_balai', 'kepala_tu', 'kepala_seksi_pephphl', 'kepala_seksi_ppphphl'],
         ],
         [
             'label' => 'Dashboard SPT',
@@ -95,7 +95,7 @@ return [
             'label' => 'Kelola SPT Pegawai',
             'url' => '/user/spt/kelola',
             'icon' => 'pencil-square',
-            'roles' => ['admin', 'pembuat_spt'],
+            'roles' => ['pembuat_spt'],
         ],
         [
             'label' => 'Verifikasi SPT',
@@ -122,16 +122,31 @@ return [
             'roles' => ['admin'],
         ],
         [
-            'label' => 'Kelola SPD',
-            'url' => '/admin/kelola-spd',
-            'icon' => 'clipboard-document-list',
+            'label' => 'Kelola Dokumen',
+            'icon' => 'document-text',
             'roles' => ['admin'],
-        ],
-        [
-            'label' => 'Kelola Rincian SPJ',
-            'url' => '/admin/kelola-rincian',
-            'icon' => 'calculator',
-            'roles' => ['admin'],
+            'sub_items' => [
+                [
+                    'label' => 'Kelola SPT',
+                    'url' => '/admin/kelola-spt',
+                    'icon' => 'document-text',
+                ],
+                [
+                    'label' => 'Kelola SPD',
+                    'url' => '/admin/kelola-spd',
+                    'icon' => 'clipboard-document-list',
+                ],
+                [
+                    'label' => 'Kelola Rincian SPJ',
+                    'url' => '/admin/kelola-rincian',
+                    'icon' => 'calculator',
+                ],
+                [
+                    'label' => 'Kelola Kwitansi',
+                    'url' => '/admin/kelola-kwitansi',
+                    'icon' => 'document-check',
+                ],
+            ],
         ],
         [
             'label' => 'Data Uang Harian',

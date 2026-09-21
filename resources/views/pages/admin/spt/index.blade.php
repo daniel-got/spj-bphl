@@ -60,7 +60,7 @@
 
                             {{-- Filter & Pencarian --}}
                             <div class="mb-6 mt-2 border-b border-border-custom pb-6">
-                                <form method="GET" action="{{ route('user.spt.kelola') }}">
+                                <form method="GET" action="{{ route('admin.kelola-spt.index') }}">
                                     <input type="hidden" name="status" value="{{ request('status') }}">
 
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
@@ -157,13 +157,13 @@
                                     $editLink = $canEdit
                                         ? '<a href="' . route('user.spt.edit', $spt->id) . '" class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover" title="Edit SPT">Edit</a>'
                                         : '';
-
-                                     $deleteForm = $canEdit
-                                         ? '<form action="' . route('user.spt.destroy', $spt->id) . '" method="POST" class="inline-block" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus SPT ini?\')">
-                                             ' . csrf_field() . method_field("DELETE") . '
-                                             <button type="submit" class="!px-2 !py-1 text-xs font-semibold text-danger hover:text-red-700 bg-transparent border-0 cursor-pointer" title="Hapus SPT">Hapus</button>
-                                            </form>'
-                                         : '<span class="text-muted text-xs">-</span>';
+// agar server tidak perlu melakukan render Blade sama sekali, yang jauh lebih ringan dan cepat
+                                    $deleteForm = $canEdit
+                                        ? '<form action="' . route('user.spt.destroy', $spt->id) . '" method="POST" class="inline-block" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus SPT ini?\')">
+                                            ' . csrf_field() . method_field("DELETE") . '
+                                            <button type="submit" class="!px-2 !py-1 text-xs font-semibold text-danger hover:text-red-700 bg-transparent border-0 cursor-pointer" title="Hapus SPT">Hapus</button>
+                                           </form>'
+                                        : '<span class="text-muted text-xs">-</span>';
 
                                     return [
                                         $iteration++,
